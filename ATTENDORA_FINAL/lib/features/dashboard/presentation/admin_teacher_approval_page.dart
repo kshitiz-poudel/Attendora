@@ -10,6 +10,7 @@ import '../../../core/constants/email_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../auth/providers.dart';
+import '../../shared/providers.dart';
 import 'admin_shell.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
@@ -547,10 +548,30 @@ class _AdminTeacherApprovalPageState
 
     if (confirmed == true) {
       try {
+        // Remove the teacher from any class groups they were added to
+        // during signup, before deleting their profile.
+        final classGroupRepo = ref.read(classGroupRepositoryProvider);
+        await classGroupRepo.removeUserFromAllGroups(teacherId);
+
+        // Fetch idNumber before deleting so we can clean up the id_index lock.
+        final userSnap = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(teacherId)
+            .get();
+        final idNumber = userSnap.data()?['idNumber'] as String?;
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(teacherId)
             .delete();
+
+        // Free up the roll number so the applicant can sign up again.
+        if (idNumber != null && idNumber.isNotEmpty) {
+          await FirebaseFirestore.instance
+              .collection('id_index')
+              .doc(idNumber)
+              .delete();
+        }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

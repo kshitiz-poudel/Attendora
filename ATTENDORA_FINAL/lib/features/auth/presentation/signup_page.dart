@@ -234,9 +234,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                                 const SizedBox(height: 20),
 
-                                // Class group selection for students
-                                if (_role == UserRole.student)
-                                  Consumer(
+                                // Class group selection for both students and teachers
+                                Consumer(
                                     builder: (context, ref, child) {
                                       final classGroupsAsync = ref.watch(
                                         allClassGroupsListProvider,
@@ -346,19 +345,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                               return;
                                             }
 
-                                            if (_role == UserRole.student) {
-                                              if (_selectedLectureGroupId ==
-                                                      null ||
-                                                  _selectedLabGroupId == null) {
-                                                ErrorDialog.show(
-                                                  context,
-                                                  title:
-                                                      'Class Groups Required',
-                                                  message:
-                                                      'Please select both a Lecture Group and a Lab Group.',
-                                                );
-                                                return;
-                                              }
+                                            if (_selectedLectureGroupId ==
+                                                    null ||
+                                                _selectedLabGroupId == null) {
+                                              ErrorDialog.show(
+                                                context,
+                                                title: 'Class Groups Required',
+                                                message:
+                                                    'Please select both a Lecture Group and a Lab Group.',
+                                              );
+                                              return;
                                             }
 
                                             if (_password.text.length < 6) {

@@ -117,9 +117,14 @@ service cloud.firestore {
           isSuperAdmin()
         );
 
-        // Student marks own attendance or Teacher manually marks
+        // Student marks own attendance (only while the session is still
+        // active and has not expired) or the owning Teacher/Admin marks manually.
         allow create, update: if isAuthenticated() && (
-          request.auth.uid == studentUid ||
+          (
+            request.auth.uid == studentUid &&
+            get(/databases/$(database)/documents/sessions/$(sessionId)).data.get('active', false) == true &&
+            get(/databases/$(database)/documents/sessions/$(sessionId)).data.get('expiresAt', request.time) > request.time
+          ) ||
           get(/databases/$(database)/documents/sessions/$(sessionId)).data.get('teacherUid', '') == request.auth.uid ||
           isSuperAdmin()
         );

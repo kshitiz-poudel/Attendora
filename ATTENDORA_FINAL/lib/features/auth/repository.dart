@@ -465,7 +465,10 @@ class AuthRepository {
         'updatedAt': now.toIso8601String(),
       };
 
-      if (role == UserRole.student) {
+      final isStudent = role == UserRole.student;
+      final isTeacher = role == UserRole.teacher;
+
+      if (isStudent || isTeacher) {
         if (lectureGroupId != null) userDoc['lectureGroup'] = lectureGroupId;
         if (labGroupId != null) userDoc['labGroup'] = labGroupId;
       }
@@ -476,9 +479,11 @@ class AuthRepository {
           .set(userDoc, SetOptions(merge: true));
       debugPrint('✅ User profile saved');
 
-      // If student selected class groups, add them to it
-      if (role == UserRole.student) {
-        debugPrint('👥 Adding student to groups...');
+      // If the user selected class groups, add them to those groups.
+      // Students go into studentUids; teachers go into teacherUids.
+      if (isStudent || isTeacher) {
+        debugPrint('👥 Adding user to groups...');
+        final membershipField = isStudent ? 'studentUids' : 'teacherUids';
         final batch = _firestore.batch();
         bool batchHasOps = false;
 
@@ -487,7 +492,7 @@ class AuthRepository {
               .collection('class_groups')
               .doc(lectureGroupId);
           batch.update(lectureRef, {
-            'studentUids': FieldValue.arrayUnion([uid]),
+            membershipField: FieldValue.arrayUnion([uid]),
             'updatedAt': FieldValue.serverTimestamp(),
           });
           batchHasOps = true;
@@ -496,7 +501,7 @@ class AuthRepository {
         if (labGroupId != null && labGroupId.isNotEmpty) {
           final labRef = _firestore.collection('class_groups').doc(labGroupId);
           batch.update(labRef, {
-            'studentUids': FieldValue.arrayUnion([uid]),
+            membershipField: FieldValue.arrayUnion([uid]),
             'updatedAt': FieldValue.serverTimestamp(),
           });
           batchHasOps = true;
@@ -517,7 +522,7 @@ class AuthRepository {
                     .collection('class_groups')
                     .doc(lectureGroupId)
                     .update({
-                      'studentUids': FieldValue.arrayUnion([uid]),
+                      membershipField: FieldValue.arrayUnion([uid]),
                       'institutionCode': institutionCode,
                       'updatedAt': FieldValue.serverTimestamp(),
                     });
@@ -527,7 +532,7 @@ class AuthRepository {
                     .collection('class_groups')
                     .doc(labGroupId)
                     .update({
-                      'studentUids': FieldValue.arrayUnion([uid]),
+                      membershipField: FieldValue.arrayUnion([uid]),
                       'institutionCode': institutionCode,
                       'updatedAt': FieldValue.serverTimestamp(),
                     });
