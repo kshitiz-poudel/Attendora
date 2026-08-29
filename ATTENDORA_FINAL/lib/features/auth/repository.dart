@@ -19,7 +19,7 @@ class AuthRepository {
            GoogleSignIn(
              scopes: const ['email'],
              clientId: kIsWeb
-                 ? '582817926495-05pkje57gk3lmd8aijl5p8c55sf3jd3c.apps.googleusercontent.com'
+                 ? '623151828674-5ptejpfng8qpd53uev3sk7cr4r2f41g7.apps.googleusercontent.com'
                  : null,
            );
 

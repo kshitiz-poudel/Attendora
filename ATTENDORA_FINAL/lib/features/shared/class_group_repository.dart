@@ -202,7 +202,22 @@ class ClassGroupRepository {
     for (final d in byLegacy.docs) {
       map[d.id] = ClassGroup.fromFirestore(d);
     }
-    return map.values.toList();
+
+    if (map.isNotEmpty) {
+      return map.values.toList();
+    }
+
+    // Fallback: nothing matched this institutionCode exactly (e.g. groups
+    // created before an institutionCode was set, or a mismatch between the
+    // code the group was tagged with and the code the signing-up user
+    // selected). Rather than silently showing an empty dropdown and
+    // blocking signup, fall back to returning every group that exists.
+    // This keeps signup working for small/single-institution deployments
+    // where strict isolation isn't the priority, while multi-institution
+    // deployments still get properly scoped results whenever there IS a
+    // match above.
+    final all = await _groupsCollection.get();
+    return all.docs.map((doc) => ClassGroup.fromFirestore(doc)).toList();
   }
 
   /// Backfill institutionCode for legacy class_groups that are missing it.

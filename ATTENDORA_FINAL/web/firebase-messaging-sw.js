@@ -2,12 +2,12 @@ importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
 importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js");
 
 firebase.initializeApp({
-  apiKey: "AIzaSyBMS5TGBrhbeg0ywkHr_htTsmZRcCkpEZE",
-  authDomain: "attendiify.firebaseapp.com",
-  projectId: "attendiify",
-  storageBucket: "attendiify.firebasestorage.app",
-  messagingSenderId: "582817926495",
-  appId: "1:582817926495:web:86136f1d438c6430f2faea"
+  apiKey: "AIzaSyA68g7y_QxmC8bvRVTI-rRNNUSEbrEuCRY",
+  authDomain: "attendora-a0fc5.firebaseapp.com",
+  projectId: "attendora-a0fc5",
+  storageBucket: "attendora-a0fc5.firebasestorage.app",
+  messagingSenderId: "623151828674",
+  appId: "1:623151828674:web:5fe4c614fc8839db4e355b"
 });
 
 const messaging = firebase.messaging();

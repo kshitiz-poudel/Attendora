@@ -33,10 +33,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -50,19 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBMS5TGBrhbeg0ywkHr_htTsmZRcCkpEZE',
-    appId: '1:582817926495:web:86136f1d438c6430f2faea',
-    messagingSenderId: '582817926495',
-    projectId: 'attendiify',
-    authDomain: 'attendiify.firebaseapp.com',
-    storageBucket: 'attendiify.firebasestorage.app',
+    apiKey: 'AIzaSyA68g7y_QxmC8bvRVTI-rRNNUSEbrEuCRY',
+    appId: '1:623151828674:web:5fe4c614fc8839db4e355b',
+    messagingSenderId: '623151828674',
+    projectId: 'attendora-a0fc5',
+    authDomain: 'attendora-a0fc5.firebaseapp.com',
+    storageBucket: 'attendora-a0fc5.firebasestorage.app',
+    measurementId: 'G-81XLWREGSS',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAOyCaoGXf1mdI5HK5o4_x8644sDbmwxpo',
-    appId: '1:582817926495:android:c399ffdb18da1b2df2faea',
-    messagingSenderId: '582817926495',
-    projectId: 'attendiify',
-    storageBucket: 'attendiify.firebasestorage.app',
+    apiKey: 'AIzaSyB241-eOHGI0OOukCp3XOyWphNS-kXsVd4',
+    appId: '1:623151828674:android:b4c9784d56022fb24e355b',
+    messagingSenderId: '623151828674',
+    projectId: 'attendora-a0fc5',
+    storageBucket: 'attendora-a0fc5.firebasestorage.app',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyA68g7y_QxmC8bvRVTI-rRNNUSEbrEuCRY',
+    appId: '1:623151828674:web:ca90f25b5be8e89f4e355b',
+    messagingSenderId: '623151828674',
+    projectId: 'attendora-a0fc5',
+    authDomain: 'attendora-a0fc5.firebaseapp.com',
+    storageBucket: 'attendora-a0fc5.firebasestorage.app',
+    measurementId: 'G-60WW562SEP',
   );
 }

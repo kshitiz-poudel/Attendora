@@ -876,7 +876,7 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Add missing institutionCode fields to all sessions, scheduled_sessions, and attendance records. This is needed if you see permission errors.',
+            'Add missing institutionCode fields to all sessions, scheduled_sessions, attendance records, and class groups. This is needed if you see permission errors or a group not showing up during signup.',
             style: GoogleFonts.outfit(color: Colors.white70),
           ),
           const SizedBox(height: 24),

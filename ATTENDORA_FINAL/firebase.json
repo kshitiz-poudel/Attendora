@@ -3,17 +3,17 @@
     "platforms": {
       "android": {
         "default": {
-          "projectId": "attendiify",
-          "appId": "1:582817926495:android:c399ffdb18da1b2df2faea",
+          "projectId": "attendora-a0fc5",
+          "appId": "1:623151828674:android:b4c9784d56022fb24e355b",
           "fileOutput": "android/app/google-services.json"
         }
       },
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "attendiify",
+          "projectId": "attendora-a0fc5",
           "configurations": {
-            "android": "1:582817926495:android:c399ffdb18da1b2df2faea",
-            "web": "1:582817926495:web:86136f1d438c6430f2faea"
+            "android": "1:623151828674:android:b4c9784d56022fb24e355b",
+            "web": "1:623151828674:web:5fe4c614fc8839db4e355b"
           }
         }
       }

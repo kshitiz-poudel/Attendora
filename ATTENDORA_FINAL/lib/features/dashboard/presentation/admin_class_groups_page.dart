@@ -9,6 +9,7 @@ import '../../shared/widgets/empty_state.dart';
 import '../../shared/models/class_group.dart';
 import '../../shared/providers.dart';
 import '../../auth/providers.dart';
+import '../../institutions/providers.dart';
 import 'admin_shell.dart';
 import '../../../core/responsive_utils.dart';
 
@@ -418,6 +419,15 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
     final nameController = TextEditingController();
     final descController = TextEditingController();
     String selectedType = 'Lecture';
+    // Only used as a fallback when the signed-in admin has no institutionCode
+    // on their own profile (e.g. a super admin managing multiple
+    // institutions). Without this, the group would silently save with a
+    // null institutionCode and become invisible to institution-scoped
+    // queries (e.g. the signup dropdown).
+    String? selectedInstitutionCode;
+    final auth = ref.read(authControllerProvider);
+    final needsInstitutionPicker =
+        auth.institutionCode == null || auth.institutionCode!.isEmpty;
 
     showDialog(
       context: context,
@@ -483,6 +493,53 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                   }
                 },
               ),
+              if (needsInstitutionPicker) ...[
+                const SizedBox(height: 12),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final institutionsAsync = ref.watch(
+                      institutionsStreamProvider,
+                    );
+                    return institutionsAsync.when(
+                      data: (institutions) {
+                        return DropdownButtonFormField<String>(
+                          initialValue: selectedInstitutionCode,
+                          dropdownColor: const Color(0xFF1E293B),
+                          style: GoogleFonts.outfit(color: Colors.white),
+                          decoration: fluentInputDecoration(
+                            context: context,
+                            labelText: 'Institution',
+                            prefixIcon: Icons.school,
+                            hintText: 'Required: select institution',
+                          ),
+                          items: institutions
+                              .map(
+                                (inst) => DropdownMenuItem(
+                                  value: inst.code,
+                                  child: Text(
+                                    '${inst.name} (${inst.code})',
+                                    style: GoogleFonts.outfit(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() => selectedInstitutionCode = value);
+                          },
+                        );
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, st) => Text(
+                        'Error loading institutions: $e',
+                        style: GoogleFonts.outfit(color: Colors.red),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ],
           ),
           actions: [
@@ -502,15 +559,30 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                   return;
                 }
 
+                final resolvedInstitutionCode = needsInstitutionPicker
+                    ? selectedInstitutionCode
+                    : auth.institutionCode;
+
+                if (resolvedInstitutionCode == null ||
+                    resolvedInstitutionCode.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please select an institution for this group',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 try {
-                  final auth = ref.read(authControllerProvider);
                   final repo = ref.read(classGroupRepositoryProvider);
                   await repo.createGroup(
                     name: nameController.text.trim(),
                     description: descController.text.trim().isEmpty
                         ? null
                         : descController.text.trim(),
-                    institutionCode: auth.institutionCode,
+                    institutionCode: resolvedInstitutionCode,
                     type: selectedType,
                   );
 

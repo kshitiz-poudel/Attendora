@@ -195,45 +195,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 ),
                                 const SizedBox(height: 20),
 
-                                // Role Dropdown
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Role',
-                                      style: GoogleFonts.outfit(
-                                        color: Colors.white70,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    GlassDropdown<UserRole>(
-                                      value: _role,
-                                      hint: 'Select Role',
-                                      items: const [
-                                        DropdownMenuItem(
-                                          value: UserRole.student,
-                                          child: Text('Student'),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: UserRole.teacher,
-                                          child: Text(
-                                            'Faculty (requires approval)',
-                                          ),
-                                        ),
-                                      ],
-                                      onChanged: (v) => setState(() {
-                                        _role = v ?? UserRole.student;
-                                        _selectedLectureGroupId = null;
-                                        _selectedLabGroupId = null;
-                                      }),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 20),
-
                                 // Class group selection for both students and teachers
                                 Consumer(
                                     builder: (context, ref, child) {
@@ -299,6 +260,54 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                       );
                                     },
                                   ),
+
+                                const SizedBox(height: 20),
+
+                                // Role selector — tick-mark style (Student / Faculty)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Role',
+                                      style: GoogleFonts.outfit(
+                                        color: Colors.white70,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildRoleChoiceCard(
+                                            label: 'Student',
+                                            selected:
+                                                _role == UserRole.student,
+                                            onTap: () => setState(() {
+                                              _role = UserRole.student;
+                                              _selectedLectureGroupId = null;
+                                              _selectedLabGroupId = null;
+                                            }),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _buildRoleChoiceCard(
+                                            label: 'Faculty',
+                                            sublabel: 'Requires approval',
+                                            selected:
+                                                _role == UserRole.teacher,
+                                            onTap: () => setState(() {
+                                              _role = UserRole.teacher;
+                                              _selectedLectureGroupId = null;
+                                              _selectedLabGroupId = null;
+                                            }),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
 
                                 const SizedBox(height: 32),
 
@@ -490,6 +499,82 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRoleChoiceCard({
+    required String label,
+    String? sublabel,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? const Color(0xFF10B981).withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? const Color(0xFF10B981)
+                : Colors.white.withValues(alpha: 0.15),
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected ? const Color(0xFF10B981) : Colors.transparent,
+                border: Border.all(
+                  color: selected
+                      ? const Color(0xFF10B981)
+                      : Colors.white.withValues(alpha: 0.4),
+                  width: 2,
+                ),
+              ),
+              child: selected
+                  ? const Icon(Icons.check, size: 15, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (sublabel != null)
+                    Text(
+                      sublabel,
+                      style: GoogleFonts.outfit(
+                        color: Colors.white54,
+                        fontSize: 11,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

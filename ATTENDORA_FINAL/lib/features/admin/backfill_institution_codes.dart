@@ -228,6 +228,88 @@ class InstitutionCodeBackfillService {
     return (updated: updated, skipped: skipped, errors: errors);
   }
 
+  /// Backfill institutionCode on all class_groups that are missing it.
+  /// Source of truth, in order of preference: an assigned teacher's
+  /// institutionCode, then an enrolled student's institutionCode. Groups
+  /// with neither (e.g. brand new, empty groups created by a super admin
+  /// with no institutionCode on their own profile) are skipped as errors
+  /// and need a manual fix from the admin UI (recreate with an institution
+  /// selected, or set the field directly in Firestore).
+  Future<({int updated, int skipped, int errors})>
+  backfillClassGroups() async {
+    int updated = 0;
+    int skipped = 0;
+    int errors = 0;
+
+    try {
+      final snapshot = await _firestore.collection('class_groups').get();
+
+      for (final doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+
+          if (data['institutionCode'] != null &&
+              data['institutionCode'] != '') {
+            skipped++;
+            continue;
+          }
+
+          String? institutionCode;
+
+          final teacherUids = List<String>.from(data['teacherUids'] ?? []);
+          for (final uid in teacherUids) {
+            final teacherDoc = await _firestore
+                .collection('users')
+                .doc(uid)
+                .get();
+            final code = teacherDoc.data()?['institutionCode'] as String?;
+            if (code != null && code.isNotEmpty) {
+              institutionCode = code;
+              break;
+            }
+          }
+
+          if (institutionCode == null) {
+            final studentUids = List<String>.from(data['studentUids'] ?? []);
+            for (final uid in studentUids) {
+              final studentDoc = await _firestore
+                  .collection('users')
+                  .doc(uid)
+                  .get();
+              final code = studentDoc.data()?['institutionCode'] as String?;
+              if (code != null && code.isNotEmpty) {
+                institutionCode = code;
+                break;
+              }
+            }
+          }
+
+          if (institutionCode == null) {
+            errors++;
+            appLogger.i(
+              'Class group ${doc.id} has no teacher/student to infer institutionCode from; needs manual fix',
+            );
+            continue;
+          }
+
+          await doc.reference.update({'institutionCode': institutionCode});
+          updated++;
+          appLogger.i(
+            '✓ Updated class group ${doc.id} with institutionCode: $institutionCode',
+          );
+        } catch (e) {
+          errors++;
+          appLogger.i('Error processing class group ${doc.id}: $e');
+        }
+      }
+    } catch (e) {
+      appLogger.i('Error fetching class groups: $e');
+      rethrow;
+    }
+
+    return (updated: updated, skipped: skipped, errors: errors);
+  }
+
   /// Run all backfill operations
   Future<Map<String, dynamic>> backfillAll() async {
     appLogger.i('Starting backfill of institutionCode on all collections...\n');
@@ -250,18 +332,27 @@ class InstitutionCodeBackfillService {
       'Attendance: ${attendanceResult.updated} updated, ${attendanceResult.skipped} skipped, ${attendanceResult.errors} errors\n',
     );
 
+    appLogger.i('4. Backfilling class_groups...');
+    final classGroupsResult = await backfillClassGroups();
+    appLogger.i(
+      'Class Groups: ${classGroupsResult.updated} updated, ${classGroupsResult.skipped} skipped, ${classGroupsResult.errors} errors\n',
+    );
+
     final totalUpdated =
         sessionsResult.updated +
         scheduledResult.updated +
-        attendanceResult.updated;
+        attendanceResult.updated +
+        classGroupsResult.updated;
     final totalSkipped =
         sessionsResult.skipped +
         scheduledResult.skipped +
-        attendanceResult.skipped;
+        attendanceResult.skipped +
+        classGroupsResult.skipped;
     final totalErrors =
         sessionsResult.errors +
         scheduledResult.errors +
-        attendanceResult.errors;
+        attendanceResult.errors +
+        classGroupsResult.errors;
 
     appLogger.i('✅ Backfill complete!');
     appLogger.i(
@@ -283,6 +374,11 @@ class InstitutionCodeBackfillService {
         'updated': attendanceResult.updated,
         'skipped': attendanceResult.skipped,
         'errors': attendanceResult.errors,
+      },
+      'class_groups': {
+        'updated': classGroupsResult.updated,
+        'skipped': classGroupsResult.skipped,
+        'errors': classGroupsResult.errors,
       },
       'totals': {
         'updated': totalUpdated,
