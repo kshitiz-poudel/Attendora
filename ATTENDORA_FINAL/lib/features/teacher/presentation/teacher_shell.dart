@@ -51,6 +51,11 @@ class TeacherShell extends ConsumerWidget {
         path: '/teacher/attendance',
       ),
       SidebarItem(
+        icon: Icons.location_on_rounded,
+        label: 'My Geo-Attendance',
+        path: '/teacher/geo-attendance',
+      ),
+      SidebarItem(
         icon: Icons.notifications_rounded,
         label: 'Notifications',
         path: '/teacher/notifications',

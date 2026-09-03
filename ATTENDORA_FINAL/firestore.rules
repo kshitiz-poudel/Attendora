@@ -177,6 +177,25 @@ service cloud.firestore {
     }
 
     // ===============================================================
+    // Faculty Geo-Attendance
+    // ===============================================================
+    match /geo_attendance_settings/{institutionCode} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isInstitutionAdmin(institutionCode);
+    }
+
+    match /faculty_geo_attendance/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && (
+        request.resource.data.get('facultyId', '') == request.auth.uid ||
+        isSuperAdmin() ||
+        isInstitutionAdmin(request.resource.data.get('institutionCode', ''))
+      );
+      allow delete: if isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''));
+    }
+
+    // ===============================================================
     // System Settings & Health
     // ===============================================================
     match /_system/{docId} {

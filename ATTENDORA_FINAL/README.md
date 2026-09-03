@@ -279,3 +279,16 @@ Attendora/
 
 * **License:** Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
 * **Contributing:** Issues, ideas, and pull requests are welcomed! Visit the [Issues Tab](https://github.com/Kshitiz/Attendora-Smart-Attendance-System/issues) to report bugs or request features.
+
+
+## Faculty Geo-Attendance Extension
+
+Attendora now includes an advanced faculty attendance workflow. Administrators configure a campus center and geofence radius. Faculty can check in and check out only after the app verifies the current location, captures a live camera photo, uploads the evidence to Firebase Storage, and stores the location, GPS accuracy, distance from campus, and server timestamp in Firestore. Location is requested only when attendance is explicitly marked; there is no continuous background tracking.
+
+### New routes
+- `/teacher/geo-attendance` — faculty check-in/check-out
+- `/admin/faculty-geo-attendance` — administrator geofence configuration and daily monitoring
+
+### Firebase collections
+- `geo_attendance_settings/{institutionCode}`
+- `faculty_geo_attendance/{institutionCode}_{facultyId}_{yyyy-MM-dd}`

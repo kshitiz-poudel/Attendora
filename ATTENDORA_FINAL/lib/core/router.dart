@@ -51,6 +51,8 @@ import '../features/student/presentation/attendance_history_page.dart';
 import '../features/student/presentation/student_home_page.dart';
 import '../features/student/presentation/student_analytics_page.dart';
 import '../features/splash/presentation/splash_page.dart';
+import '../features/faculty_geo_attendance/presentation/faculty_geo_attendance_page.dart';
+import '../features/faculty_geo_attendance/presentation/faculty_geo_attendance_admin_page.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   // Keep a single router instance and refresh it when auth changes.
@@ -199,6 +201,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: 'broadcast',
             builder: (context, state) => const AdminBroadcastPage(),
           ),
+          GoRoute(
+            path: 'faculty-geo-attendance',
+            builder: (context, state) => const FacultyGeoAttendanceAdminPage(),
+          ),
         ],
       ),
       GoRoute(
@@ -318,6 +324,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'settings',
             builder: (context, state) => const TeacherSettingsPage(),
+          ),
+          GoRoute(
+            path: 'geo-attendance',
+            builder: (context, state) => const FacultyGeoAttendancePage(),
           ),
         ],
       ),

@@ -165,6 +165,19 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "collectionId": "faculty_geo_attendance",
+      "fields": [
+        {
+          "fieldPath": "institutionCode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": [

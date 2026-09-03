@@ -53,7 +53,7 @@
             "value": "0"
           }
         ]
-      },                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+      },
       {
         "source": "**/*.@(png|jpg|jpeg|gif|svg|webp|ico|ttf|woff|woff2)",
         "headers": [
@@ -64,5 +64,8 @@
         ]
       }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
-}                                                                                                                                                                                                                                                                                                                                                                                                                                   
+}

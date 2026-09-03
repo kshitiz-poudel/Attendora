@@ -75,6 +75,7 @@ class _AdminShellState extends ConsumerState<AdminShell> {
           '/admin/reports',
           '/admin/profile',
           '/admin/about',
+          '/admin/faculty-geo-attendance',
         ].contains(location);
 
         return Scaffold(
@@ -462,6 +463,11 @@ class _Sidebar extends ConsumerWidget {
         icon: Icons.school_rounded,
         label: 'Teacher Analytics',
         path: '/admin/teachers-analytics',
+      ),
+      SidebarItem(
+        icon: Icons.location_on_rounded,
+        label: 'Faculty Geo-Attendance',
+        path: '/admin/faculty-geo-attendance',
       ),
       SidebarItem.divider(),
       SidebarItem.header('Analytics'),

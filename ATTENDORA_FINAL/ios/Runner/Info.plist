@@ -43,6 +43,11 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
+	<key>NSCameraUsageDescription</key>
+	<string>Attendora uses the camera to capture live faculty attendance verification photos.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Attendora uses your location only when you mark entry or exit attendance to verify the campus geofence.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
