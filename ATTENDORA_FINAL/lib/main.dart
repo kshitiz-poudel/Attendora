@@ -16,7 +16,16 @@ import 'error_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Web and Android use the generated FlutterFire options. iOS uses the
+  // native GoogleService-Info.plist generated for the SAME Firebase project.
+  // This keeps the mobile app and Chrome/web app connected to the same backend.
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    await Firebase.initializeApp();
+  } else {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 
   // On web, cloud_firestore's IndexedDB-backed offline persistence has a
   // known bug where its internal watch-target bookkeeping can end up in a
@@ -27,7 +36,11 @@ Future<void> main() async {
   // so disabling it entirely on web removes this whole class of bug.
   if (kIsWeb) {
     FirebaseFirestore.instance.settings = const Settings(
+      // Avoid IndexedDB persistence corruption and use a more resilient
+      // WebChannel transport for Chrome/local development.
       persistenceEnabled: false,
+      webExperimentalForceLongPolling: true,
+      webExperimentalAutoDetectLongPolling: false,
     );
   }
 

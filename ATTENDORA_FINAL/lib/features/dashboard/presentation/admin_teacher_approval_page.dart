@@ -16,56 +16,46 @@ import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
 
-// Provider for pending teachers (not approved) - RBAC SCOPED
-final pendingTeachersProvider = StreamProvider<List<Map<String, dynamic>>>((
-  ref,
-) {
+// A single stable listener is used for the complete teacher directory.  The
+// pending/approved lists are derived in memory. This avoids rapidly adding and
+// removing multiple Firestore watch targets when an approval changes a document.
+final teacherDirectoryProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
   final auth = ref.watch(authControllerProvider);
+  Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection('users');
 
-  // Institution Admin: Only see pending teachers from their institution
-  // Super Admin: See all pending teachers
-  Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection(
-    'users',
-  );
-
-  if (!auth.isSuperAdmin && auth.institutionCode != null) {
-    // Institution Admin: Scope to their institution
-    q = q.where('institutionCode', isEqualTo: auth.institutionCode);
+  if (!auth.isSuperAdmin && auth.institutionCode != null && auth.institutionCode!.isNotEmpty) {
+    query = query.where('institutionCode', isEqualTo: auth.institutionCode);
   }
-  // Super Admin: No institution filter - see all
 
-  // Filter for pending teachers (role = teacher AND approved = false)
-  q = q.where('role', isEqualTo: 'teacher').where('approved', isEqualTo: false);
+  return query.snapshots().map((snap) {
+    final teachers = snap.docs
+        .map((doc) => <String, dynamic>{'id': doc.id, ...doc.data()})
+        .where((data) {
+          final role = (data['role'] as String? ?? '').toLowerCase();
+          // Support legacy demo accounts created with either role name.
+          return role == 'teacher' || role == 'faculty';
+        })
+        .toList();
 
-  return q.snapshots().map(
-    (snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList(),
-  );
+    teachers.sort((a, b) {
+      final aName = (a['displayName'] as String? ?? '').toLowerCase();
+      final bName = (b['displayName'] as String? ?? '').toLowerCase();
+      return aName.compareTo(bName);
+    });
+    return teachers;
+  });
 });
 
-// Provider for approved teachers - RBAC SCOPED
-final approvedTeachersProvider = StreamProvider<List<Map<String, dynamic>>>((
-  ref,
-) {
-  final auth = ref.watch(authControllerProvider);
+final pendingTeachersProvider = Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  return ref.watch(teacherDirectoryProvider).whenData(
+        (teachers) => teachers.where((teacher) => teacher['approved'] != true).toList(),
+      );
+});
 
-  // Institution Admin: Only see approved teachers from their institution
-  // Super Admin: See all approved teachers
-  Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection(
-    'users',
-  );
-
-  if (!auth.isSuperAdmin && auth.institutionCode != null) {
-    // Institution Admin: Scope to their institution
-    q = q.where('institutionCode', isEqualTo: auth.institutionCode);
-  }
-  // Super Admin: No institution filter - see all
-
-  // Filter for approved teachers (role = teacher AND approved = true)
-  q = q.where('role', isEqualTo: 'teacher').where('approved', isEqualTo: true);
-
-  return q.snapshots().map(
-    (snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList(),
-  );
+final approvedTeachersProvider = Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  return ref.watch(teacherDirectoryProvider).whenData(
+        (teachers) => teachers.where((teacher) => teacher['approved'] == true).toList(),
+      );
 });
 
 class AdminTeacherApprovalPage extends ConsumerStatefulWidget {
@@ -448,11 +438,11 @@ class _AdminTeacherApprovalPageState
       await FirebaseFirestore.instance
           .collection('users')
           .doc(teacherId)
-          .update({
+          .set({
             'approved': true,
             'updatedAt': FieldValue.serverTimestamp(),
             'approvedAt': FieldValue.serverTimestamp(),
-          });
+          }, SetOptions(merge: true));
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

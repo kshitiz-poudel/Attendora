@@ -126,7 +126,7 @@ final pendingTeachersCountProvider = StreamProvider<int>((ref) {
 
   return q.snapshots().map((snap) {
     return snap.docs.where((doc) {
-      return doc.data()['role'] == 'teacher' && doc.data()['approved'] != true;
+      return _isTeacherRole(doc.data()['role']) && doc.data()['approved'] != true;
     }).length;
   });
 });
@@ -210,7 +210,7 @@ final pendingTeachersListProvider = StreamProvider<List<Map<String, dynamic>>>((
     // Filter for pending teachers
     var pendingTeachers = snap.docs
         .map((doc) => {'id': doc.id, ...doc.data()})
-        .where((data) => data['role'] == 'teacher' && data['approved'] == false)
+        .where((data) => _isTeacherRole(data['role']) && data['approved'] == false)
         .toList();
 
     // Sort by createdAt descending
@@ -224,6 +224,11 @@ final pendingTeachersListProvider = StreamProvider<List<Map<String, dynamic>>>((
     return pendingTeachers.take(5).toList();
   });
 });
+
+bool _isTeacherRole(dynamic role) {
+  final value = (role as String? ?? '').toLowerCase();
+  return value == 'teacher' || value == 'faculty';
+}
 
 DateTime _parseDateTime(dynamic value) {
   if (value == null) return DateTime(2000);

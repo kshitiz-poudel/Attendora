@@ -12,6 +12,34 @@ import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
 
+
+class _WebStep extends StatelessWidget {
+  const _WebStep({required this.number, required this.text});
+
+  final String number;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: Color(0xFF10B981),
+            shape: BoxShape.circle,
+          ),
+          child: Text(number, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Text(text, style: GoogleFonts.outfit(color: Colors.white70))),
+      ],
+    );
+  }
+}
+
 class GenerateQrPage extends ConsumerStatefulWidget {
   const GenerateQrPage({
     super.key,
@@ -54,6 +82,23 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
     _durationController.dispose();
     _radiusController.dispose();
     super.dispose();
+  }
+
+
+  static final Uri _androidDownloadUri = Uri.parse(
+    'https://drive.usercontent.google.com/download?id=1Ml0hlqjI1YckzSO89aKw3ymBwckjMSR5&export=download',
+  );
+
+  Future<void> _downloadAndroidApp() async {
+    final launched = await launchUrl(
+      _androidDownloadUri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched && mounted) {
+      setState(() {
+        _error = 'Unable to open the Android download link. Please try again later.';
+      });
+    }
   }
 
   Future<void> _startSession() async {
@@ -322,20 +367,18 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       Container(
                                         padding: const EdgeInsets.all(24),
                                         decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFF10B981,
-                                          ).withValues(alpha: 0.1),
+                                          color: const Color(0xFF10B981).withValues(alpha: 0.12),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
-                                          Icons.phonelink_ring_rounded,
+                                          Icons.phone_iphone_rounded,
                                           size: 64,
-                                          color: Color(0xFF10B981),
+                                          color: Color(0xFF34D399),
                                         ),
                                       ),
                                       const SizedBox(height: 24),
                                       Text(
-                                        'Use Mobile App to Start Session',
+                                        'Start securely from the attendora mobile app',
                                         style: GoogleFonts.outfit(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
@@ -343,74 +386,95 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
-                                      const SizedBox(height: 16),
+                                      const SizedBox(height: 12),
                                       Text(
-                                        'To ensure accurate location tracking, please start the session from the Attendora Mobile App on your phone.',
+                                        'The mobile app uses your phone GPS for a more reliable attendance session. Android and iPhone builds use the same Firebase project and the same teacher account.',
                                         style: GoogleFonts.outfit(
-                                          fontSize: 16,
+                                          fontSize: 15,
+                                          height: 1.5,
                                           color: Colors.white70,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
                                       const SizedBox(height: 24),
-                                      FilledButton.icon(
-                                        onPressed: () async {
-                                          final uri = Uri.parse(
-                                            'https://drive.google.com/uc?export=download&id=1Ml0hlqjI1YckzSO89aKw3ymBwckjMSR5',
-                                          );
-                                          await launchUrl(
-                                            uri,
-                                            mode:
-                                                LaunchMode.externalApplication,
-                                          );
-                                        },
-                                        icon: const Icon(
-                                          Icons.download_rounded,
-                                        ),
-                                        label: const Text('Download APK'),
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xFF10B981,
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 52,
+                                        child: ElevatedButton.icon(
+                                          onPressed: _downloadAndroidApp,
+                                          icon: const Icon(Icons.android_rounded),
+                                          label: Text(
+                                            'Download attendora for Android',
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 24,
-                                            vertical: 12,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF10B981),
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(14),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 24),
+                                      const SizedBox(height: 12),
                                       Container(
-                                        padding: const EdgeInsets.all(16),
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.05,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
+                                          color: Colors.white.withValues(alpha: 0.04),
+                                          borderRadius: BorderRadius.circular(14),
                                           border: Border.all(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.1,
-                                            ),
+                                            color: Colors.white.withValues(alpha: 0.10),
                                           ),
                                         ),
                                         child: Row(
                                           children: [
-                                            const Icon(
-                                              Icons.info_outline_rounded,
-                                              color: Colors.white70,
-                                            ),
-                                            const SizedBox(width: 16),
+                                            const Icon(Icons.phone_iphone_rounded,
+                                                color: Color(0xFF94A3B8)),
+                                            const SizedBox(width: 10),
                                             Expanded(
                                               child: Text(
-                                                'Once you start the session on your phone, the QR code will automatically appear here for students to scan.',
+                                                'iPhone version: install through the official iOS distribution link when it is published.',
                                                 style: GoogleFonts.outfit(
                                                   color: Colors.white70,
+                                                  fontSize: 13,
                                                 ),
                                               ),
                                             ),
                                           ],
                                         ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(alpha: 0.05),
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(alpha: 0.10),
+                                          ),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            _WebStep(number: '1', text: 'Open attendora on your Android phone or iPhone.'),
+                                            const SizedBox(height: 12),
+                                            _WebStep(number: '2', text: 'Sign in with this same teacher account.'),
+                                            const SizedBox(height: 12),
+                                            _WebStep(number: '3', text: 'Start the session and keep this page open.'),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'The active session and QR code will synchronize automatically through Firebase.',
+                                        style: GoogleFonts.outfit(
+                                          color: const Color(0xFF6EE7B7),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   )
@@ -446,7 +510,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Create New Session',
+                                                  'Create a secure attendance session',
                                                   style: GoogleFonts.outfit(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
@@ -455,7 +519,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  'Generate a QR code for students to scan',
+                                                  'GPS is captured from your phone before the QR session starts',
                                                   style: GoogleFonts.outfit(
                                                     fontSize: 14,
                                                     color: Colors.white70,
@@ -466,7 +530,9 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 32),
+                                      const SizedBox(height: 24),
+                                      _buildMobileSafetyStrip(),
+                                      const SizedBox(height: 24),
                                       _buildSubjectDropdown(context, ref),
                                       const SizedBox(height: 24),
                                       Row(
@@ -767,6 +833,29 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildMobileSafetyStrip() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10B981).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.22)),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.verified_user_outlined, color: Color(0xFF34D399)),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Live GPS verification is performed before your session begins.',
+              style: TextStyle(color: Colors.white70, height: 1.35),
+            ),
+          ),
+        ],
       ),
     );
   }

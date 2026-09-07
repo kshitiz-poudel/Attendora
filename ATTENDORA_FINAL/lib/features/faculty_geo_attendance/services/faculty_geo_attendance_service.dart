@@ -82,11 +82,25 @@ class FacultyGeoAttendanceService {
     required double distance,
     required String photoUrl,
   }) async {
+    if (type != 'checkIn' && type != 'checkOut') {
+      throw ArgumentError.value(type, 'type', 'Must be checkIn or checkOut');
+    }
     final now = DateTime.now();
     final date = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
     final docId = '${institutionCode}_${facultyId}_$date';
     final field = type == 'checkIn' ? 'checkIn' : 'checkOut';
     final ref = _firestore.collection('faculty_geo_attendance').doc(docId);
+    final existing = await ref.get();
+    final existingData = existing.data();
+
+    if (type == 'checkOut' && (existingData == null || existingData['checkIn'] == null)) {
+      throw Exception('Please mark entry attendance before marking exit.');
+    }
+    if (existingData != null && existingData[field] != null) {
+      throw Exception(type == 'checkIn'
+          ? 'Entry attendance has already been recorded for today.'
+          : 'Exit attendance has already been recorded for today.');
+    }
 
     final event = {
       'timestamp': FieldValue.serverTimestamp(),

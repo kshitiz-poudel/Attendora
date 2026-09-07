@@ -413,10 +413,11 @@ class AdminNotificationsPage extends ConsumerWidget {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(teacherId)
-          .update({
+          .set({
             'approved': true,
+            'approvedAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
-          });
+          }, SetOptions(merge: true));
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
