@@ -163,16 +163,15 @@ class NotificationRepository {
     }
 
     // 3. Merge and sort
-    return CombineLatestStream.list([personalStream, globalStream]).map((
-      lists,
-    ) {
-      final allNotifications = <NotificationModel>[];
-      for (var list in lists) {
-        allNotifications.addAll(list);
-      }
-      allNotifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      return allNotifications;
-    });
+    return CombineLatestStream.list([personalStream, globalStream])
+        .map((lists) {
+          final allNotifications = <NotificationModel>[];
+          for (var list in lists) {
+            allNotifications.addAll(list);
+          }
+          allNotifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return allNotifications;
+        });
   }
 
   Future<void> markAsRead(String notificationId, {String? userId}) async {

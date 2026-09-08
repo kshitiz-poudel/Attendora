@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+
 import '../../shared/widgets/safe_avatar.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../core/responsive_utils.dart';
@@ -144,9 +147,8 @@ class _AdminTeachersAnalyticsPageState
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
               border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.outline.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.outline
+                    .withValues(alpha: 0.1),
               ),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -163,9 +165,8 @@ class _AdminTeachersAnalyticsPageState
                 Container(
                   padding: EdgeInsets.all(isMobile ? 12 : 16),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: .15),
+                    color: Theme.of(context).colorScheme.primary
+                        .withValues(alpha: .15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -317,15 +318,13 @@ class _AdminTeachersAnalyticsPageState
                       const SizedBox(height: 4),
                       Text(
                         teacher.email,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF94A3B8),
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: const Color(0xFF94A3B8)),
                       ),
                       Text(
                         'ID: ${teacher.idNumber}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF94A3B8),
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: const Color(0xFF94A3B8)),
                       ),
                     ],
                   ),
@@ -463,9 +462,8 @@ class _AdminTeachersAnalyticsPageState
               if (teacher.createdAt != null)
                 _buildDetailRow(
                   'Joined',
-                  DateFormat(
-                    'MMMM dd, yyyy at hh:mm a',
-                  ).format(teacher.createdAt!),
+                  DateFormat('MMMM dd, yyyy at hh:mm a')
+                      .format(teacher.createdAt!),
                 ),
             ],
           ),

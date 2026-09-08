@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
 import '../../shared/widgets/empty_state.dart';
@@ -235,9 +236,8 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                                 ),
                               ),
                               Text(
-                                DateFormat(
-                                  'MMM dd, yyyy',
-                                ).format(_selectedDate),
+                                DateFormat('MMM dd, yyyy')
+                                    .format(_selectedDate),
                                 style: GoogleFonts.outfit(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -494,9 +494,8 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                 targetTime != null
                     ? isActive
                           ? 'Expires ${DateFormat('h:mm a').format(targetTime)}'
-                          : DateFormat(
-                              'MMM dd, yyyy • h:mm a',
-                            ).format(targetTime)
+                          : DateFormat('MMM dd, yyyy • h:mm a')
+                                .format(targetTime)
                     : 'No date',
                 style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
               ),
@@ -829,9 +828,8 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
             if (studentUids.isNotEmpty) {
               final batch = FirebaseFirestore.instance.batch();
               final now = Timestamp.now();
-              final formattedTime = DateFormat(
-                'MMM dd, h:mm a',
-              ).format(scheduledFor);
+              final formattedTime = DateFormat('MMM dd, h:mm a')
+                  .format(scheduledFor);
 
               int count = 0;
               for (final recipientUid in studentUids) {
@@ -900,9 +898,8 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
           .delete();
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Session deleted')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Session deleted')));
       }
     } catch (e) {
       if (mounted) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../institutions/models.dart';
 
 // Fetch single institution details
@@ -34,80 +35,78 @@ final institutionDetailsProvider = StreamProvider.family<Institution?, String>((
 });
 
 // Fetch institution specific stats
-final institutionStatsProvider = StreamProvider.family<Map<String, int>, String>((
-  ref,
-  code,
-) {
-  final firestore = FirebaseFirestore.instance;
+final institutionStatsProvider =
+    StreamProvider.family<Map<String, int>, String>((ref, code) {
+      final firestore = FirebaseFirestore.instance;
 
-  // We can't easily do aggregation queries in stream without cloud functions or many reads.
-  // For now, we'll do separate queries for counts.
-  // Optimization: In production, these should be aggregated counters on the institution document.
+      // We can't easily do aggregation queries in stream without cloud functions or many reads.
+      // For now, we'll do separate queries for counts.
+      // Optimization: In production, these should be aggregated counters on the institution document.
 
-  final students = firestore
-      .collection('users')
-      .where('institutionCode', isEqualTo: code)
-      .where('role', isEqualTo: 'student')
-      .count()
-      .get()
-      .then((s) => s.count ?? 0);
-  final teachers = firestore
-      .collection('users')
-      .where('institutionCode', isEqualTo: code)
-      .where('role', isEqualTo: 'teacher')
-      .count()
-      .get()
-      .then((s) => s.count ?? 0);
-  final admins = firestore
-      .collection('users')
-      .where('institutionCode', isEqualTo: code)
-      .where('role', isEqualTo: 'admin')
-      .count()
-      .get()
-      .then((s) => s.count ?? 0);
-  final classes = firestore
-      .collection('class_groups')
-      .where('institutionCode', isEqualTo: code)
-      .count()
-      .get()
-      .then((s) => s.count ?? 0);
-  final sessions = firestore
-      .collection('sessions')
-      .where('institutionCode', isEqualTo: code)
-      .count()
-      .get()
-      .then((s) => s.count ?? 0);
+      final students = firestore
+          .collection('users')
+          .where('institutionCode', isEqualTo: code)
+          .where('role', isEqualTo: 'student')
+          .count()
+          .get()
+          .then((s) => s.count ?? 0);
+      final teachers = firestore
+          .collection('users')
+          .where('institutionCode', isEqualTo: code)
+          .where('role', isEqualTo: 'teacher')
+          .count()
+          .get()
+          .then((s) => s.count ?? 0);
+      final admins = firestore
+          .collection('users')
+          .where('institutionCode', isEqualTo: code)
+          .where('role', isEqualTo: 'admin')
+          .count()
+          .get()
+          .then((s) => s.count ?? 0);
+      final classes = firestore
+          .collection('class_groups')
+          .where('institutionCode', isEqualTo: code)
+          .count()
+          .get()
+          .then((s) => s.count ?? 0);
+      final sessions = firestore
+          .collection('sessions')
+          .where('institutionCode', isEqualTo: code)
+          .count()
+          .get()
+          .then((s) => s.count ?? 0);
 
-  // Handle missing index for active sessions gracefully
-  final activeSessions = firestore
-      .collection('sessions')
-      .where('institutionCode', isEqualTo: code)
-      .where('active', isEqualTo: true)
-      .count()
-      .get()
-      .then((s) => s.count ?? 0)
-      .catchError((e) => 0);
+      // Handle missing index for active sessions gracefully
+      final activeSessions = firestore
+          .collection('sessions')
+          .where('institutionCode', isEqualTo: code)
+          .where('active', isEqualTo: true)
+          .count()
+          .get()
+          .then((s) => s.count ?? 0)
+          .catchError((e) => 0);
 
-  return Stream.fromFuture(
-    Future.wait([
-      students,
-      teachers,
-      admins,
-      classes,
-      sessions,
-      activeSessions,
-    ]).then((results) {
-      return {
-        'students': results[0],
-        'teachers': results[1],
-        'admins': results[2],
-        'classes': results[3],
-        'sessions': results[4],
-        'activeSessions': results[5],
-      };
-    }),
-  );
-});
+      return Stream.fromFuture(
+        Future.wait([
+          students,
+          teachers,
+          admins,
+          classes,
+          sessions,
+          activeSessions,
+        ]).then((results) {
+          return {
+            'students': results[0],
+            'teachers': results[1],
+            'admins': results[2],
+            'classes': results[3],
+            'sessions': results[4],
+            'activeSessions': results[5],
+          };
+        }),
+      );
+    });
 
 // Fetch institution admins
 final institutionAdminsProvider =

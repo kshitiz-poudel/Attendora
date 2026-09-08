@@ -2,9 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../attendance/providers.dart';
 import '../../auth/providers.dart';
+
 import 'package:google_fonts/google_fonts.dart';
+
 import 'glass_card.dart';
 
 final attendanceChartSpotsProvider = StreamProvider<List<FlSpot>>((ref) {

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
+
 import '../auth/providers.dart';
 import '../attendance/providers.dart';
 import 'models/attendance_record.dart';
@@ -20,77 +21,79 @@ class AttendanceListController extends Notifier<List<AttendanceRecord>> {
 }
 
 // Live attendance stream for a specific student
-final studentAttendanceFamilyProvider = StreamProvider.family<List<AttendanceRecord>, String>((
-  ref,
-  uid,
-) {
-  final repo = ref.watch(attendanceRepositoryProvider);
-  // Last 90 days by default for history
-  final cutoff = DateTime.now().subtract(const Duration(days: 90));
-  return repo.streamMyAttendanceDocs(uid, since: cutoff).asyncMap((rows) async {
-    // 1. Identify sessions that need subject resolution (missing subject field)
-    final sessionIdsToFetch = <String>{};
-    for (final data in rows) {
-      if (data['subject'] == null && data['sessionId'] != null) {
-        sessionIdsToFetch.add(data['sessionId'] as String);
-      }
-    }
-
-    // 2. Fetch session details
-    final sessionSubjects = <String, String>{};
-    if (sessionIdsToFetch.isNotEmpty) {
-      // Fetch in batches or parallel
-      // Since we only need the 'subject' field, we can optimize if needed, but get() is fine.
-      // We limit to 10 concurrent fetches to be safe, though Firestore handles more.
-      final futures = sessionIdsToFetch.map(
-        (sid) =>
-            FirebaseFirestore.instance.collection('sessions').doc(sid).get(),
-      );
-
-      final snapshots = await Future.wait(futures);
-      for (final snap in snapshots) {
-        if (snap.exists) {
-          final data = snap.data();
-          if (data != null && data['subject'] != null) {
-            sessionSubjects[snap.id] = data['subject'] as String;
+final studentAttendanceFamilyProvider =
+    StreamProvider.family<List<AttendanceRecord>, String>((ref, uid) {
+      final repo = ref.watch(attendanceRepositoryProvider);
+      // Last 90 days by default for history
+      final cutoff = DateTime.now().subtract(const Duration(days: 90));
+      return repo.streamMyAttendanceDocs(uid, since: cutoff).asyncMap((
+        rows,
+      ) async {
+        // 1. Identify sessions that need subject resolution (missing subject field)
+        final sessionIdsToFetch = <String>{};
+        for (final data in rows) {
+          if (data['subject'] == null && data['sessionId'] != null) {
+            sessionIdsToFetch.add(data['sessionId'] as String);
           }
         }
-      }
-    }
 
-    // 3. Map to AttendanceRecord
-    return rows.map((data) {
-      final ts = data['timestamp'];
-      DateTime date;
-      if (ts is Timestamp) {
-        date = ts.toDate();
-      } else if (ts is DateTime) {
-        date = ts;
-      } else {
-        date = DateTime.tryParse(ts?.toString() ?? '') ?? DateTime.now();
-      }
+        // 2. Fetch session details
+        final sessionSubjects = <String, String>{};
+        if (sessionIdsToFetch.isNotEmpty) {
+          // Fetch in batches or parallel
+          // Since we only need the 'subject' field, we can optimize if needed, but get() is fine.
+          // We limit to 10 concurrent fetches to be safe, though Firestore handles more.
+          final futures = sessionIdsToFetch.map(
+            (sid) => FirebaseFirestore.instance
+                .collection('sessions')
+                .doc(sid)
+                .get(),
+          );
 
-      final status = (data['status'] as String?) ?? 'present';
-      final sessionId = (data['sessionId'] as String?) ?? 'unknown';
+          final snapshots = await Future.wait(futures);
+          for (final snap in snapshots) {
+            if (snap.exists) {
+              final data = snap.data();
+              if (data != null && data['subject'] != null) {
+                sessionSubjects[snap.id] = data['subject'] as String;
+              }
+            }
+          }
+        }
 
-      // Resolve subject: Use stored subject, or fetched subject, or fallback
-      String subject =
-          (data['subject'] as String?) ??
-          sessionSubjects[sessionId] ??
-          'Session';
+        // 3. Map to AttendanceRecord
+        return rows.map((data) {
+          final ts = data['timestamp'];
+          DateTime date;
+          if (ts is Timestamp) {
+            date = ts.toDate();
+          } else if (ts is DateTime) {
+            date = ts;
+          } else {
+            date = DateTime.tryParse(ts?.toString() ?? '') ?? DateTime.now();
+          }
 
-      return AttendanceRecord(
-        sessionId: sessionId,
-        timestamp: date,
-        subject: subject,
-        result: status.toLowerCase() == 'present' ? 'Present' : 'Rejected',
-        locationNote: data['distanceMeters'] != null
-            ? 'Within ${((data['distanceMeters'] as num).toDouble()).toStringAsFixed(1)} m'
-            : null,
-      );
-    }).toList();
-  });
-});
+          final status = (data['status'] as String?) ?? 'present';
+          final sessionId = (data['sessionId'] as String?) ?? 'unknown';
+
+          // Resolve subject: Use stored subject, or fetched subject, or fallback
+          String subject =
+              (data['subject'] as String?) ??
+              sessionSubjects[sessionId] ??
+              'Session';
+
+          return AttendanceRecord(
+            sessionId: sessionId,
+            timestamp: date,
+            subject: subject,
+            result: status.toLowerCase() == 'present' ? 'Present' : 'Rejected',
+            locationNote: data['distanceMeters'] != null
+                ? 'Within ${((data['distanceMeters'] as num).toDouble()).toStringAsFixed(1)} m'
+                : null,
+          );
+        }).toList();
+      });
+    });
 
 // Live attendance stream for the current user
 final studentAttendanceStreamProvider = StreamProvider<List<AttendanceRecord>>((

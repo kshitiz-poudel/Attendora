@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 PLATFORM="${1:-android}"
-
 flutter clean
 flutter pub get
-
 case "$PLATFORM" in
   android)
     flutter build apk --release
     mkdir -p build/releases
     cp build/app/outputs/flutter-apk/app-release.apk build/releases/attendora-latest.apk
+    flutter build web --release
+    mkdir -p build/web/downloads
+    cp build/releases/attendora-latest.apk build/web/downloads/attendora.apk
     echo "Android APK: build/releases/attendora-latest.apk"
+    echo "Web download copy: build/web/downloads/attendora.apk"
     ;;
   android-appbundle)
     flutter build appbundle --release

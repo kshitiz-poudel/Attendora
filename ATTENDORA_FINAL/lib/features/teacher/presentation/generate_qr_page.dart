@@ -5,13 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../../core/utils/error_handler.dart';
 import '../../teacher/providers.dart';
 import '../../teacher/presentation/teacher_subjects_page.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
-
 
 class _WebStep extends StatelessWidget {
   const _WebStep({required this.number, required this.text});
@@ -31,10 +31,18 @@ class _WebStep extends StatelessWidget {
             color: Color(0xFF10B981),
             shape: BoxShape.circle,
           ),
-          child: Text(number, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: Text(
+            number,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         const SizedBox(width: 12),
-        Expanded(child: Text(text, style: GoogleFonts.outfit(color: Colors.white70))),
+        Expanded(
+          child: Text(text, style: GoogleFonts.outfit(color: Colors.white70)),
+        ),
       ],
     );
   }
@@ -84,10 +92,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
     super.dispose();
   }
 
-
-  static final Uri _androidDownloadUri = Uri.parse(
-    'https://drive.usercontent.google.com/download?id=1Ml0hlqjI1YckzSO89aKw3ymBwckjMSR5&export=download',
-  );
+  Uri get _androidDownloadUri => Uri.base.resolve('downloads/attendora.apk');
 
   Future<void> _downloadAndroidApp() async {
     final launched = await launchUrl(
@@ -96,7 +101,8 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
     );
     if (!launched && mounted) {
       setState(() {
-        _error = 'Unable to open the Android download link. Please try again later.';
+        _error =
+            'Unable to open the Android download link. Please try again later.';
       });
     }
   }
@@ -367,7 +373,8 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       Container(
                                         padding: const EdgeInsets.all(24),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                                          color: const Color(0xFF10B981)
+                                              .withValues(alpha: 0.12),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
@@ -402,7 +409,9 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         height: 52,
                                         child: ElevatedButton.icon(
                                           onPressed: _downloadAndroidApp,
-                                          icon: const Icon(Icons.android_rounded),
+                                          icon: const Icon(
+                                            Icons.android_rounded,
+                                          ),
                                           label: Text(
                                             'Download attendora for Android',
                                             style: GoogleFonts.outfit(
@@ -411,10 +420,13 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF10B981),
+                                            backgroundColor: const Color(
+                                              0xFF10B981,
+                                            ),
                                             foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(14),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
                                             ),
                                           ),
                                         ),
@@ -424,16 +436,24 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         width: double.infinity,
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 0.04),
-                                          borderRadius: BorderRadius.circular(14),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.04,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
                                           border: Border.all(
-                                            color: Colors.white.withValues(alpha: 0.10),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.10,
+                                            ),
                                           ),
                                         ),
                                         child: Row(
                                           children: [
-                                            const Icon(Icons.phone_iphone_rounded,
-                                                color: Color(0xFF94A3B8)),
+                                            const Icon(
+                                              Icons.phone_iphone_rounded,
+                                              color: Color(0xFF94A3B8),
+                                            ),
                                             const SizedBox(width: 10),
                                             Expanded(
                                               child: Text(
@@ -451,19 +471,34 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       Container(
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 0.05),
-                                          borderRadius: BorderRadius.circular(16),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.05,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           border: Border.all(
-                                            color: Colors.white.withValues(alpha: 0.10),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.10,
+                                            ),
                                           ),
                                         ),
                                         child: Column(
                                           children: [
-                                            _WebStep(number: '1', text: 'Open attendora on your Android phone or iPhone.'),
+                                            _WebStep(
+                                              number: '1',
+                                              text: 'Open attendora on your Android phone or iPhone.',
+                                            ),
                                             const SizedBox(height: 12),
-                                            _WebStep(number: '2', text: 'Sign in with this same teacher account.'),
+                                            _WebStep(
+                                              number: '2',
+                                              text: 'Sign in with this same teacher account.',
+                                            ),
                                             const SizedBox(height: 12),
-                                            _WebStep(number: '3', text: 'Start the session and keep this page open.'),
+                                            _WebStep(
+                                              number: '3',
+                                              text: 'Start the session and keep this page open.',
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -605,16 +640,14 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         Container(
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: const Color(
-                                              0xFFEF4444,
-                                            ).withValues(alpha: 0.1),
+                                            color: const Color(0xFFEF4444)
+                                                .withValues(alpha: 0.1),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
                                             border: Border.all(
-                                              color: const Color(
-                                                0xFFEF4444,
-                                              ).withValues(alpha: 0.3),
+                                              color: const Color(0xFFEF4444)
+                                                  .withValues(alpha: 0.3),
                                             ),
                                           ),
                                           child: Row(
@@ -843,7 +876,9 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
       decoration: BoxDecoration(
         color: const Color(0xFF10B981).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.22)),
+        border: Border.all(
+          color: const Color(0xFF10B981).withValues(alpha: 0.22),
+        ),
       ),
       child: const Row(
         children: [

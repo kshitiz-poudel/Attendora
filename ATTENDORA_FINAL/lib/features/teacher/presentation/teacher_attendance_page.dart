@@ -1,9 +1,11 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'teacher_shell.dart';
 import '../../auth/providers.dart';
 import '../../../core/pdf_generator.dart';
@@ -28,10 +30,25 @@ final teacherSessionsWithAttendanceProvider =
       return FirebaseFirestore.instance
           .collection('sessions')
           .where('teacherUid', isEqualTo: teacherUid)
-          .orderBy('createdAt', descending: true)
-          .limit(20)
+          .limit(50) // Removed orderBy('createdAt') to prevent Web SDK crash on mixed types
           .snapshots()
           .asyncMap((sessionsSnapshot) async {
+            final docs = sessionsSnapshot.docs.toList();
+            docs.sort((a, b) {
+              final aRaw = a.data()['createdAt'];
+              final bRaw = b.data()['createdAt'];
+              DateTime? aDate;
+              if (aRaw is Timestamp) aDate = aRaw.toDate();
+              else if (aRaw is String) aDate = DateTime.tryParse(aRaw);
+              DateTime? bDate;
+              if (bRaw is Timestamp) bDate = bRaw.toDate();
+              else if (bRaw is String) bDate = DateTime.tryParse(bRaw);
+              if (aDate == null || bDate == null) return 0;
+              return bDate.compareTo(aDate); // descending
+            });
+            // Take top 20
+            final topDocs = docs.take(20).toList();
+            
             final sessions = <Map<String, dynamic>>[];
 
             // 1. Fetch All Students in Institution (to identify absentees)
@@ -55,7 +72,7 @@ final teacherSessionsWithAttendanceProvider =
             };
 
             // 3. Process Sessions
-            for (final sessionDoc in sessionsSnapshot.docs) {
+            for (final sessionDoc in topDocs) {
               final sessionData = sessionDoc.data();
               final sessionId = sessionDoc.id;
               final subjectStr = sessionData['subject'] as String? ?? 'Session';

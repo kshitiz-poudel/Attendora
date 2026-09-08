@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+
 import 'models.dart';
 
 class InstitutionsRepository {
@@ -49,11 +50,10 @@ class InstitutionsRepository {
     debugPrint('🌍 Fetching ALL institutions');
     return _firestore
         .collection('institutions')
-        .orderBy('name')
         .snapshots()
         .map((snap) {
           debugPrint('📊 Found ${snap.docs.length} institutions');
-          return snap.docs.map((d) {
+          final list = snap.docs.map((d) {
             final data = d.data();
             debugPrint('  - ${data['name']} (${data['code']})');
             return Institution(
@@ -64,6 +64,10 @@ class InstitutionsRepository {
               emailDomain: (data['emailDomain'] as String?) ?? '',
             );
           }).toList();
+          
+          // Sort client-side to avoid Firestore Web SDK Unexpected state error
+          list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+          return list;
         });
   }
 

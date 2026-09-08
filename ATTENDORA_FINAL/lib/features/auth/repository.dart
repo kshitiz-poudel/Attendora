@@ -1,10 +1,14 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
+
 import 'providers.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/services/device_service.dart';
 
 class AuthRepository {
@@ -108,7 +112,8 @@ class AuthRepository {
       final userDomain = email.split('@').last.toLowerCase();
 
       // Prototype: allow both the institution's configured domain and gmail.com
-      return userDomain == emailDomain.toLowerCase() || userDomain == 'gmail.com';
+      return userDomain == emailDomain.toLowerCase() ||
+          userDomain == 'gmail.com';
     } catch (e) {
       throw Exception('Email validation failed: $e');
     }

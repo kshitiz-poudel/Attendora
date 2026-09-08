@@ -23,12 +23,12 @@ class GeoAttendanceSettings {
   }
 
   Map<String, dynamic> toMap() => {
-        'latitude': latitude,
-        'longitude': longitude,
-        'radiusMeters': radiusMeters,
-        'enabled': enabled,
-        'updatedAt': FieldValue.serverTimestamp(),
-      };
+    'latitude': latitude,
+    'longitude': longitude,
+    'radiusMeters': radiusMeters,
+    'enabled': enabled,
+    'updatedAt': FieldValue.serverTimestamp(),
+  };
 }
 
 class FacultyGeoAttendance {
@@ -49,9 +49,12 @@ class FacultyGeoAttendance {
   factory FacultyGeoAttendance.fromMap(String id, Map<String, dynamic> map) {
     GeoAttendanceEvent? parse(String key) {
       final value = map[key];
-      if (value is Map<String, dynamic>) return GeoAttendanceEvent.fromMap(value);
+      if (value is Map<String, dynamic>) {
+        return GeoAttendanceEvent.fromMap(value);
+      }
       return null;
     }
+
     return FacultyGeoAttendance(
       id: id,
       facultyId: map['facultyId'] as String? ?? '',

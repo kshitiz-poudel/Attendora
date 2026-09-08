@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
+
 import '../../auth/providers.dart';
 import '../../shared/providers.dart';
 import '../../shared/widgets/error_dialog.dart';
@@ -74,12 +75,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(
-                                    0xFF10B981,
-                                  ).withValues(alpha: 0.2),
-                                  const Color(
-                                    0xFF2F6FED,
-                                  ).withValues(alpha: 0.2),
+                                  const Color(0xFF10B981)
+                                      .withValues(alpha: 0.2),
+                                  const Color(0xFF2F6FED)
+                                      .withValues(alpha: 0.2),
                                 ],
                               ),
                               borderRadius: const BorderRadius.vertical(
@@ -102,9 +101,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(
-                                          0xFF10B981,
-                                        ).withValues(alpha: 0.3),
+                                        color: const Color(0xFF10B981)
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
@@ -197,69 +195,67 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                                 // Class group selection for both students and teachers
                                 Consumer(
-                                    builder: (context, ref, child) {
-                                      final classGroupsAsync = ref.watch(
-                                        allClassGroupsListProvider,
-                                      );
-                                      return classGroupsAsync.when(
-                                        data: (groups) {
-                                          if (groups.isEmpty) {
-                                            return Text(
-                                              'No class groups available yet. Contact admin.',
-                                              style: GoogleFonts.outfit(
-                                                color: Colors.orange,
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            );
-                                          }
-
-                                          final lectureGroups = groups
-                                              .where((g) => g.type == 'Lecture')
-                                              .toList();
-                                          final labGroups = groups
-                                              .where((g) => g.type == 'Lab')
-                                              .toList();
-
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              _buildGroupDropdown(
-                                                'Lecture Group',
-                                                lectureGroups,
-                                                _selectedLectureGroupId,
-                                                (val) => setState(
-                                                  () =>
-                                                      _selectedLectureGroupId =
-                                                          val,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 20),
-                                              _buildGroupDropdown(
-                                                'Lab Group',
-                                                labGroups,
-                                                _selectedLabGroupId,
-                                                (val) => setState(
-                                                  () =>
-                                                      _selectedLabGroupId = val,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                        loading: () =>
-                                            const LinearProgressIndicator(
-                                              color: Color(0xFF10B981),
+                                  builder: (context, ref, child) {
+                                    final classGroupsAsync = ref.watch(
+                                      allClassGroupsListProvider,
+                                    );
+                                    return classGroupsAsync.when(
+                                      data: (groups) {
+                                        if (groups.isEmpty) {
+                                          return Text(
+                                            'No class groups available yet. Contact admin.',
+                                            style: GoogleFonts.outfit(
+                                              color: Colors.orange,
+                                              fontStyle: FontStyle.italic,
                                             ),
-                                        error: (e, _) => Text(
-                                          'Error loading groups: $e',
-                                          style: GoogleFonts.outfit(
-                                            color: Colors.red,
+                                          );
+                                        }
+
+                                        final lectureGroups = groups
+                                            .where((g) => g.type == 'Lecture')
+                                            .toList();
+                                        final labGroups = groups
+                                            .where((g) => g.type == 'Lab')
+                                            .toList();
+
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            _buildGroupDropdown(
+                                              'Lecture Group',
+                                              lectureGroups,
+                                              _selectedLectureGroupId,
+                                              (val) => setState(
+                                                () => _selectedLectureGroupId =
+                                                    val,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            _buildGroupDropdown(
+                                              'Lab Group',
+                                              labGroups,
+                                              _selectedLabGroupId,
+                                              (val) => setState(
+                                                () => _selectedLabGroupId = val,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                      loading: () =>
+                                          const LinearProgressIndicator(
+                                            color: Color(0xFF10B981),
                                           ),
+                                      error: (e, _) => Text(
+                                        'Error loading groups: $e',
+                                        style: GoogleFonts.outfit(
+                                          color: Colors.red,
                                         ),
-                                      );
-                                    },
-                                  ),
+                                      ),
+                                    );
+                                  },
+                                ),
 
                                 const SizedBox(height: 20),
 
@@ -281,8 +277,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                         Expanded(
                                           child: _buildRoleChoiceCard(
                                             label: 'Student',
-                                            selected:
-                                                _role == UserRole.student,
+                                            selected: _role == UserRole.student,
                                             onTap: () => setState(() {
                                               _role = UserRole.student;
                                               _selectedLectureGroupId = null;
@@ -295,8 +290,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                           child: _buildRoleChoiceCard(
                                             label: 'Faculty',
                                             sublabel: 'Requires approval',
-                                            selected:
-                                                _role == UserRole.teacher,
+                                            selected: _role == UserRole.teacher,
                                             onTap: () => setState(() {
                                               _role = UserRole.teacher;
                                               _selectedLectureGroupId = null;
@@ -322,15 +316,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                                             if (institutionCode == null ||
                                                 institutionCode.isEmpty) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Institution not selected. Please go back and sign in again.',
-                                                  ),
-                                                ),
-                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Institution not selected. Please go back and sign in again.',
+                                                      ),
+                                                    ),
+                                                  );
                                               return;
                                             }
 
@@ -338,8 +331,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                               ErrorDialog.show(
                                                 context,
                                                 title: 'ID Number Required',
-                                                message:
-                                                    'Please enter your ID Number to continue.',
+                                                message: 'Please enter your ID Number to continue.',
                                               );
                                               return;
                                             }
@@ -348,8 +340,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                               ErrorDialog.show(
                                                 context,
                                                 title: 'Invalid ID Number',
-                                                message:
-                                                    'ID Number must be at least 3 characters long.',
+                                                message: 'ID Number must be at least 3 characters long.',
                                               );
                                               return;
                                             }
@@ -360,8 +351,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                               ErrorDialog.show(
                                                 context,
                                                 title: 'Class Groups Required',
-                                                message:
-                                                    'Please select both a Lecture Group and a Lab Group.',
+                                                message: 'Please select both a Lecture Group and a Lab Group.',
                                               );
                                               return;
                                             }
@@ -370,8 +360,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                               ErrorDialog.show(
                                                 context,
                                                 title: 'Password Too Short',
-                                                message:
-                                                    'Your password must be at least 6 characters long.',
+                                                message: 'Your password must be at least 6 characters long.',
                                               );
                                               return;
                                             }
@@ -418,8 +407,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                             await SuccessDialog.show(
                                               context,
                                               title: 'Account Created!',
-                                              message:
-                                                  'Your account has been successfully set up. You will now be redirected to your dashboard.',
+                                              message: 'Your account has been successfully set up. You will now be redirected to your dashboard.',
                                               actionText: 'Continue',
                                             );
 
@@ -439,9 +427,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       elevation: 0,
-                                      shadowColor: const Color(
-                                        0xFF10B981,
-                                      ).withValues(alpha: 0.5),
+                                      shadowColor: const Color(0xFF10B981)
+                                          .withValues(alpha: 0.5),
                                     ),
                                     child: state.loading
                                         ? const SizedBox(

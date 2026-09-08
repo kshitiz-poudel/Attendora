@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:rxdart/rxdart.dart';
+
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
@@ -15,242 +16,243 @@ import '../../notifications/repository.dart';
 import '../../notifications/providers.dart';
 
 // Provider for students grouped by Subject, with attendance stats
-final studentsProvider = StreamProvider.autoDispose<Map<String, List<Map<String, dynamic>>>>((
-  ref,
-) {
-  final auth = ref.watch(authControllerProvider);
-  final teacherUid = auth.uid;
-  final institutionCode = auth.institutionCode;
+final studentsProvider =
+    StreamProvider.autoDispose<Map<String, List<Map<String, dynamic>>>>((ref) {
+      final auth = ref.watch(authControllerProvider);
+      final teacherUid = auth.uid;
+      final institutionCode = auth.institutionCode;
 
-  if (teacherUid == null || institutionCode == null) {
-    return Stream.value({});
-  }
+      if (teacherUid == null || institutionCode == null) {
+        return Stream.value({});
+      }
 
-  final subjectsStream = FirebaseFirestore.instance
-      .collection('subjects')
-      .where('teacherUid', isEqualTo: teacherUid)
-      .snapshots();
+      final subjectsStream = FirebaseFirestore.instance
+          .collection('subjects')
+          .where('teacherUid', isEqualTo: teacherUid)
+          .snapshots();
 
-  final sessionsStream = FirebaseFirestore.instance
-      .collection('sessions')
-      .where('teacherUid', isEqualTo: teacherUid)
-      .snapshots();
+      final sessionsStream = FirebaseFirestore.instance
+          .collection('sessions')
+          .where('teacherUid', isEqualTo: teacherUid)
+          .snapshots();
 
-  final detentionsStream = FirebaseFirestore.instance
-      .collection('detentions')
-      .where('teacherUid', isEqualTo: teacherUid)
-      .snapshots();
+      final detentionsStream = FirebaseFirestore.instance
+          .collection('detentions')
+          .where('teacherUid', isEqualTo: teacherUid)
+          .snapshots();
 
-  return Rx.combineLatest3<
-        QuerySnapshot<Map<String, dynamic>>,
-        QuerySnapshot<Map<String, dynamic>>,
-        QuerySnapshot<Map<String, dynamic>>,
-        (
-          QuerySnapshot<Map<String, dynamic>>,
-          QuerySnapshot<Map<String, dynamic>>,
-          QuerySnapshot<Map<String, dynamic>>,
-        )
-      >(
-        subjectsStream,
-        sessionsStream,
-        detentionsStream,
-        (subjectsSnap, sessionsSnap, detentionsSnap) =>
-            (subjectsSnap, sessionsSnap, detentionsSnap),
-      )
-      .asyncMap((data) async {
-        final subjectsSnap = data.$1;
-        final sessionsSnap = data.$2;
-        final detentionsSnap = data.$3;
+      return Rx.combineLatest3<
+            QuerySnapshot<Map<String, dynamic>>,
+            QuerySnapshot<Map<String, dynamic>>,
+            QuerySnapshot<Map<String, dynamic>>,
+            (
+              QuerySnapshot<Map<String, dynamic>>,
+              QuerySnapshot<Map<String, dynamic>>,
+              QuerySnapshot<Map<String, dynamic>>,
+            )
+          >(
+            subjectsStream,
+            sessionsStream,
+            detentionsStream,
+            (subjectsSnap, sessionsSnap, detentionsSnap) =>
+                (subjectsSnap, sessionsSnap, detentionsSnap),
+          )
+          .asyncMap((data) async {
+            final subjectsSnap = data.$1;
+            final sessionsSnap = data.$2;
+            final detentionsSnap = data.$3;
 
-        if (subjectsSnap.docs.isEmpty) return {};
+            if (subjectsSnap.docs.isEmpty) return {};
 
-        // Build a lookup of detained (studentId|subjectNameNorm|subjectGroupNorm) pairs
-        final detainedPairs = <String>{};
-        for (final doc in detentionsSnap.docs) {
-          final d = doc.data();
-          final sid = d['studentId'] as String?;
-          final nameNorm = d['subjectNameNorm'] as String?;
-          final groupNorm = d['subjectGroupNorm'] as String?;
-          if (sid != null && nameNorm != null) {
-            detainedPairs.add('$sid|$nameNorm|${groupNorm ?? ''}');
-          }
-        }
-
-        // 1. Parse Subjects
-        final subjects = subjectsSnap.docs
-            .map((d) => {'id': d.id, ...d.data()})
-            .toList();
-
-        // 2. Fetch Students in the institution
-        // We fetch all students in the institution and filter in memory to handle lectureGroup/labGroup logic correctly.
-        final studentsSnap = await FirebaseFirestore.instance
-            .collection('users')
-            .where('role', isEqualTo: 'student')
-            .where('institutionCode', isEqualTo: institutionCode)
-            .get();
-
-        final allStudents = studentsSnap.docs
-            .map((d) => {'id': d.id, ...d.data()})
-            .toList();
-
-        // 3. Fetch Class Groups to resolve IDs to Names
-        final groupsSnap = await FirebaseFirestore.instance
-            .collection('class_groups')
-            .where('institutionCode', isEqualTo: institutionCode)
-            .get();
-
-        final groupIdToName = {
-          for (var doc in groupsSnap.docs) doc.id: doc.data()['name'] as String,
-        };
-
-        // 4. Parse Sessions (from stream)
-        final sessions = sessionsSnap.docs
-            .map((d) => {'id': d.id, ...d.data()})
-            .toList();
-
-        // 5. Calculate Stats per Subject
-        final result = <String, List<Map<String, dynamic>>>{};
-
-        for (final subject in subjects) {
-          final subjectName = subject['name'] as String;
-          final subjectGroup = subject['group'] as String;
-
-          // Filter students who belong to this subject's group (either as lecture or lab group)
-          final subjectStudents = allStudents.where((s) {
-            // Get raw IDs/Values
-            final lId = s['lectureGroup'] as String?;
-            final labId = s['labGroup'] as String?;
-            final gVal = s['group'] as String?;
-
-            // Resolve to Names (or keep as is if not an ID)
-            final lectureGroupName = (groupIdToName[lId] ?? lId)
-                ?.trim()
-                .toLowerCase();
-            final labGroupName = (groupIdToName[labId] ?? labId)
-                ?.trim()
-                .toLowerCase();
-            final fallbackGroup = gVal?.trim().toLowerCase();
-
-            final targetGroup = subjectGroup.trim().toLowerCase();
-
-            return lectureGroupName == targetGroup ||
-                labGroupName == targetGroup ||
-                fallbackGroup == targetGroup;
-          }).toList();
-
-          // Filter sessions for this subject
-          // Improved matching logic to handle "Name (Group)" format and "group" field
-          final subjectSessions = sessions.where((s) {
-            final sSubject = s['subject'] as String? ?? '';
-            final sGroupField = s['group'] as String?;
-
-            String? sGroup = sGroupField;
-            String sName = sSubject;
-
-            // Parse if group missing or to separate name
-            if (sSubject.contains('(') && sSubject.endsWith(')')) {
-              final parts = sSubject.split('(');
-              sName = parts.first.trim();
-              sGroup ??= parts.last.replaceAll(')', '').trim();
+            // Build a lookup of detained (studentId|subjectNameNorm|subjectGroupNorm) pairs
+            final detainedPairs = <String>{};
+            for (final doc in detentionsSnap.docs) {
+              final d = doc.data();
+              final sid = d['studentId'] as String?;
+              final nameNorm = d['subjectNameNorm'] as String?;
+              final groupNorm = d['subjectGroupNorm'] as String?;
+              if (sid != null && nameNorm != null) {
+                detainedPairs.add('$sid|$nameNorm|${groupNorm ?? ''}');
+              }
             }
 
-            final targetGroupLower = subjectGroup.trim().toLowerCase();
-            final targetNameLower = subjectName.trim().toLowerCase();
+            // 1. Parse Subjects
+            final subjects = subjectsSnap.docs
+                .map((d) => {'id': d.id, ...d.data()})
+                .toList();
 
-            final sGroupLower = sGroup?.trim().toLowerCase();
-            final sNameLower = sName.trim().toLowerCase();
+            // 2. Fetch Students in the institution
+            // We fetch all students in the institution and filter in memory to handle lectureGroup/labGroup logic correctly.
+            final studentsSnap = await FirebaseFirestore.instance
+                .collection('users')
+                .where('role', isEqualTo: 'student')
+                .where('institutionCode', isEqualTo: institutionCode)
+                .get();
 
-            // Match if Group matches AND (Name matches OR exact string match)
-            // We prioritize Group match because that defines the set of students.
-            // But we also check Name to avoid mixing "Math (Group A)" and "Science (Group A)".
-            final groupMatch = sGroupLower == targetGroupLower;
-            final nameMatch = sNameLower == targetNameLower;
+            final allStudents = studentsSnap.docs
+                .map((d) => {'id': d.id, ...d.data()})
+                .toList();
 
-            // Also match if the session has NO group but the name matches (General/Lecture session)
-            final isGeneralSession =
-                nameMatch && (sGroupLower == null || sGroupLower.isEmpty);
+            // 3. Fetch Class Groups to resolve IDs to Names
+            final groupsSnap = await FirebaseFirestore.instance
+                .collection('class_groups')
+                .where('institutionCode', isEqualTo: institutionCode)
+                .get();
 
-            // Fallback: Exact string match
-            final exactMatch = sSubject == '$subjectName ($subjectGroup)';
-
-            return (groupMatch && nameMatch) || exactMatch || isGeneralSession;
-          }).toList();
-          final totalSessions = subjectSessions.length;
-
-          // Fetch attendance for these sessions
-          // Note: We still fetch attendance sub-collections manually.
-          // To make THIS real-time, we'd need a collection group query or similar, which is expensive.
-          // For now, updating when a SESSION is created is the main requirement.
-          final studentAttendanceCounts =
-              <String, int>{}; // StudentID -> AttendedCount
-
-          if (totalSessions > 0) {
-            await Future.wait(
-              subjectSessions.map((session) async {
-                final attendanceSnap = await FirebaseFirestore.instance
-                    .collection('sessions')
-                    .doc(session['id'])
-                    .collection('attendance')
-                    .get();
-
-                for (final doc in attendanceSnap.docs) {
-                  final data = doc.data();
-                  final uid = data['uid'] as String;
-                  final status = data['status'] as String? ?? 'present';
-
-                  if (status == 'present' || status == 'late') {
-                    studentAttendanceCounts[uid] =
-                        (studentAttendanceCounts[uid] ?? 0) + 1;
-                  }
-                }
-              }),
-            );
-          }
-
-          // Build Student List with Stats
-          final subjectNameNorm = subjectName.trim().toLowerCase();
-          final subjectGroupNorm = subjectGroup.trim().toLowerCase();
-
-          final studentsWithStats = subjectStudents.map((student) {
-            final uid = student['id'] as String;
-            final attended = studentAttendanceCounts[uid] ?? 0;
-            final percentage = totalSessions > 0
-                ? (attended / totalSessions) * 100
-                : 0.0;
-            final isDetained = detainedPairs.contains(
-              '$uid|$subjectNameNorm|$subjectGroupNorm',
-            );
-
-            return {
-              ...student,
-              'stats': {
-                'totalSessions': totalSessions,
-                'attendedSessions': attended,
-                'percentage': percentage,
-              },
-              'assignedGroup':
-                  subjectGroup, // Inject the group name this student belongs to for this subject
-              'subjectName': subjectName,
-              'subjectGroup': subjectGroup,
-              'detained': isDetained,
+            final groupIdToName = {
+              for (var doc in groupsSnap.docs)
+                doc.id: doc.data()['name'] as String,
             };
-          }).toList();
 
-          // Sort by Name
-          studentsWithStats.sort(
-            (a, b) => (a['displayName'] as String).compareTo(
-              b['displayName'] as String,
-            ),
-          );
+            // 4. Parse Sessions (from stream)
+            final sessions = sessionsSnap.docs
+                .map((d) => {'id': d.id, ...d.data()})
+                .toList();
 
-          // Use composite key to ensure uniqueness and display group
-          final key = '$subjectName ($subjectGroup)';
-          result[key] = studentsWithStats;
-        }
+            // 5. Calculate Stats per Subject
+            final result = <String, List<Map<String, dynamic>>>{};
 
-        return result;
-      });
-});
+            for (final subject in subjects) {
+              final subjectName = subject['name'] as String;
+              final subjectGroup = subject['group'] as String;
+
+              // Filter students who belong to this subject's group (either as lecture or lab group)
+              final subjectStudents = allStudents.where((s) {
+                // Get raw IDs/Values
+                final lId = s['lectureGroup'] as String?;
+                final labId = s['labGroup'] as String?;
+                final gVal = s['group'] as String?;
+
+                // Resolve to Names (or keep as is if not an ID)
+                final lectureGroupName = (groupIdToName[lId] ?? lId)
+                    ?.trim()
+                    .toLowerCase();
+                final labGroupName = (groupIdToName[labId] ?? labId)
+                    ?.trim()
+                    .toLowerCase();
+                final fallbackGroup = gVal?.trim().toLowerCase();
+
+                final targetGroup = subjectGroup.trim().toLowerCase();
+
+                return lectureGroupName == targetGroup ||
+                    labGroupName == targetGroup ||
+                    fallbackGroup == targetGroup;
+              }).toList();
+
+              // Filter sessions for this subject
+              // Improved matching logic to handle "Name (Group)" format and "group" field
+              final subjectSessions = sessions.where((s) {
+                final sSubject = s['subject'] as String? ?? '';
+                final sGroupField = s['group'] as String?;
+
+                String? sGroup = sGroupField;
+                String sName = sSubject;
+
+                // Parse if group missing or to separate name
+                if (sSubject.contains('(') && sSubject.endsWith(')')) {
+                  final parts = sSubject.split('(');
+                  sName = parts.first.trim();
+                  sGroup ??= parts.last.replaceAll(')', '').trim();
+                }
+
+                final targetGroupLower = subjectGroup.trim().toLowerCase();
+                final targetNameLower = subjectName.trim().toLowerCase();
+
+                final sGroupLower = sGroup?.trim().toLowerCase();
+                final sNameLower = sName.trim().toLowerCase();
+
+                // Match if Group matches AND (Name matches OR exact string match)
+                // We prioritize Group match because that defines the set of students.
+                // But we also check Name to avoid mixing "Math (Group A)" and "Science (Group A)".
+                final groupMatch = sGroupLower == targetGroupLower;
+                final nameMatch = sNameLower == targetNameLower;
+
+                // Also match if the session has NO group but the name matches (General/Lecture session)
+                final isGeneralSession =
+                    nameMatch && (sGroupLower == null || sGroupLower.isEmpty);
+
+                // Fallback: Exact string match
+                final exactMatch = sSubject == '$subjectName ($subjectGroup)';
+
+                return (groupMatch && nameMatch) ||
+                    exactMatch ||
+                    isGeneralSession;
+              }).toList();
+              final totalSessions = subjectSessions.length;
+
+              // Fetch attendance for these sessions
+              // Note: We still fetch attendance sub-collections manually.
+              // To make THIS real-time, we'd need a collection group query or similar, which is expensive.
+              // For now, updating when a SESSION is created is the main requirement.
+              final studentAttendanceCounts =
+                  <String, int>{}; // StudentID -> AttendedCount
+
+              if (totalSessions > 0) {
+                await Future.wait(
+                  subjectSessions.map((session) async {
+                    final attendanceSnap = await FirebaseFirestore.instance
+                        .collection('sessions')
+                        .doc(session['id'])
+                        .collection('attendance')
+                        .get();
+
+                    for (final doc in attendanceSnap.docs) {
+                      final data = doc.data();
+                      final uid = data['uid'] as String;
+                      final status = data['status'] as String? ?? 'present';
+
+                      if (status == 'present' || status == 'late') {
+                        studentAttendanceCounts[uid] =
+                            (studentAttendanceCounts[uid] ?? 0) + 1;
+                      }
+                    }
+                  }),
+                );
+              }
+
+              // Build Student List with Stats
+              final subjectNameNorm = subjectName.trim().toLowerCase();
+              final subjectGroupNorm = subjectGroup.trim().toLowerCase();
+
+              final studentsWithStats = subjectStudents.map((student) {
+                final uid = student['id'] as String;
+                final attended = studentAttendanceCounts[uid] ?? 0;
+                final percentage = totalSessions > 0
+                    ? (attended / totalSessions) * 100
+                    : 0.0;
+                final isDetained = detainedPairs.contains(
+                  '$uid|$subjectNameNorm|$subjectGroupNorm',
+                );
+
+                return {
+                  ...student,
+                  'stats': {
+                    'totalSessions': totalSessions,
+                    'attendedSessions': attended,
+                    'percentage': percentage,
+                  },
+                  'assignedGroup': subjectGroup, // Inject the group name this student belongs to for this subject
+                  'subjectName': subjectName,
+                  'subjectGroup': subjectGroup,
+                  'detained': isDetained,
+                };
+              }).toList();
+
+              // Sort by Name
+              studentsWithStats.sort(
+                (a, b) => (a['displayName'] as String).compareTo(
+                  b['displayName'] as String,
+                ),
+              );
+
+              // Use composite key to ensure uniqueness and display group
+              final key = '$subjectName ($subjectGroup)';
+              result[key] = studentsWithStats;
+            }
+
+            return result;
+          });
+    });
 
 class TeacherStudentsPage extends ConsumerStatefulWidget {
   const TeacherStudentsPage({super.key});
@@ -342,9 +344,8 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF10B981,
-                              ).withValues(alpha: 0.2),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -373,9 +374,8 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF10B981,
-                              ).withValues(alpha: 0.2),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -579,9 +579,8 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF10B981,
-                            ).withValues(alpha: 0.1),
+                            color: const Color(0xFF10B981)
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -1148,9 +1147,8 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to update: $e')));
       }
     }
   }
@@ -1594,9 +1592,8 @@ class _AddStudentDialogState extends State<_AddStudentDialog> {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF10B981,
-                                  ).withValues(alpha: 0.1),
+                                  color: const Color(0xFF10B981)
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Icon(

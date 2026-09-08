@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
+
 import '../../auth/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
@@ -30,9 +31,8 @@ class ApprovalPendingPage extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFF59E0B,
-                            ).withValues(alpha: 0.1),
+                            color: const Color(0xFFF59E0B)
+                                .withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(

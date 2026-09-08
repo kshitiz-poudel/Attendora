@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'teacher_shell.dart';
 import '../../auth/providers.dart';
 import '../providers.dart';
@@ -77,8 +78,7 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
         await downloadFile(
           filename: '${subject['name']}_${subject['group'] ?? ''}_report.xlsx',
           bytes: bytes,
-          mimeType:
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         );
 
         if (mounted) {

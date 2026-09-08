@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
@@ -39,12 +40,10 @@ final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
   }
 
   // 2. New Institutions Stream (Super Admin only, or empty for others)
-  // AVOID COMPOSITE INDEX (status + createdAt)
-  // Query by createdAt only, filter status in memory.
   Query<Map<String, dynamic>> institutionsQ = FirebaseFirestore.instance
       .collection('institutions')
-      .orderBy('createdAt', descending: true)
-      .limit(10); // Fetch slightly more to account for filtering
+      // Removed orderBy('createdAt') to avoid Web SDK crash on mixed types
+      .limit(50); 
 
   // 3. Students Stream (for low attendance check)
   // AVOID COMPOSITE INDEX (role + institutionCode)
@@ -70,13 +69,8 @@ final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
   if (!isSuperAdmin && code != null) {
     sessionsQ = sessionsQ.where('institutionCode', isEqualTo: code);
   } else {
-    // If superadmin (no code filter), we can use createdAt filter safely (single field)
-    // But if we have no code, we might get too many docs.
-    // Assuming superadmin sees all or handled elsewhere.
-    sessionsQ = sessionsQ.where(
-      'createdAt',
-      isGreaterThan: Timestamp.fromDate(thirtyDaysAgo),
-    );
+    // Fetch limited sessions to avoid massive reads, filter createdAt in memory
+    sessionsQ = sessionsQ.limit(100);
   }
 
   // Combine streams
@@ -114,7 +108,14 @@ final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
       // In-memory filter: Must be Active
       if (data['status'] != 'Active') continue;
 
-      final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+      final rawCreatedAt = data['createdAt'];
+      DateTime? createdAt;
+      if (rawCreatedAt is Timestamp) {
+        createdAt = rawCreatedAt.toDate();
+      } else if (rawCreatedAt is String) {
+        createdAt = DateTime.tryParse(rawCreatedAt);
+      }
+      
       if (createdAt != null && createdAt.isAfter(sevenDaysAgo)) {
         alerts.add({
           'type': 'new_institution',
@@ -128,7 +129,13 @@ final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
     // Process Low Attendance
     // Filter sessions for last 30 days in memory (if not done by query)
     final recentSessions = sessionsSnap.docs.where((doc) {
-      final createdAt = (doc.data()['createdAt'] as Timestamp?)?.toDate();
+      final rawCreatedAt = doc.data()['createdAt'];
+      DateTime? createdAt;
+      if (rawCreatedAt is Timestamp) {
+        createdAt = rawCreatedAt.toDate();
+      } else if (rawCreatedAt is String) {
+        createdAt = DateTime.tryParse(rawCreatedAt);
+      }
       return createdAt != null && createdAt.isAfter(thirtyDaysAgo);
     }).toList();
 
@@ -143,10 +150,19 @@ final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
       // We limit to checking the last 20 sessions to avoid excessive reads
       final sessionsToCheck = recentSessions.toList()
         ..sort((a, b) {
-          final aTs = a.data()['createdAt'] as Timestamp?;
-          final bTs = b.data()['createdAt'] as Timestamp?;
-          if (aTs == null || bTs == null) return 0;
-          return bTs.compareTo(aTs);
+          final aRaw = a.data()['createdAt'];
+          final bRaw = b.data()['createdAt'];
+          
+          DateTime? aDate;
+          if (aRaw is Timestamp) aDate = aRaw.toDate();
+          else if (aRaw is String) aDate = DateTime.tryParse(aRaw);
+
+          DateTime? bDate;
+          if (bRaw is Timestamp) bDate = bRaw.toDate();
+          else if (bRaw is String) bDate = DateTime.tryParse(bRaw);
+
+          if (aDate == null || bDate == null) return 0;
+          return bDate.compareTo(aDate);
         });
 
       final limitedSessions = sessionsToCheck.take(20).toList();
@@ -176,7 +192,10 @@ final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
         if (studentData['role'] != 'student') continue;
 
         // Check if student joined more than 30 days ago
-        final joinedAt = (studentData['createdAt'] as Timestamp?)?.toDate();
+        final rawJoinedAt = studentData['createdAt'];
+        DateTime? joinedAt;
+        if (rawJoinedAt is Timestamp) joinedAt = rawJoinedAt.toDate();
+        else if (rawJoinedAt is String) joinedAt = DateTime.tryParse(rawJoinedAt);
         if (joinedAt == null || joinedAt.isAfter(thirtyDaysAgo)) continue;
 
         final attendedCount = attendanceByStudent[studentDoc.id] ?? 0;

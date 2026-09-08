@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/logger.dart';
 import '../../auth/providers.dart';
 import 'empty_state.dart';
@@ -29,8 +31,7 @@ final dashboardActiveSessionProvider = StreamProvider<Map<String, dynamic>?>((
     Query<Map<String, dynamic>> query = FirebaseFirestore.instance
         .collection('sessions')
         .where('active', isEqualTo: true)
-        .orderBy('createdAt', descending: true)
-        .limit(1);
+        .limit(10); // Removed orderBy('createdAt') to prevent Web SDK crashes on mixed types
 
     // Add institution filter for non-superadmin users
     if (!auth.isSuperAdmin && code != null && code.isNotEmpty) {
@@ -46,32 +47,40 @@ final dashboardActiveSessionProvider = StreamProvider<Map<String, dynamic>?>((
         .snapshots()
         .map((snap) {
           if (snap.docs.isEmpty) return null;
-          final doc = snap.docs.first;
-          final data = doc.data();
+          
+          final docs = snap.docs.toList();
+          // Sort in memory to get the latest
+          docs.sort((a, b) {
+            final aRaw = a.data()['createdAt'];
+            final bRaw = b.data()['createdAt'];
+            DateTime? aDate;
+            if (aRaw is Timestamp) aDate = aRaw.toDate();
+            else if (aRaw is String) aDate = DateTime.tryParse(aRaw);
+            DateTime? bDate;
+            if (bRaw is Timestamp) bDate = bRaw.toDate();
+            else if (bRaw is String) bDate = DateTime.tryParse(bRaw);
+            if (aDate == null || bDate == null) return 0;
+            return bDate.compareTo(aDate);
+          });
 
-          // DEFENSIVE CHECKS to handle Firestore sync delays
+          for (final doc in docs) {
+            final data = doc.data();
 
-          // Check 1: Verify active is not explicitly false
-          if (data['active'] == false) {
-            return null;
-          }
+            // DEFENSIVE CHECKS to handle Firestore sync delays
+            if (data['active'] == false) continue;
+            if (data['endedAt'] != null) continue;
 
-          // Check 2: Check if session was manually ended
-          if (data['endedAt'] != null) {
-            return null;
-          }
-
-          // Check 3: Double-check the session is not expired
-          final expiresAtRaw = data['expiresAt'];
-          if (expiresAtRaw is Timestamp) {
-            final expiresAt = expiresAtRaw.toDate();
-            if (DateTime.now().isAfter(expiresAt)) {
-              // Session expired, should not be shown as active
-              return null;
+            final expiresAtRaw = data['expiresAt'];
+            if (expiresAtRaw is Timestamp) {
+              final expiresAt = expiresAtRaw.toDate();
+              if (DateTime.now().isAfter(expiresAt)) {
+                continue;
+              }
             }
-          }
 
-          return {'id': doc.id, ...data};
+            return {'id': doc.id, ...data};
+          }
+          return null;
         })
         .handleError((error) {
           appLogger.i('Error in dashboardActiveSessionProvider: $error');

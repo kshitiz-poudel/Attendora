@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+
 import 'models/class_group.dart';
 
 class ClassGroupRepository {
@@ -80,10 +81,17 @@ class ClassGroupRepository {
       query = query.where('institutionCode', isEqualTo: institutionCode);
     }
 
-    return query.snapshots().map(
-      (snapshot) =>
-          snapshot.docs.map((doc) => ClassGroup.fromFirestore(doc)).toList(),
-    );
+    return query.snapshots().map((snapshot) {
+      final groups = <ClassGroup>[];
+      for (final doc in snapshot.docs) {
+        try {
+          groups.add(ClassGroup.fromFirestore(doc));
+        } catch (e) {
+          debugPrint('⚠️ Skipping malformed class_group doc ${doc.id}: $e');
+        }
+      }
+      return groups;
+    });
   }
 
   /// Stream groups assigned to a specific teacher
@@ -91,11 +99,17 @@ class ClassGroupRepository {
     return _groupsCollection
         .where('teacherUids', arrayContains: teacherUid)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ClassGroup.fromFirestore(doc))
-              .toList(),
-        );
+        .map((snapshot) {
+          final groups = <ClassGroup>[];
+          for (final doc in snapshot.docs) {
+            try {
+              groups.add(ClassGroup.fromFirestore(doc));
+            } catch (e) {
+              debugPrint('⚠️ Skipping malformed doc ${doc.id}: $e');
+            }
+          }
+          return groups;
+        });
   }
 
   /// Stream groups where a student is enrolled
@@ -103,11 +117,17 @@ class ClassGroupRepository {
     return _groupsCollection
         .where('studentUids', arrayContains: studentUid)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ClassGroup.fromFirestore(doc))
-              .toList(),
-        );
+        .map((snapshot) {
+          final groups = <ClassGroup>[];
+          for (final doc in snapshot.docs) {
+            try {
+              groups.add(ClassGroup.fromFirestore(doc));
+            } catch (e) {
+              debugPrint('⚠️ Skipping malformed doc ${doc.id}: $e');
+            }
+          }
+          return groups;
+        });
   }
 
   /// Assign a teacher to a class group

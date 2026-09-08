@@ -1,21 +1,24 @@
 import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:geolocator/geolocator.dart';
+
 import '../models/geo_attendance_models.dart';
 
 class FacultyGeoAttendanceService {
   FacultyGeoAttendanceService({
     FirebaseFirestore? firestore,
     FirebaseStorage? storage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _storage = storage ?? FirebaseStorage.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
 
-  DocumentReference<Map<String, dynamic>> _settingsRef(String institutionCode) =>
-      _firestore.collection('geo_attendance_settings').doc(institutionCode);
+  DocumentReference<Map<String, dynamic>> _settingsRef(
+    String institutionCode,
+  ) => _firestore.collection('geo_attendance_settings').doc(institutionCode);
 
   Future<GeoAttendanceSettings?> getSettings(String institutionCode) async {
     final snapshot = await _settingsRef(institutionCode).get();
@@ -24,18 +27,41 @@ class FacultyGeoAttendanceService {
   }
 
   Stream<GeoAttendanceSettings?> watchSettings(String institutionCode) =>
-      _settingsRef(institutionCode).snapshots().map((snapshot) =>
-          snapshot.exists && snapshot.data() != null
-              ? GeoAttendanceSettings.fromMap(snapshot.data()!)
-              : null);
+      _settingsRef(institutionCode).snapshots().map(
+        (snapshot) => snapshot.exists && snapshot.data() != null
+            ? GeoAttendanceSettings.fromMap(snapshot.data()!)
+            : null,
+      );
 
-  Future<void> saveSettings(String institutionCode, GeoAttendanceSettings settings) async {
-    await _settingsRef(institutionCode).set(settings.toMap(), SetOptions(merge: true));
+  Future<void> saveSettings(
+    String institutionCode,
+    GeoAttendanceSettings settings,
+  ) async {
+    if (institutionCode.trim().isEmpty) {
+      throw ArgumentError.value(
+        institutionCode,
+        'institutionCode',
+        'Cannot be empty',
+      );
+    }
+    if (settings.latitude < -90 ||
+        settings.latitude > 90 ||
+        settings.longitude < -180 ||
+        settings.longitude > 180) {
+      throw ArgumentError('Campus coordinates are invalid.');
+    }
+    if (settings.radiusMeters <= 0 || settings.radiusMeters > 10000) {
+      throw ArgumentError('Campus radius must be between 1 and 10000 meters.');
+    }
+    await _settingsRef(institutionCode)
+        .set(settings.toMap(), SetOptions(merge: true));
   }
 
   Future<Position> getVerifiedCurrentPosition() async {
     if (!await Geolocator.isLocationServiceEnabled()) {
-      throw Exception('Location services are disabled. Please enable GPS and try again.');
+      throw Exception(
+        'Location services are disabled. Please enable GPS and try again.',
+      );
     }
     var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -43,22 +69,27 @@ class FacultyGeoAttendanceService {
     }
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
-      throw Exception('Location permission is required to mark faculty attendance.');
+      throw Exception(
+        'Location permission is required to mark faculty attendance.',
+      );
     }
     return Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 20),
       ),
     );
   }
 
-  double distanceFromCampus(Position position, GeoAttendanceSettings settings) =>
-      Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        settings.latitude,
-        settings.longitude,
-      );
+  double distanceFromCampus(
+    Position position,
+    GeoAttendanceSettings settings,
+  ) => Geolocator.distanceBetween(
+    position.latitude,
+    position.longitude,
+    settings.latitude,
+    settings.longitude,
+  );
 
   Future<String> uploadEvidence({
     required String facultyId,
@@ -86,20 +117,33 @@ class FacultyGeoAttendanceService {
       throw ArgumentError.value(type, 'type', 'Must be checkIn or checkOut');
     }
     final now = DateTime.now();
-    final date = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final date =
+        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
     final docId = '${institutionCode}_${facultyId}_$date';
     final field = type == 'checkIn' ? 'checkIn' : 'checkOut';
     final ref = _firestore.collection('faculty_geo_attendance').doc(docId);
-    final existing = await ref.get();
-    final existingData = existing.data();
-
-    if (type == 'checkOut' && (existingData == null || existingData['checkIn'] == null)) {
-      throw Exception('Please mark entry attendance before marking exit.');
+    if (photoUrl.trim().isEmpty) {
+      throw ArgumentError.value(
+        photoUrl,
+        'photoUrl',
+        'A verification photo is required.',
+      );
     }
-    if (existingData != null && existingData[field] != null) {
-      throw Exception(type == 'checkIn'
-          ? 'Entry attendance has already been recorded for today.'
-          : 'Exit attendance has already been recorded for today.');
+    if (distance.isNaN || distance.isInfinite || distance < 0) {
+      throw ArgumentError.value(
+        distance,
+        'distance',
+        'Invalid campus distance.',
+      );
+    }
+    if (position.accuracy.isNaN ||
+        position.accuracy.isInfinite ||
+        position.accuracy < 0) {
+      throw ArgumentError.value(
+        position.accuracy,
+        'accuracy',
+        'Invalid location accuracy.',
+      );
     }
 
     final event = {
@@ -112,20 +156,37 @@ class FacultyGeoAttendanceService {
       'photoUrl': photoUrl,
     };
 
-    await ref.set({
-      'facultyId': facultyId,
-      'facultyName': facultyName,
-      'institutionCode': institutionCode,
-      'date': date,
-      field: event,
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    await _firestore.runTransaction((transaction) async {
+      final existing = await transaction.get(ref);
+      final existingData = existing.data();
+      if (type == 'checkOut' &&
+          (existingData == null || existingData['checkIn'] == null)) {
+        throw Exception('Please mark entry attendance before marking exit.');
+      }
+      if (existingData != null && existingData[field] != null) {
+        throw Exception(
+          type == 'checkIn'
+              ? 'Entry attendance has already been recorded for today.'
+              : 'Exit attendance has already been recorded for today.',
+        );
+      }
+      transaction.set(ref, {
+        'facultyId': facultyId,
+        'facultyName': facultyName,
+        'institutionCode': institutionCode,
+        'date': date,
+        field: event,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    });
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> watchTodayAttendance(String institutionCode, String date) =>
-      _firestore
-          .collection('faculty_geo_attendance')
-          .where('institutionCode', isEqualTo: institutionCode)
-          .where('date', isEqualTo: date)
-          .snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> watchTodayAttendance(
+    String institutionCode,
+    String date,
+  ) => _firestore
+      .collection('faculty_geo_attendance')
+      .where('institutionCode', isEqualTo: institutionCode)
+      .where('date', isEqualTo: date)
+      .snapshots();
 }

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rxdart/rxdart.dart';
+
 import '../../auth/providers.dart';
 import '../../teacher/providers.dart';
 import '../../../core/utils/error_handler.dart';
@@ -447,9 +448,8 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                             ),
                                             TextSpan(
                                               text: targetTime != null
-                                                  ? DateFormat(
-                                                      'h:mm a',
-                                                    ).format(targetTime)
+                                                  ? DateFormat('h:mm a')
+                                                        .format(targetTime)
                                                   : 'No time',
                                             ),
                                           ],
@@ -483,9 +483,8 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                       ),
                                       decoration: BoxDecoration(
                                         color: isScheduled
-                                            ? const Color(
-                                                0xFFF59E0B,
-                                              ).withValues(alpha: 0.15)
+                                            ? const Color(0xFFF59E0B)
+                                                  .withValues(alpha: 0.15)
                                             : color.withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(12),
                                       ),

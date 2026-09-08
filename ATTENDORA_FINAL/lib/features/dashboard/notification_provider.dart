@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../auth/providers.dart';
 import 'providers.dart';
 import '../shared/widgets/alerts_card.dart';
@@ -39,15 +40,10 @@ class NotificationData {
 final newRegistrationsProvider = StreamProvider<List<Map<String, dynamic>>>((
   ref,
 ) {
-  // Listen for users created in the last 5 minutes
-  // This is a "live" stream for notifications
-  final cutoff = DateTime.now().subtract(const Duration(minutes: 5));
-
-  return FirebaseFirestore.instance
-      .collection('users')
-      .where('createdAt', isGreaterThan: Timestamp.fromDate(cutoff))
-      .snapshots()
-      .map((snap) => snap.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+  // Disabled the where('createdAt') query because it causes an INTERNAL ASSERTION FAILED
+  // in the Firestore Web SDK due to heterogeneous types (String vs Timestamp) in the database.
+  // A cloud function should ideally populate a 'recent_activity' collection instead.
+  return Stream.value([]);
 });
 
 /// Provider that combines all notification sources

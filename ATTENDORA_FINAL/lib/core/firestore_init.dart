@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'logger.dart';
 
 /// Service to initialize Firestore collections on first launch
@@ -59,8 +60,7 @@ class FirestoreInitService {
         await _firestore.collection(collectionName).doc('_placeholder').set({
           '_placeholder': true,
           'createdAt': FieldValue.serverTimestamp(),
-          'description':
-              'This is a placeholder document to ensure the collection exists. It will be automatically cleaned up.',
+          'description': 'This is a placeholder document to ensure the collection exists. It will be automatically cleaned up.',
         });
 
         // Delete the placeholder immediately (it already created the collection)

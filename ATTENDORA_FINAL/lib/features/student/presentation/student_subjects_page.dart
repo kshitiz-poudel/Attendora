@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/utils/error_handler.dart';
+
 import 'package:attendora/core/responsive_utils.dart';
 import 'package:attendora/features/student/presentation/student_shell.dart';
 import 'package:attendora/features/student/providers.dart';
+
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
@@ -247,14 +250,12 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: _getAttendanceColor(
-                            percentage,
-                          ).withValues(alpha: 0.1),
+                          color: _getAttendanceColor(percentage)
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: _getAttendanceColor(
-                              percentage,
-                            ).withValues(alpha: 0.3),
+                            color: _getAttendanceColor(percentage)
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(

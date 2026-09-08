@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../auth/providers.dart';
 import '../../institutions/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
@@ -33,8 +34,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
           ErrorDialog.show(
             context,
             title: 'Account Already Exists',
-            message:
-                'You already have an account with this email. Please log in instead.',
+            message: 'You already have an account with this email. Please log in instead.',
             actionText: 'Log in',
             onAction: () {
               ref.read(authControllerProvider.notifier).clearError();
@@ -72,8 +72,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
           ErrorDialog.show(
             context,
             title: 'Account Already Exists',
-            message:
-                'You already have an account with this email. Please log in instead.',
+            message: 'You already have an account with this email. Please log in instead.',
             actionText: 'Log in',
             onAction: () {
               ref.read(authControllerProvider.notifier).clearError();
@@ -114,12 +113,10 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(
-                                    0xFF10B981,
-                                  ).withValues(alpha: 0.2),
-                                  const Color(
-                                    0xFF059669,
-                                  ).withValues(alpha: 0.2),
+                                  const Color(0xFF10B981)
+                                      .withValues(alpha: 0.2),
+                                  const Color(0xFF059669)
+                                      .withValues(alpha: 0.2),
                                 ],
                               ),
                               borderRadius: const BorderRadius.only(
@@ -143,9 +140,8 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(
-                                          0xFF10B981,
-                                        ).withValues(alpha: 0.3),
+                                        color: const Color(0xFF10B981)
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
@@ -400,15 +396,13 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                           return Container(
                                             padding: const EdgeInsets.all(16),
                                             decoration: BoxDecoration(
-                                              color: const Color(
-                                                0xFF2F6FED,
-                                              ).withValues(alpha: 0.1),
+                                              color: const Color(0xFF2F6FED)
+                                                  .withValues(alpha: 0.1),
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                               border: Border.all(
-                                                color: const Color(
-                                                  0xFF2F6FED,
-                                                ).withValues(alpha: 0.3),
+                                                color: const Color(0xFF2F6FED)
+                                                    .withValues(alpha: 0.3),
                                               ),
                                             ),
                                             child: Row(
@@ -457,16 +451,14 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                         return Container(
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: const Color(
-                                              0xFF2F6FED,
-                                            ).withValues(alpha: 0.1),
+                                            color: const Color(0xFF2F6FED)
+                                                .withValues(alpha: 0.1),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
                                             border: Border.all(
-                                              color: const Color(
-                                                0xFF2F6FED,
-                                              ).withValues(alpha: 0.3),
+                                              color: const Color(0xFF2F6FED)
+                                                  .withValues(alpha: 0.3),
                                             ),
                                           ),
                                           child: Row(

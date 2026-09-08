@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../shared/widgets/empty_state.dart';
@@ -91,7 +92,9 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                 );
 
                 final createButton = FilledButton.icon(
-                  onPressed: () => _showCreateGroupDialog(context),
+                  onPressed: auth.uid == null
+                      ? null
+                      : () => _showCreateGroupDialog(context),
                   icon: const Icon(Icons.group_add),
                   label: const Text('Create Group'),
                 );
@@ -364,8 +367,7 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                   return const EmptyState(
                     icon: Icons.groups,
                     title: 'No Class Groups',
-                    subtitle:
-                        'Create your first class group to organize students and teachers.',
+                    subtitle: 'Create your first class group to organize students and teachers.',
                   );
                 }
 
@@ -599,7 +601,7 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                     ErrorHandler.showErrorSnackBar(
                       context,
                       e,
-                      customMessage: 'Unable to delete class group',
+                      customMessage: 'Unable to create class group',
                     );
                   }
                 }
@@ -689,9 +691,8 @@ class _GroupCard extends ConsumerWidget {
                     if (group.description != null)
                       Text(
                         group.description!,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: FluentColors.textSecondary,
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: FluentColors.textSecondary),
                       ),
                   ],
                 ),

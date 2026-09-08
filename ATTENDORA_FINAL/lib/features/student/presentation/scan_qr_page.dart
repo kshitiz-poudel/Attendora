@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../student/models/attendance_record.dart';
 import '../../student/providers.dart';
 import '../../auth/providers.dart';
@@ -13,9 +15,13 @@ import '../../attendance/providers.dart';
 import '../../notifications/repository.dart';
 import '../../notifications/providers.dart';
 import '../../shared/providers.dart';
+
 import 'package:flutter/foundation.dart';
+
 import 'dart:io';
+
 import '../../shared/widgets/glass_card.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
 class ScanQrPage extends ConsumerStatefulWidget {
@@ -143,12 +149,10 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
             pos.longitude,
           );
 
-          if (bypassLocation || distance <= radius + 2.0) {
-            result = 'Present';
+          if (bypassLocation || (radius > 0 && distance <= radius + 2.0)) {
             final rollNumber =
                 ref.read(authControllerProvider).rollNumber ?? '';
-            final idNumber =
-                rollNumber; // User confirmed ID and Roll Number are the same/reflected
+            final idNumber = rollNumber; // User confirmed ID and Roll Number are the same/reflected
             if (idNumber.isEmpty) {
               note = 'No ID/Roll number on profile. Complete onboarding.';
               throw Exception(note);
@@ -159,6 +163,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
               rollNumber: rollNumber,
               distanceMeters: distance,
             );
+            result = 'Present';
             note = bypassLocation
                 ? 'Location check bypassed by teacher (${distance.toStringAsFixed(1)} m)'
                 : 'Marked within ${distance.toStringAsFixed(1)} m';
@@ -201,8 +206,11 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
         }
       }
     } catch (e) {
-      // note variable already contains user-friendly message from specific error cases above
-      // Don't expose technical error to user
+      // Keep a friendly message for unexpected Firestore/location failures.
+      if (note.isEmpty) {
+        note = 'Unable to record attendance. Please try again.';
+      }
+      debugPrint('Attendance scan failed: $e');
     }
 
     ref
@@ -349,9 +357,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () async {
-                      final uri = Uri.parse(
-                        'https://drive.google.com/uc?export=download&id=1Ml0hlqjI1YckzSO89aKw3ymBwckjMSR5',
-                      );
+                      final uri = Uri.base.resolve('downloads/attendora.apk');
                       await launchUrl(
                         uri,
                         mode: LaunchMode.externalApplication,

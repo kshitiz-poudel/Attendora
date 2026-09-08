@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../auth/providers.dart';
 import '../../auth/services/biometric_service.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
 import '../../shared/widgets/error_dialog.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -163,12 +165,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(
-                                    0xFF10B981,
-                                  ).withValues(alpha: 0.2),
-                                  const Color(
-                                    0xFF2F6FED,
-                                  ).withValues(alpha: 0.2),
+                                  const Color(0xFF10B981)
+                                      .withValues(alpha: 0.2),
+                                  const Color(0xFF2F6FED)
+                                      .withValues(alpha: 0.2),
                                 ],
                               ),
                               borderRadius: const BorderRadius.vertical(
@@ -191,9 +191,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(
-                                          0xFF10B981,
-                                        ).withValues(alpha: 0.3),
+                                        color: const Color(0xFF10B981)
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
@@ -296,62 +295,58 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                 _passwordController.text;
 
                                             if (idNumber.isEmpty) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Please enter your ID Number',
-                                                  ),
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                ),
-                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Please enter your ID Number',
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.orange,
+                                                    ),
+                                                  );
                                               return;
                                             }
 
                                             if (idNumber.length < 3) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'ID Number must be at least 3 characters',
-                                                  ),
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                ),
-                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'ID Number must be at least 3 characters',
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.orange,
+                                                    ),
+                                                  );
                                               return;
                                             }
 
                                             if (password.isEmpty) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Please enter your password',
-                                                  ),
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                ),
-                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Please enter your password',
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.orange,
+                                                    ),
+                                                  );
                                               return;
                                             }
 
                                             if (password.length < 6) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Password must be at least 6 characters',
-                                                  ),
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                ),
-                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Password must be at least 6 characters',
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.orange,
+                                                    ),
+                                                  );
                                               return;
                                             }
                                             await ref
@@ -374,9 +369,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       elevation: 0,
-                                      shadowColor: const Color(
-                                        0xFF10B981,
-                                      ).withValues(alpha: 0.5),
+                                      shadowColor: const Color(0xFF10B981)
+                                          .withValues(alpha: 0.5),
                                     ),
                                     child: state.loading
                                         ? const SizedBox(
@@ -458,14 +452,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFF59E0B,
-                                    ).withValues(alpha: 0.1),
+                                    color: const Color(0xFFF59E0B)
+                                        .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: const Color(
-                                        0xFFF59E0B,
-                                      ).withValues(alpha: 0.3),
+                                      color: const Color(0xFFF59E0B)
+                                          .withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Row(

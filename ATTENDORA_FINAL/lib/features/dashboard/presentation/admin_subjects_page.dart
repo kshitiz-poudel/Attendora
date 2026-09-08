@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
+
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
@@ -932,8 +933,7 @@ class _SubjectDetailsDialog extends ConsumerWidget {
                       return const EmptyState(
                         icon: Icons.class_outlined,
                         title: 'No Active Classes',
-                        subtitle:
-                            'This subject is not currently assigned to any groups.',
+                        subtitle: 'This subject is not currently assigned to any groups.',
                         color: FluentColors.textSecondary,
                       );
                     }

@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'dart:async';
+
 import 'repository.dart';
 import 'services/biometric_service.dart';
 import '../../core/services/secure_storage_service.dart';
@@ -561,8 +563,7 @@ class AuthController extends Notifier<AuthState> {
 
       state = state.copyWith(
         loading: false,
-        role: profile
-            .role, // Should be admin/none depending on implementation, but usually admin
+        role: profile.role, // Should be admin/none depending on implementation, but usually admin
         uid: originalUid,
         email: profile.email,
         displayName: profile.displayName,

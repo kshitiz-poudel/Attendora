@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+
 import '../../core/services/connectivity_service.dart';
 import '../../core/services/offline_service.dart';
 
@@ -280,8 +281,7 @@ class AttendanceRepository {
   }) async {
     final data = <String, dynamic>{};
     if (topic != null) {
-      data['subject'] =
-          topic; // 'subject' is used as topic in UI often, but let's stick to schema
+      data['subject'] = topic; // 'subject' is used as topic in UI often, but let's stick to schema
     }
     if (notes != null) data['notes'] = notes;
 

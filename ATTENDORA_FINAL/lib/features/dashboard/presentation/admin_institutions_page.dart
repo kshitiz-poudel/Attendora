@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../institutions/models.dart';
 import '../../institutions/providers.dart';
 import '../../super_admin/presentation/super_admin_shell.dart';
@@ -282,9 +283,8 @@ class _AdminInstitutionsPageState extends ConsumerState<AdminInstitutionsPage> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Sync failed: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Sync failed: $e')));
       }
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class GlassCard extends StatelessWidget {
@@ -30,9 +31,8 @@ class GlassCard extends StatelessWidget {
             height: height,
             padding: padding ?? const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(
-                0xFF1E293B,
-              ).withValues(alpha: 0.6), // Semi-transparent slate
+              color: const Color(0xFF1E293B)
+                  .withValues(alpha: 0.6), // Semi-transparent slate
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.08),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
 import '../../shared/providers.dart';
@@ -932,9 +933,8 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF2F6FED,
-                              ).withValues(alpha: 0.1),
+                              color: const Color(0xFF2F6FED)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Icon(
@@ -958,9 +958,8 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF10B981,
-                              ).withValues(alpha: 0.1),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Icon(
@@ -1200,9 +1199,8 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF2F6FED,
-                              ).withValues(alpha: 0.1),
+                              color: const Color(0xFF2F6FED)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Icon(
@@ -1226,9 +1224,8 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF10B981,
-                              ).withValues(alpha: 0.1),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Icon(

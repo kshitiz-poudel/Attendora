@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:intl/intl.dart';
+
 import '../../../core/responsive_utils.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../shared/widgets/attendance_chart.dart';
@@ -84,9 +85,8 @@ class AdminAnalyticsPage extends ConsumerWidget {
           Container(
             padding: EdgeInsets.all(isMobile ? 12 : 16),
             decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: .2),
+              color: Theme.of(context).colorScheme.primary
+                  .withValues(alpha: .2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/responsive_utils.dart';
 import '../../shared/widgets/modern_sidebar.dart';
 import '../../shared/widgets/background_pattern.dart';
@@ -105,9 +106,8 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                         final unreadCount = notifications
                             .where((n) => !n.read)
                             .length;
-                        final location = GoRouterState.of(
-                          context,
-                        ).uri.toString();
+                        final location = GoRouterState.of(context).uri
+                            .toString();
 
                         if (location.contains('/admin/notifications')) {
                           return const SizedBox.shrink();
@@ -367,9 +367,8 @@ class _UserMenuButton extends ConsumerWidget {
               ),
               Text(
                 email,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.white54),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: Colors.white54),
               ),
             ],
           ),

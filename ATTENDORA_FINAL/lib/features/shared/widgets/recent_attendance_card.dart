@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/logger.dart';
 import '../../auth/providers.dart';
 import 'empty_state.dart';
@@ -301,9 +302,8 @@ class RecentAttendanceCard extends ConsumerWidget {
                               if (timestamp != null) ...[
                                 const SizedBox(height: 4),
                                 Text(
-                                  DateFormat(
-                                    'MMM d, h:mm a',
-                                  ).format(timestamp), // Date and Time
+                                  DateFormat('MMM d, h:mm a')
+                                      .format(timestamp), // Date and Time
                                   style: GoogleFonts.outfit(
                                     color: const Color(0xFF94A3B8),
                                     fontSize: 11,
@@ -332,8 +332,7 @@ class RecentAttendanceCard extends ConsumerWidget {
                   return const EmptyState(
                     icon: Icons.build_circle_outlined,
                     title: 'Setting Up Database',
-                    subtitle:
-                        'Please wait 2-3 minutes for indexes to build, then refresh',
+                    subtitle: 'Please wait 2-3 minutes for indexes to build, then refresh',
                     color: Color(0xFFF59E0B),
                   );
                 }

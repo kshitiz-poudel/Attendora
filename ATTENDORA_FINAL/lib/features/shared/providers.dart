@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'models/class_group.dart';
 import 'class_group_repository.dart';
 import 'subject_repository.dart';
@@ -18,6 +19,15 @@ final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
 final allClassGroupsProvider = StreamProvider.autoDispose<List<ClassGroup>>((
   ref,
 ) {
+  // Firestore requires an authenticated request.  This provider can be first
+  // watched while AuthController is still restoring FirebaseAuth's session;
+  // watching auth makes Riverpod replace that pre-auth stream as soon as the
+  // UID is available.
+  final auth = ref.watch(authControllerProvider);
+  if (auth.uid == null) {
+    return Stream.value(const <ClassGroup>[]);
+  }
+
   final repo = ref.watch(classGroupRepositoryProvider);
   return repo.streamAllGroups();
 });
@@ -53,12 +63,12 @@ final studentClassGroupsProvider = StreamProvider.autoDispose<List<ClassGroup>>(
 );
 
 // Future provider to get all groups for dropdown selection
-final allClassGroupsListProvider = FutureProvider.autoDispose<List<ClassGroup>>((
-  ref,
-) async {
-  final repo = ref.watch(classGroupRepositoryProvider);
-  // Prefer institution selected during onboarding, else current user's institution
-  final auth = ref.watch(authControllerProvider);
-  final code = auth.selectedInstitutionForSignup ?? auth.institutionCode;
-  return repo.getAllGroups(institutionCode: code);
-});
+final allClassGroupsListProvider = FutureProvider.autoDispose<List<ClassGroup>>(
+  (ref) async {
+    final repo = ref.watch(classGroupRepositoryProvider);
+    // Prefer institution selected during onboarding, else current user's institution
+    final auth = ref.watch(authControllerProvider);
+    final code = auth.selectedInstitutionForSignup ?? auth.institutionCode;
+    return repo.getAllGroups(institutionCode: code);
+  },
+);

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -69,8 +70,7 @@ class NotificationService {
         const channel = AndroidNotificationChannel(
           'high_importance_channel', // id
           'High Importance Notifications', // title
-          description:
-              'This channel is used for important notifications.', // description
+          description: 'This channel is used for important notifications.', // description
           importance: Importance.max,
         );
 

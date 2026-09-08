@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../auth/providers.dart';
 
 class TeacherPendingApprovalPage extends ConsumerWidget {
@@ -60,9 +61,8 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                     // Message
                     Text(
                       'Your teacher account is awaiting admin approval.',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.copyWith(color: Colors.grey[700]),
+                      style: Theme.of(context).textTheme.bodyLarge
+                          ?.copyWith(color: Colors.grey[700]),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),

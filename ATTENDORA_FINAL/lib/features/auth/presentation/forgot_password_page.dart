@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 
@@ -199,9 +200,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(
-                                      0xFFF59E0B,
-                                    ).withValues(alpha: 0.3),
+                                    color: const Color(0xFFF59E0B)
+                                        .withValues(alpha: 0.3),
                                     blurRadius: 20,
                                     offset: const Offset(0, 8),
                                   ),
@@ -481,14 +481,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                   Container(
                                     padding: const EdgeInsets.all(20),
                                     decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF10B981,
-                                      ).withValues(alpha: 0.1),
+                                      color: const Color(0xFF10B981)
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: const Color(
-                                          0xFF10B981,
-                                        ).withValues(alpha: 0.3),
+                                        color: const Color(0xFF10B981)
+                                            .withValues(alpha: 0.3),
                                       ),
                                     ),
                                     child: Column(

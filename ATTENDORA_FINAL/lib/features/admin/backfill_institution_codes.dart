@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../core/logger.dart';
 
 class InstitutionCodeBackfillService {
@@ -235,8 +236,7 @@ class InstitutionCodeBackfillService {
   /// with no institutionCode on their own profile) are skipped as errors
   /// and need a manual fix from the admin UI (recreate with an institution
   /// selected, or set the field directly in Firestore).
-  Future<({int updated, int skipped, int errors})>
-  backfillClassGroups() async {
+  Future<({int updated, int skipped, int errors})> backfillClassGroups() async {
     int updated = 0;
     int skipped = 0;
     int errors = 0;

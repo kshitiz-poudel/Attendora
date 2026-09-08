@@ -135,28 +135,23 @@ class ErrorDialog {
       case 'firebase_auth/invalid-credential':
       case 'firebase_auth/wrong-password':
         title = 'Incorrect Credentials';
-        message =
-            'The ID Number or password you entered is incorrect. Please check and try again.';
+        message = 'The ID Number or password you entered is incorrect. Please check and try again.';
         break;
       case 'firebase_auth/user-not-found':
         title = 'Account Not Found';
-        message =
-            'No account exists with this ID Number. Please check your ID Number or create a new account.';
+        message = 'No account exists with this ID Number. Please check your ID Number or create a new account.';
         break;
       case 'firebase_auth/user-disabled':
         title = 'Account Disabled';
-        message =
-            'This account has been disabled. Please contact your institution administrator.';
+        message = 'This account has been disabled. Please contact your institution administrator.';
         break;
       case 'firebase_auth/too-many-requests':
         title = 'Too Many Attempts';
-        message =
-            'Too many failed login attempts. Please wait a few minutes and try again.';
+        message = 'Too many failed login attempts. Please wait a few minutes and try again.';
         break;
       case 'firebase_auth/email-already-in-use':
         title = 'Account Already Exists';
-        message =
-            'An account with this email already exists. Please use a different email or try logging in.';
+        message = 'An account with this email already exists. Please use a different email or try logging in.';
         break;
       case 'firebase_auth/invalid-email':
         title = 'Invalid Email';
@@ -169,39 +164,32 @@ class ErrorDialog {
         break;
       case 'firebase_auth/weak-password':
         title = 'Weak Password';
-        message =
-            'Your password is too weak. Please use at least 6 characters with a mix of letters and numbers.';
+        message = 'Your password is too weak. Please use at least 6 characters with a mix of letters and numbers.';
         break;
       case 'firebase_auth/network-request-failed':
         title = 'Network Error';
-        message =
-            'Unable to connect to the server. Please check your internet connection and try again.';
+        message = 'Unable to connect to the server. Please check your internet connection and try again.';
         break;
       case 'id-already-taken':
         title = 'ID Number Taken';
-        message =
-            'This ID Number is already registered. Please check your ID Number or contact your administrator.';
+        message = 'This ID Number is already registered. Please check your ID Number or contact your administrator.';
         break;
       case 'invalid-institution-email':
         title = 'Invalid Email Domain';
-        message =
-            'Please use your institutional email address (e.g., your@institution.edu).';
+        message = 'Please use your institutional email address (e.g., your@institution.edu).';
         break;
       case 'password-mismatch':
         title = 'Passwords Don\'t Match';
-        message =
-            'The passwords you entered don\'t match. Please make sure both passwords are identical.';
+        message = 'The passwords you entered don\'t match. Please make sure both passwords are identical.';
         break;
       case 'account-already-exists':
         title = 'Account Already Exists';
-        message =
-            'You already have an account with this email. Please log in instead.';
+        message = 'You already have an account with this email. Please log in instead.';
         break;
       case 'firebase_auth/unauthorized-domain':
       case 'unauthorized-domain':
         title = 'Unauthorized Domain';
-        message =
-            'This domain is not authorized for authentication. Please add it to the Authorized Domains list in the Firebase Console.';
+        message = 'This domain is not authorized for authentication. Please add it to the Authorized Domains list in the Firebase Console.';
         break;
       case 'firebase_auth/popup-closed-by-user':
       case 'popup-closed-by-user':

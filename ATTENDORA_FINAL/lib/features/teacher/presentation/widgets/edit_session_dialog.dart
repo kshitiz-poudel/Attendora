@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../attendance/providers.dart';
 
 class EditSessionDialog extends ConsumerStatefulWidget {
@@ -40,9 +41,8 @@ class _EditSessionDialogState extends ConsumerState<EditSessionDialog> {
 
   Future<void> _save() async {
     if (_topicController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Topic cannot be empty')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Topic cannot be empty')));
       return;
     }
 

@@ -1,0 +1,92 @@
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.pem
+
+# ==========================================
+# Build & Output Directories
+# ==========================================
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+coverage/
+
+# ==========================================
+# macOS System Files
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ==========================================
+# IDE & Code Editor Files
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# Large Files & Datasets (Prevent LFS)
+# ==========================================
+# Binary & Archives
+*.zip
+*.tar.gz
+*.tar
+*.7z
+*.rar
+*.iso
+
+# Datasets / Database dumps
+*.sqlite
+*.sqlite3
+*.db
+*.csv
+*.dump
+*.sql
+
+# Large Media & AI Models
+*.mp4
+*.mov
+*.avi
+*.bin
+*.onnx
+*.pt
+*.pth
+*.h5
+
+# Machine Learning / Python caches (if applicable)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/

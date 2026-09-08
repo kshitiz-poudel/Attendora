@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_dropdown.dart';
 import '../../teacher/providers.dart';
 import '../../auth/providers.dart';
 import 'teacher_shell.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../attendance/providers.dart';
 
 class ManualAttendancePage extends ConsumerStatefulWidget {
@@ -306,9 +309,8 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                 ),
                                 const SizedBox(width: 12),
                                 Text(
-                                  DateFormat(
-                                    'MMM dd, yyyy',
-                                  ).format(_selectedDate),
+                                  DateFormat('MMM dd, yyyy')
+                                      .format(_selectedDate),
                                   style: GoogleFonts.outfit(
                                     color: Colors.white,
                                   ),

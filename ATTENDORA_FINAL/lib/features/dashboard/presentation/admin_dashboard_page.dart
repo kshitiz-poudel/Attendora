@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/responsive_utils.dart';
 import '../../../core/utils/error_handler.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../features/auth/providers.dart';
 import '../../shared/widgets/attendance_chart.dart';
 import '../providers.dart';
@@ -832,9 +835,8 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('❌ Backfill failed: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('❌ Backfill failed: $e')));
     } finally {
       if (mounted) {
         setState(() => _isBackfilling = false);

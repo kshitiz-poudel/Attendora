@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+
 import '../../shared/widgets/safe_avatar.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/responsive_utils.dart';
 import '../../../core/services/email_service.dart';
 import '../../../core/constants/email_constants.dart';
+
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../shared/widgets/empty_state.dart';
 import '../../auth/providers.dart';
 import '../../shared/providers.dart';
@@ -19,11 +24,17 @@ import '../../shared/widgets/glass_text_field.dart';
 // A single stable listener is used for the complete teacher directory.  The
 // pending/approved lists are derived in memory. This avoids rapidly adding and
 // removing multiple Firestore watch targets when an approval changes a document.
-final teacherDirectoryProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
+final teacherDirectoryProvider = StreamProvider<List<Map<String, dynamic>>>((
+  ref,
+) {
   final auth = ref.watch(authControllerProvider);
-  Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection('users');
+  Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection(
+    'users',
+  );
 
-  if (!auth.isSuperAdmin && auth.institutionCode != null && auth.institutionCode!.isNotEmpty) {
+  if (!auth.isSuperAdmin &&
+      auth.institutionCode != null &&
+      auth.institutionCode!.isNotEmpty) {
     query = query.where('institutionCode', isEqualTo: auth.institutionCode);
   }
 
@@ -46,17 +57,27 @@ final teacherDirectoryProvider = StreamProvider<List<Map<String, dynamic>>>((ref
   });
 });
 
-final pendingTeachersProvider = Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
-  return ref.watch(teacherDirectoryProvider).whenData(
-        (teachers) => teachers.where((teacher) => teacher['approved'] != true).toList(),
-      );
-});
+final pendingTeachersProvider =
+    Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
+      return ref
+          .watch(teacherDirectoryProvider)
+          .whenData(
+            (teachers) => teachers
+                .where((teacher) => teacher['approved'] != true)
+                .toList(),
+          );
+    });
 
-final approvedTeachersProvider = Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
-  return ref.watch(teacherDirectoryProvider).whenData(
-        (teachers) => teachers.where((teacher) => teacher['approved'] == true).toList(),
-      );
-});
+final approvedTeachersProvider =
+    Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
+      return ref
+          .watch(teacherDirectoryProvider)
+          .whenData(
+            (teachers) => teachers
+                .where((teacher) => teacher['approved'] == true)
+                .toList(),
+          );
+    });
 
 class AdminTeacherApprovalPage extends ConsumerStatefulWidget {
   const AdminTeacherApprovalPage({super.key});
@@ -435,14 +456,11 @@ class _AdminTeacherApprovalPageState
     String? name,
   ) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(teacherId)
-          .set({
-            'approved': true,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'approvedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+      await FirebaseFirestore.instance.collection('users').doc(teacherId).set({
+        'approved': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'approvedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -481,8 +499,7 @@ class _AdminTeacherApprovalPageState
               templateParams: {
                 'to_name': name ?? 'Teacher',
                 'to_email': email,
-                'message':
-                    'Your teacher account has been approved. You can now log in.',
+                'message': 'Your teacher account has been approved. You can now log in.',
                 'email': email,
                 'action_url': 'https://attendora.pages.dev/',
               },
@@ -702,8 +719,7 @@ class _AdminTeacherApprovalPageState
                 );
               }
               await EmailService.sendEmail(
-                templateId: EmailConstants
-                    .rejectionTemplateId, // Reusing rejection template for revocation
+                templateId: EmailConstants.rejectionTemplateId, // Reusing rejection template for revocation
                 templateParams: {
                   'to_name': name ?? 'Teacher',
                   'to_email': email,
@@ -771,8 +787,7 @@ class _TeacherCard extends ConsumerWidget {
                   children: [
                     // Avatar
                     SafeAvatar(
-                      imageUrl:
-                          null, // Teacher approval usually doesn't have photoUrl yet, or check if it does
+                      imageUrl: null, // Teacher approval usually doesn't have photoUrl yet, or check if it does
                       name: name,
                       radius: 24,
                       backgroundColor: isPending

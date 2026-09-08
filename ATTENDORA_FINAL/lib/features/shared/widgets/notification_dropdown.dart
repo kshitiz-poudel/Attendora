@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../dashboard/providers.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../dashboard/notification_provider.dart';
@@ -276,9 +277,8 @@ class NotificationDropdown extends ConsumerWidget {
                                 Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFF59E0B,
-                                    ).withValues(alpha: 0.2),
+                                    color: const Color(0xFFF59E0B)
+                                        .withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: const Icon(

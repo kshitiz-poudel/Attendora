@@ -31,12 +31,26 @@ class ClassGroup {
   final DateTime? updatedAt;
   final String type; // 'Lecture' or 'Lab'
 
+  /// Helper to parse a Firestore field that might be a Timestamp or a String
+  static DateTime _parseDate(dynamic raw, {DateTime? fallback}) {
+    if (raw is Timestamp) return raw.toDate();
+    if (raw is String) return DateTime.tryParse(raw) ?? (fallback ?? DateTime.now());
+    return fallback ?? DateTime.now();
+  }
+
+  static DateTime? _parseDateOrNull(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is Timestamp) return raw.toDate();
+    if (raw is String) return DateTime.tryParse(raw);
+    return null;
+  }
+
   /// Create ClassGroup from Firestore document
   factory ClassGroup.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return ClassGroup(
       id: doc.id,
-      name: data['name'] as String,
+      name: (data['name'] as String?) ?? 'Unnamed Group',
       description: data['description'] as String?,
       teacherUids: List<String>.from(data['teacherUids'] ?? []),
       studentUids: List<String>.from(data['studentUids'] ?? []),
@@ -46,10 +60,8 @@ class ClassGroup {
       institutionCode:
           data['institutionCode'] as String? ??
           data['institutionId'] as String?, // Support both field names
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: data['updatedAt'] != null
-          ? (data['updatedAt'] as Timestamp).toDate()
-          : null,
+      createdAt: _parseDate(data['createdAt']),
+      updatedAt: _parseDateOrNull(data['updatedAt']),
       type: data['type'] as String? ?? 'Lecture',
     );
   }

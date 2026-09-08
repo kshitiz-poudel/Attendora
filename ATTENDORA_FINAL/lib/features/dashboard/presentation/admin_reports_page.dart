@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:animate_do/animate_do.dart';
+
 import '../../../core/responsive_utils.dart';
 import '../../shared/services/export_service.dart';
 import '../../auth/providers.dart';
@@ -64,9 +65,8 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
             Container(
               padding: EdgeInsets.all(isMobile ? 12 : 16),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: .15),
+                color: Theme.of(context).colorScheme.primary
+                    .withValues(alpha: .15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -91,9 +91,8 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
                     const SizedBox(height: 6),
                     Text(
                       'Create detailed PDF reports for attendance, teachers, students, and sessions.',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(color: Colors.white70),
                     ),
                   ],
                 ],
@@ -409,9 +408,8 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error exporting data: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error exporting data: $e')));
       }
     } finally {
       if (mounted) {
@@ -652,9 +650,7 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
     final allSessionsSnapshot = await FirebaseFirestore.instance
         .collection('sessions')
         .orderBy('createdAt', descending: true)
-        .limit(
-          200,
-        ) // Fetch more to ensure we get 50+ from our institution after filtering
+        .limit(200) // Fetch more to ensure we get 50+ from our institution after filtering
         .get();
 
     // Filter by institution code client-side and limit to 50
@@ -758,9 +754,8 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
 
       reportData.add({
         'Session ID': doc.id.substring(0, 8),
-        'Date': DateFormat(
-          'MMM dd, HH:mm',
-        ).format((data['createdAt'] as Timestamp).toDate()),
+        'Date': DateFormat('MMM dd, HH:mm')
+            .format((data['createdAt'] as Timestamp).toDate()),
         'Created By': teacherName,
         'Group': group ?? 'N/A',
         'Present': presentCount,

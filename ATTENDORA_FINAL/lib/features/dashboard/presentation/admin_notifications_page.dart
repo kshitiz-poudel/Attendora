@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../dashboard/presentation/admin_shell.dart';
 import '../../dashboard/notification_provider.dart';
 import '../../../core/fluent_theme.dart';
@@ -410,14 +411,11 @@ class AdminNotificationsPage extends ConsumerWidget {
   ) async {
     if (teacherId == null) return;
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(teacherId)
-          .set({
-            'approved': true,
-            'approvedAt': FieldValue.serverTimestamp(),
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+      await FirebaseFirestore.instance.collection('users').doc(teacherId).set({
+        'approved': true,
+        'approvedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

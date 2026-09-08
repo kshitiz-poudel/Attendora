@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../../core/services/email_service.dart';
 import '../../../core/constants/email_constants.dart';
 import '../../../core/fluent_theme.dart';
@@ -421,8 +422,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                 templateParams: {
                   'to_name': name ?? 'Teacher',
                   'to_email': email,
-                  'message':
-                      'Your account approval has been revoked by the administrator.',
+                  'message': 'Your account approval has been revoked by the administrator.',
                   'email': email,
                   'support_url': '#',
                 },
@@ -434,8 +434,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                 templateParams: {
                   'to_name': name ?? 'Teacher',
                   'to_email': email,
-                  'message':
-                      'Your teacher account has been approved. You can now log in.',
+                  'message': 'Your teacher account has been approved. You can now log in.',
                   'email': email,
                   'action_url': 'https://attendora.pages.dev/',
                 },
@@ -836,8 +835,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                   'email': email,
                   'teacher_name': name ?? 'Teacher',
                   'platform_name': 'Attendora',
-                  'rejection_reason':
-                      'Administrative decision. Please contact support for more details.',
+                  'rejection_reason': 'Administrative decision. Please contact support for more details.',
                   'support_link': 'mailto:support@attendora.com',
                 },
               );

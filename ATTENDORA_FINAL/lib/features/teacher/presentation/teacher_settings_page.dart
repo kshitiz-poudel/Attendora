@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
+
 import 'teacher_shell.dart';
 import '../../auth/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
@@ -379,9 +380,8 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                           color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: const Color(
-                              0xFFEF4444,
-                            ).withValues(alpha: 0.3),
+                            color: const Color(0xFFEF4444)
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(

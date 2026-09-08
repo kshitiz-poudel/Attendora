@@ -14,17 +14,8 @@ final activeSessionsCountProvider = StreamProvider.autoDispose<int>((ref) {
 
 // 2. Real-time Today's Sessions Count
 final todaySessionsCountProvider = StreamProvider.autoDispose<int>((ref) {
-  final now = DateTime.now();
-  final startOfDay = DateTime(now.year, now.month, now.day);
-
-  return FirebaseFirestore.instance
-      .collection('sessions')
-      .where(
-        'createdAt',
-        isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
-      )
-      .snapshots()
-      .map((snapshot) => snapshot.docs.length);
+  // Disabled where('createdAt') due to Firestore Web SDK crash on mixed types
+  return Stream.value(0);
 });
 
 // 3. Total Counts (Future - refreshed on load)
@@ -85,49 +76,8 @@ final attendanceStatsProvider =
 final recentActivityProvider = StreamProvider.autoDispose<List<ActivityItem>>((
   ref,
 ) {
-  return FirebaseFirestore.instance
-      .collection('sessions')
-      .orderBy('createdAt', descending: true)
-      .limit(7)
-      .snapshots()
-      .asyncMap((snapshot) async {
-        // Fetch teacher names in parallel if possible, or cache them
-        // For simplicity and speed, we'll just fetch.
-        final futures = snapshot.docs.map((doc) async {
-          final data = doc.data();
-          final teacherUid = data['teacherUid'] as String?;
-
-          String teacherName = 'Unknown Teacher';
-          if (teacherUid != null) {
-            // In a real app, we'd use a userProvider(uid) to cache this
-            try {
-              final userDoc = await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(teacherUid)
-                  .get();
-              teacherName =
-                  userDoc.data()?['displayName'] as String? ??
-                  'Unknown Teacher';
-            } catch (_) {}
-          }
-
-          final attendanceCount =
-              (await doc.reference.collection('attendance').count().get())
-                  .count ??
-              0;
-
-          return ActivityItem(
-            id: doc.id,
-            teacherName: teacherName,
-            subject: data['subject'] as String? ?? 'Unknown Subject',
-            attendanceCount: attendanceCount,
-            timestamp: _parseTimestamp(data['createdAt']),
-            isActive: data['active'] as bool? ?? false,
-          );
-        });
-
-        return Future.wait(futures);
-      });
+  // Disabled orderBy('createdAt') due to Firestore Web SDK crash on mixed types
+  return Stream.value([]);
 });
 
 DateTime? _parseTimestamp(dynamic timestamp) {

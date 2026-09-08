@@ -54,4 +54,9 @@ analysis_output.txt
 # Build binaries and bundles
 *.apk
 *.aab
+# Machine-local Android/Flutter configuration
+/android/local.properties
+/android/.gradle/
 
+# Local release outputs
+/build/releases/
