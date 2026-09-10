@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../auth/providers.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class SuperAdminProfilePage extends ConsumerStatefulWidget {
   const SuperAdminProfilePage({super.key});
@@ -41,9 +42,9 @@ class _SuperAdminProfilePageState extends ConsumerState<SuperAdminProfilePage> {
       setState(() => _oldVerified = true);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Old password verified'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -67,9 +68,9 @@ class _SuperAdminProfilePageState extends ConsumerState<SuperAdminProfilePage> {
       await FirebaseAuth.instance.currentUser?.updatePassword(_newPass.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Password changed successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -78,7 +79,7 @@ class _SuperAdminProfilePageState extends ConsumerState<SuperAdminProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to change password: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }

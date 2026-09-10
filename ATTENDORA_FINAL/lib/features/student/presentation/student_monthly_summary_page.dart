@@ -12,6 +12,7 @@ import '../../auth/providers.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/providers.dart';
 import '../../../core/utils/error_handler.dart';
+import '../../../core/design/app_colors.dart';
 
 class MonthlySummaryStats {
   final double overallPercentage;
@@ -197,12 +198,12 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
               style: GoogleFonts.outfit(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
             Text(
               stats.monthName,
-              style: GoogleFonts.outfit(fontSize: 16, color: Colors.white70),
+              style: GoogleFonts.outfit(fontSize: 16, color: context.c.textSecondary),
             ),
             const SizedBox(height: 24),
 
@@ -214,7 +215,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                     label: 'Present',
                     value: '${stats.presentCount}',
                     icon: Icons.check_circle_outline,
-                    color: const Color(0xFF10B981),
+                    color: context.c.accent,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -223,14 +224,14 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                     label: 'Missed',
                     value: '${stats.absentCount}',
                     icon: Icons.cancel_outlined,
-                    color: const Color(0xFFEF4444),
+                    color: context.c.danger,
                   ),
                 ),
                 // Expanded(child: _MetricCard(
                 //   label: 'Absent',
                 //   value: '${stats.absentCount}',
                 //   icon: Icons.cancel_outlined,
-                //   color: const Color(0xFFEF4444),
+                //   color: context.c.danger,
                 // )),
               ],
             ),
@@ -247,7 +248,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -257,7 +258,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                         ? Center(
                             child: Text(
                               'No data yet',
-                              style: GoogleFonts.outfit(color: Colors.white54),
+                              style: GoogleFonts.outfit(color: context.c.textTertiary),
                             ),
                           )
                         : LineChart(
@@ -281,8 +282,8 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                                         padding: const EdgeInsets.only(top: 8),
                                         child: Text(
                                           'Day ${value.toInt()}',
-                                          style: const TextStyle(
-                                            color: Colors.white54,
+                                          style: TextStyle(
+                                            color: context.c.textTertiary,
                                             fontSize: 10,
                                           ),
                                         ),
@@ -336,7 +337,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
@@ -356,7 +357,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           Text(
@@ -364,7 +365,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: _getColorForPercentage(entry.value),
+                              color: _getColorForPercentage(context, entry.value),
                             ),
                           ),
                         ],
@@ -374,9 +375,9 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: entry.value / 100,
-                          backgroundColor: Colors.white10,
+                          backgroundColor: context.c.border,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            _getColorForPercentage(entry.value),
+                            _getColorForPercentage(context, entry.value),
                           ),
                           minHeight: 8,
                         ),
@@ -397,10 +398,10 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
     );
   }
 
-  Color _getColorForPercentage(double percentage) {
-    if (percentage >= 85) return const Color(0xFF10B981);
-    if (percentage >= 75) return const Color(0xFFF59E0B);
-    return const Color(0xFFEF4444);
+  Color _getColorForPercentage(BuildContext context, double percentage) {
+    if (percentage >= 85) return context.c.accent;
+    if (percentage >= 75) return context.c.warning;
+    return context.c.danger;
   }
 }
 
@@ -438,12 +439,12 @@ class _MetricCard extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           Text(
             label,
-            style: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+            style: GoogleFonts.outfit(fontSize: 14, color: context.c.textSecondary),
           ),
         ],
       ),

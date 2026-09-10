@@ -138,53 +138,91 @@ class AuthController extends Notifier<AuthState> {
       } else {
         final loadingUid = user.uid;
 
-        // Listen for force logout signals and role changes
+        // Live-sync the profile: force-logout signals, privilege changes, and
+        // approval status all have to reach the running session. Without this
+        // an admin approving a teacher had no effect until the teacher fully
+        // signed out and back in, because `approved` was only ever read once
+        // during loadProfile().
         _userDocSub = _repo.userDocStream(loadingUid).listen((data) {
-          if (data != null) {
-            // 1. Check for force logout
-            final forceLogoutAt = data['forceLogoutAt'] as Timestamp?;
-            if (forceLogoutAt != null) {
-              final logoutTime = forceLogoutAt.toDate();
-              if (DateTime.now().difference(logoutTime).inSeconds < 10) {
-                signOut();
-                return;
-              }
-            }
+          if (data == null) return;
 
-            // 2. Check for Role/Admin changes
-            // We compare the Firestore data with the CURRENT state
-            // If there's a mismatch in critical fields, we force a logout to ensure security
-            // and correct routing on next login.
-
-            final firestoreRoleName = (data['role'] as String?) ?? 'student';
-            final firestoreRole = UserRole.values.firstWhere(
-              (r) => r.name == firestoreRoleName,
-              orElse: () => UserRole.student,
-            );
-            final firestoreIsAdmin =
-                (data['admin'] as bool?) ?? (firestoreRole == UserRole.admin);
-
-            // Get current effective role from state
-            final currentRole = state.role;
-            final currentIsAdmin = state.isAdmin;
-
-            // Skip check if state is loading or verifying (initial load)
-            if (state.loading ||
-                state.isVerifyingSignup ||
-                state.role == UserRole.none) {
+          // 1. Check for force logout
+          final forceLogoutAt = data['forceLogoutAt'] as Timestamp?;
+          if (forceLogoutAt != null) {
+            final logoutTime = forceLogoutAt.toDate();
+            if (DateTime.now().difference(logoutTime).inSeconds < 10) {
+              signOut();
               return;
             }
+          }
 
-            // Skip check if impersonating (state role will differ from Firestore role)
-            if (state.originalAdminUid != null) return;
+          // Skip while the initial load or signup verification is in flight;
+          // state is not yet a meaningful baseline to diff against.
+          if (state.loading ||
+              state.isVerifyingSignup ||
+              state.role == UserRole.none) {
+            return;
+          }
 
-            // If critical permissions changed, force logout
-            if (firestoreRole != currentRole ||
-                firestoreIsAdmin != currentIsAdmin) {
-              // Role changed (e.g. Student -> Teacher, or Admin -> Teacher)
-              // User requested: "automatically open the login page"
-              signOut();
-            }
+          // Skip while impersonating: state intentionally reflects the
+          // impersonated user, not this document.
+          if (state.originalAdminUid != null) return;
+
+          final firestoreRoleName = (data['role'] as String?) ?? 'student';
+          final firestoreRole = UserRole.values.firstWhere(
+            (r) => r.name == firestoreRoleName,
+            orElse: () => UserRole.student,
+          );
+          final firestoreIsAdmin =
+              (data['admin'] as bool?) ?? (firestoreRole == UserRole.admin);
+
+          // 2. A genuine privilege change forces re-authentication. Compare
+          // against the same effective role we derived when building state
+          // (admin flag wins over the raw role), otherwise an admin whose
+          // document still says role:'teacher' would be signed out on every
+          // snapshot.
+          final firestoreEffectiveRole = firestoreIsAdmin
+              ? UserRole.admin
+              : firestoreRole;
+          if (firestoreEffectiveRole != state.role ||
+              firestoreIsAdmin != state.isAdmin) {
+            signOut();
+            return;
+          }
+
+          // 3. Propagate non-privilege profile changes into the live session.
+          // Approval is the important one: it flips the router away from
+          // /teacher/pending the moment an admin approves the account.
+          final firestoreApproved =
+              (data['approved'] as bool?) ??
+              (firestoreRole == UserRole.teacher ? false : true);
+          final firestoreInstitution = data['institutionCode'] as String?;
+          final firestoreDisplayName = data['displayName'] as String?;
+          final firestoreLectureGroup =
+              (data['lectureGroup'] as String?) ?? (data['group'] as String?);
+          final firestoreLabGroup =
+              (data['labGroup'] as String?) ?? (data['group'] as String?);
+          final firestoreElectives = (data['electives'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList();
+
+          final changed =
+              firestoreApproved != state.approved ||
+              firestoreInstitution != state.institutionCode ||
+              firestoreLectureGroup != state.lectureGroup ||
+              firestoreLabGroup != state.labGroup ||
+              (firestoreDisplayName != null &&
+                  firestoreDisplayName != state.displayName);
+
+          if (changed) {
+            state = state.copyWith(
+              approved: firestoreApproved,
+              institutionCode: firestoreInstitution,
+              displayName: firestoreDisplayName,
+              lectureGroup: firestoreLectureGroup,
+              labGroup: firestoreLabGroup,
+              electives: firestoreElectives,
+            );
           }
         });
 

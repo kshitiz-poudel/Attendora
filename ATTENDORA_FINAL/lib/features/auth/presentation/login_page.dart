@@ -12,6 +12,8 @@ import '../../shared/widgets/glass_text_field.dart';
 import '../../shared/widgets/error_dialog.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/responsive_utils.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -41,7 +43,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         child: Container(
           width: double.infinity,
           height: 400,
@@ -56,16 +58,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     style: GoogleFonts.outfit(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(Icons.close, color: context.c.textPrimary),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const Divider(color: Colors.white24),
+              Divider(color: context.c.border),
               Expanded(
                 child: ListView.builder(
                   itemCount: logs.length,
@@ -75,7 +77,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       logs[index],
                       style: GoogleFonts.outfit(
                         fontSize: 12,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ),
@@ -147,7 +149,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           BackgroundPattern(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(context.isMobile ? 12 : 24),
                 child: FadeInUp(
                   duration: const Duration(milliseconds: 800),
                   child: ConstrainedBox(
@@ -165,9 +167,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(0xFF10B981)
+                                  context.c.accent
                                       .withValues(alpha: 0.2),
-                                  const Color(0xFF2F6FED)
+                                  context.c.primary
                                       .withValues(alpha: 0.2),
                                 ],
                               ),
@@ -180,27 +182,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Container(
                                   padding: const EdgeInsets.all(20),
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        Color(0xFF10B981),
-                                        Color(0xFF2F6FED),
+                                        context.c.accent,
+                                        context.c.primary,
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF10B981)
+                                        color: context.c.accent
                                             .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.login_rounded,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                     size: 40,
                                   ),
                                 ),
@@ -212,7 +214,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     style: GoogleFonts.outfit(
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: context.c.textPrimary,
                                       letterSpacing: -0.5,
                                     ),
                                   ),
@@ -221,7 +223,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Text(
                                   'Welcome back! Please login to continue.',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                     fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
@@ -254,7 +256,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       _obscurePassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: Colors.white54,
+                                      color: context.c.textTertiary,
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -273,7 +275,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     child: Text(
                                       'Forgot password?',
                                       style: GoogleFonts.outfit(
-                                        color: const Color(0xFF10B981),
+                                        color: context.c.accent,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -297,12 +299,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                             if (idNumber.isEmpty) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                    const SnackBar(
+                                                    SnackBar(
                                                       content: Text(
                                                         'Please enter your ID Number',
                                                       ),
                                                       backgroundColor:
-                                                          Colors.orange,
+                                                          context.c.warning,
                                                     ),
                                                   );
                                               return;
@@ -311,12 +313,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                             if (idNumber.length < 3) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                    const SnackBar(
+                                                    SnackBar(
                                                       content: Text(
                                                         'ID Number must be at least 3 characters',
                                                       ),
                                                       backgroundColor:
-                                                          Colors.orange,
+                                                          context.c.warning,
                                                     ),
                                                   );
                                               return;
@@ -325,12 +327,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                             if (password.isEmpty) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                    const SnackBar(
+                                                    SnackBar(
                                                       content: Text(
                                                         'Please enter your password',
                                                       ),
                                                       backgroundColor:
-                                                          Colors.orange,
+                                                          context.c.warning,
                                                     ),
                                                   );
                                               return;
@@ -339,12 +341,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                             if (password.length < 6) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                    const SnackBar(
+                                                    SnackBar(
                                                       content: Text(
                                                         'Password must be at least 6 characters',
                                                       ),
                                                       backgroundColor:
-                                                          Colors.orange,
+                                                          context.c.warning,
                                                     ),
                                                   );
                                               return;
@@ -363,22 +365,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                 );
                                           },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF10B981),
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: context.c.accent,
+                                      foregroundColor: context.c.textPrimary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       elevation: 0,
-                                      shadowColor: const Color(0xFF10B981)
+                                      shadowColor: context.c.accent
                                           .withValues(alpha: 0.5),
                                     ),
                                     child: state.loading
-                                        ? const SizedBox(
+                                        ? SizedBox(
                                             height: 24,
                                             width: 24,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: context.c.textPrimary,
                                             ),
                                           )
                                         : Text(
@@ -425,9 +427,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                   ),
                                                 ),
                                                 style: OutlinedButton.styleFrom(
-                                                  foregroundColor: Colors.white,
+                                                  foregroundColor: context.c.textPrimary,
                                                   side: BorderSide(
-                                                    color: Colors.white
+                                                    color: context.c.textPrimary
                                                         .withValues(alpha: 0.3),
                                                   ),
                                                   shape: RoundedRectangleBorder(
@@ -452,19 +454,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF59E0B)
+                                    color: context.c.warning
                                         .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: const Color(0xFFF59E0B)
+                                      color: context.c.warning
                                           .withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.warning_amber_rounded,
-                                        color: Color(0xFFF59E0B),
+                                        color: context.c.warning,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 12),
@@ -472,7 +474,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         child: Text(
                                           'Note: Your account will be locked to this device. You cannot log in from another device once logged in.',
                                           style: GoogleFonts.outfit(
-                                            color: const Color(0xFFFDE68A),
+                                            color: context.c.warning,
                                             fontSize: 12,
                                           ),
                                         ),
@@ -490,7 +492,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       Text(
                                         "Don't have an account? ",
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white70,
+                                          color: context.c.textSecondary,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -507,7 +509,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         child: Text(
                                           'Sign up',
                                           style: GoogleFonts.outfit(
-                                            color: const Color(0xFF10B981),
+                                            color: context.c.accent,
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -536,12 +538,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Color(0xFF10B981)),
+                      CircularProgressIndicator(color: context.c.accent),
                       const SizedBox(height: 24),
                       Text(
                         'Authenticating...',
                         style: GoogleFonts.outfit(
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),

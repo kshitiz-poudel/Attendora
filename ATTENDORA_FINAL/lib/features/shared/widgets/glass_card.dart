@@ -2,6 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/design/app_colors.dart';
+
+/// Frosted panel used as the primary content container across the app.
+/// Colours resolve from the active theme so it reads correctly in both modes.
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -20,6 +24,7 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.c;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -31,13 +36,18 @@ class GlassCard extends StatelessWidget {
             height: height,
             padding: padding ?? const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B)
-                  .withValues(alpha: 0.6), // Semi-transparent slate
+              color: c.glassFill,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 1,
-              ),
+              border: Border.all(color: c.glassBorder, width: 1),
+              boxShadow: c.isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: c.shadow,
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
             ),
             child: child,
           ),

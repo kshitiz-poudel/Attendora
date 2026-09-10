@@ -7,6 +7,7 @@ import '../providers.dart';
 import '../repository.dart';
 import '../../auth/providers.dart';
 import '../../../core/utils/error_handler.dart';
+import '../../../core/design/app_colors.dart';
 
 class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
@@ -17,7 +18,7 @@ class NotificationsPage extends ConsumerWidget {
     final notificationsAsync = ref.watch(userNotificationsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: context.c.canvas,
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -37,7 +38,7 @@ class NotificationsPage extends ConsumerWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -45,7 +46,7 @@ class NotificationsPage extends ConsumerWidget {
                         'Stay updated with important alerts',
                         style: GoogleFonts.outfit(
                           fontSize: 14,
-                          color: Colors.white54,
+                          color: context.c.textTertiary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -67,9 +68,9 @@ class NotificationsPage extends ConsumerWidget {
                               icon: const Icon(Icons.done_all, size: 18),
                               label: const Text('Mark all read'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFF00B0FF),
-                                side: const BorderSide(
-                                  color: Color(0xFF00B0FF),
+                                foregroundColor: context.c.info,
+                                side: BorderSide(
+                                  color: context.c.info,
                                 ),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -94,8 +95,8 @@ class NotificationsPage extends ConsumerWidget {
                               icon: const Icon(Icons.delete_outline, size: 18),
                               label: const Text('Clear all'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.redAccent,
-                                side: const BorderSide(color: Colors.redAccent),
+                                foregroundColor: context.c.danger,
+                                side: BorderSide(color: context.c.danger),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
@@ -120,7 +121,7 @@ class NotificationsPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -128,7 +129,7 @@ class NotificationsPage extends ConsumerWidget {
                             'Stay updated with important alerts',
                             style: GoogleFonts.outfit(
                               fontSize: 14,
-                              color: Colors.white54,
+                              color: context.c.textTertiary,
                             ),
                           ),
                         ],
@@ -153,7 +154,7 @@ class NotificationsPage extends ConsumerWidget {
                           icon: const Icon(Icons.done_all, size: 18),
                           label: const Text('Mark all as read'),
                           style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF00B0FF),
+                            foregroundColor: context.c.info,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -176,7 +177,7 @@ class NotificationsPage extends ConsumerWidget {
                           icon: const Icon(Icons.delete_outline, size: 18),
                           label: const Text('Clear all'),
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
+                            foregroundColor: context.c.danger,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -203,14 +204,14 @@ class NotificationsPage extends ConsumerWidget {
                           Icon(
                             Icons.notifications_off_outlined,
                             size: 64,
-                            color: Colors.white24,
+                            color: context.c.border,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No notifications yet',
                             style: GoogleFonts.outfit(
                               fontSize: 16,
-                              color: Colors.white54,
+                              color: context.c.textTertiary,
                             ),
                           ),
                         ],
@@ -249,15 +250,15 @@ class _NotificationItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
     final isLocationViolation = notification.type == 'location_violation';
-    final color = isLocationViolation ? Colors.red : Colors.blue;
+    final color = isLocationViolation ? context.c.danger : context.c.info;
     final icon = isLocationViolation ? Icons.location_off : Icons.info;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: notification.read
-            ? Colors.white.withValues(alpha: 0.02)
-            : Colors.white.withValues(alpha: 0.08),
+            ? context.c.textPrimary.withValues(alpha: 0.02)
+            : context.c.textPrimary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: notification.read
@@ -283,7 +284,7 @@ class _NotificationItem extends ConsumerWidget {
                 style: GoogleFonts.outfit(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
             ),
@@ -301,29 +302,29 @@ class _NotificationItem extends ConsumerWidget {
             const SizedBox(height: 8),
             Text(
               notification.message,
-              style: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+              style: GoogleFonts.outfit(fontSize: 14, color: context.c.textSecondary),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.access_time, size: 12, color: Colors.white38),
+                Icon(Icons.access_time, size: 12, color: context.c.textTertiary),
                 const SizedBox(width: 4),
                 Text(
                   DateFormat('MMM d, h:mm a').format(notification.timestamp),
                   style: GoogleFonts.outfit(
                     fontSize: 12,
-                    color: Colors.white38,
+                    color: context.c.textTertiary,
                   ),
                 ),
                 if (isLocationViolation) ...[
                   const SizedBox(width: 16),
-                  Icon(Icons.person, size: 12, color: Colors.white38),
+                  Icon(Icons.person, size: 12, color: context.c.textTertiary),
                   const SizedBox(width: 4),
                   Text(
                     notification.senderRollNumber,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
-                      color: Colors.white38,
+                      color: context.c.textTertiary,
                     ),
                   ),
                 ],
@@ -340,9 +341,9 @@ class _NotificationItem extends ConsumerWidget {
         },
         trailing: !notification.read
             ? IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.check_circle_outline,
-                  color: Colors.white54,
+                  color: context.c.textTertiary,
                 ),
                 tooltip: 'Mark as read',
                 onPressed: () {

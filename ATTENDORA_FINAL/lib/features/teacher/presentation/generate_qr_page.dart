@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,6 +11,8 @@ import '../../teacher/presentation/teacher_subjects_page.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import 'widgets/rotating_qr_view.dart';
+import '../../../core/design/app_colors.dart';
 
 class _WebStep extends StatelessWidget {
   const _WebStep({required this.number, required this.text});
@@ -27,21 +28,21 @@ class _WebStep extends StatelessWidget {
           width: 28,
           height: 28,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Color(0xFF10B981),
+          decoration: BoxDecoration(
+            color: context.c.accent,
             shape: BoxShape.circle,
           ),
           child: Text(
             number,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.c.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(text, style: GoogleFonts.outfit(color: Colors.white70)),
+          child: Text(text, style: GoogleFonts.outfit(color: context.c.textSecondary)),
         ),
       ],
     );
@@ -149,17 +150,17 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
           final proceed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: const Color(0xFF1E293B),
+              backgroundColor: context.c.surface,
               title: Text(
                 'Weak Location Signal',
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
               ),
               content: Text(
                 'Your location accuracy is poor (${pos.accuracy.toStringAsFixed(0)} meters). '
                 'This usually happens on desktops without GPS/Wi-Fi.\n\n'
                 'Students will likely fail the location check.\n'
                 'Do you want to proceed and BYPASS location checks for this session?',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
               actions: [
                 TextButton(
@@ -169,7 +170,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                 FilledButton(
                   onPressed: () => Navigator.pop(context, true),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
+                    backgroundColor: context.c.accent,
                   ),
                   child: const Text('Proceed & Bypass'),
                 ),
@@ -221,7 +222,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: context.c.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -230,12 +231,12 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                    color: context.c.warning.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.info_outline,
-                    color: Color(0xFFF59E0B),
+                    color: context.c.warning,
                     size: 24,
                   ),
                 ),
@@ -244,7 +245,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                   child: Text(
                     'Session Already Running',
                     style: GoogleFonts.outfit(
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -259,7 +260,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                 Text(
                   'Currently, the session of ${e.subjectName} is running for ${e.group}.',
                   style: GoogleFonts.outfit(
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                     fontSize: 15,
                   ),
                 ),
@@ -267,17 +268,17 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                    color: context.c.warning.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                      color: context.c.warning.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.person_outline,
-                        color: Color(0xFFF59E0B),
+                        color: context.c.warning,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -285,7 +286,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                         child: Text(
                           'Started by: ${e.teacherName}',
                           style: GoogleFonts.outfit(
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                             fontSize: 14,
                           ),
                         ),
@@ -297,7 +298,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                 Text(
                   'You cannot start a new session for this group until the current session ends.',
                   style: GoogleFonts.outfit(
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                     fontSize: 13,
                   ),
                 ),
@@ -307,7 +308,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
               FilledButton(
                 onPressed: () => Navigator.pop(context),
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFF59E0B),
+                  backgroundColor: context.c.warning,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -340,11 +341,11 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
       appBar: AppBar(
         title: Text(
           'Start Session',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: context.c.textPrimary),
       ),
       body: BackgroundPattern(
         child: LayoutBuilder(
@@ -373,14 +374,14 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       Container(
                                         padding: const EdgeInsets.all(24),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF10B981)
+                                          color: context.c.accent
                                               .withValues(alpha: 0.12),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.phone_iphone_rounded,
                                           size: 64,
-                                          color: Color(0xFF34D399),
+                                          color: context.c.success,
                                         ),
                                       ),
                                       const SizedBox(height: 24),
@@ -389,7 +390,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         style: GoogleFonts.outfit(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: context.c.textPrimary,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -399,7 +400,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         style: GoogleFonts.outfit(
                                           fontSize: 15,
                                           height: 1.5,
-                                          color: Colors.white70,
+                                          color: context.c.textSecondary,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -420,10 +421,8 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(
-                                              0xFF10B981,
-                                            ),
-                                            foregroundColor: Colors.white,
+                                            backgroundColor: context.c.accent,
+                                            foregroundColor: context.c.textPrimary,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(14),
@@ -436,30 +435,30 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         width: double.infinity,
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(
+                                          color: context.c.textPrimary.withValues(
                                             alpha: 0.04,
                                           ),
                                           borderRadius: BorderRadius.circular(
                                             14,
                                           ),
                                           border: Border.all(
-                                            color: Colors.white.withValues(
+                                            color: context.c.textPrimary.withValues(
                                               alpha: 0.10,
                                             ),
                                           ),
                                         ),
                                         child: Row(
                                           children: [
-                                            const Icon(
+                                            Icon(
                                               Icons.phone_iphone_rounded,
-                                              color: Color(0xFF94A3B8),
+                                              color: context.c.textSecondary,
                                             ),
                                             const SizedBox(width: 10),
                                             Expanded(
                                               child: Text(
                                                 'iPhone version: install through the official iOS distribution link when it is published.',
                                                 style: GoogleFonts.outfit(
-                                                  color: Colors.white70,
+                                                  color: context.c.textSecondary,
                                                   fontSize: 13,
                                                 ),
                                               ),
@@ -471,14 +470,14 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       Container(
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(
+                                          color: context.c.textPrimary.withValues(
                                             alpha: 0.05,
                                           ),
                                           borderRadius: BorderRadius.circular(
                                             16,
                                           ),
                                           border: Border.all(
-                                            color: Colors.white.withValues(
+                                            color: context.c.textPrimary.withValues(
                                               alpha: 0.10,
                                             ),
                                           ),
@@ -506,7 +505,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       Text(
                                         'The active session and QR code will synchronize automatically through Firebase.',
                                         style: GoogleFonts.outfit(
-                                          color: const Color(0xFF6EE7B7),
+                                          color: context.c.success,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         textAlign: TextAlign.center,
@@ -523,18 +522,18 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                           Container(
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
-                                              gradient: const LinearGradient(
+                                              gradient: LinearGradient(
                                                 colors: [
-                                                  Color(0xFF10B981),
+                                                  context.c.accent,
                                                   Color(0xFF7C3AED),
                                                 ],
                                               ),
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
-                                            child: const Icon(
+                                            child: Icon(
                                               Icons.qr_code_2_rounded,
-                                              color: Colors.white,
+                                              color: context.c.textPrimary,
                                               size: 28,
                                             ),
                                           ),
@@ -549,7 +548,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                   style: GoogleFonts.outfit(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
+                                                    color: context.c.textPrimary,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
@@ -557,7 +556,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                   'GPS is captured from your phone before the QR session starts',
                                                   style: GoogleFonts.outfit(
                                                     fontSize: 14,
-                                                    color: Colors.white70,
+                                                    color: context.c.textSecondary,
                                                   ),
                                                 ),
                                               ],
@@ -602,13 +601,13 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                               ? null
                                               : _startSession,
                                           icon: _requesting
-                                              ? const SizedBox(
+                                              ? SizedBox(
                                                   width: 20,
                                                   height: 20,
                                                   child:
                                                       CircularProgressIndicator(
                                                         strokeWidth: 2,
-                                                        color: Colors.white,
+                                                        color: context.c.textPrimary,
                                                       ),
                                                 )
                                               : const Icon(
@@ -620,10 +619,8 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                 : 'Start Session',
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(
-                                              0xFF10B981,
-                                            ),
-                                            foregroundColor: Colors.white,
+                                            backgroundColor: context.c.accent,
+                                            foregroundColor: context.c.textPrimary,
                                             textStyle: GoogleFonts.outfit(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
@@ -640,21 +637,21 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         Container(
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFEF4444)
+                                            color: context.c.danger
                                                 .withValues(alpha: 0.1),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
                                             border: Border.all(
-                                              color: const Color(0xFFEF4444)
+                                              color: context.c.danger
                                                   .withValues(alpha: 0.3),
                                             ),
                                           ),
                                           child: Row(
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Icons.error_outline,
-                                                color: Color(0xFFEF4444),
+                                                color: context.c.danger,
                                                 size: 20,
                                               ),
                                               const SizedBox(width: 12),
@@ -662,9 +659,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                 child: Text(
                                                   _error!,
                                                   style: GoogleFonts.outfit(
-                                                    color: const Color(
-                                                      0xFFEF4444,
-                                                    ),
+                                                    color: context.c.danger,
                                                   ),
                                                 ),
                                               ),
@@ -688,10 +683,10 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                         vertical: 12,
                                       ),
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
+                                        gradient: LinearGradient(
                                           colors: [
-                                            Color(0xFF10B981),
-                                            Color(0xFF059669),
+                                            context.c.accent,
+                                            context.c.success,
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(24),
@@ -699,9 +694,9 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.check_circle,
-                                            color: Colors.white,
+                                            color: context.c.textPrimary,
                                             size: 24,
                                           ),
                                           const SizedBox(width: 12),
@@ -712,7 +707,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                               Text(
                                                 'Session Active',
                                                 style: GoogleFonts.outfit(
-                                                  color: Colors.white,
+                                                  color: context.c.textPrimary,
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -721,7 +716,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                                 Text(
                                                   'Expires in ${timeLeft.inMinutes.remainder(60).toString().padLeft(2, '0')}:${(timeLeft.inSeconds.remainder(60)).toString().padLeft(2, '0')}',
                                                   style: GoogleFonts.outfit(
-                                                    color: Colors.white,
+                                                    color: context.c.textPrimary,
                                                     fontSize: 14,
                                                   ),
                                                 ),
@@ -732,54 +727,15 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                     ),
                                     const SizedBox(height: 32),
                                     if (code != null)
-                                      Container(
-                                        padding: const EdgeInsets.all(24),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            24,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                              blurRadius: 30,
-                                              offset: const Offset(0, 10),
-                                            ),
-                                          ],
-                                        ),
-                                        child: QrImageView(
-                                          data: code,
-                                          size: 280,
-                                          backgroundColor: Colors.white,
-                                        ),
+                                      RotatingQrView(
+                                        data: code,
+                                        isSecured: active.isSecured,
                                       ),
-                                    const SizedBox(height: 16),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.refresh_rounded,
-                                          size: 16,
-                                          color: Colors.white54,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Code refreshes every 5 seconds',
-                                          style: GoogleFonts.outfit(
-                                            color: Colors.white54,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                     const SizedBox(height: 32),
                                     Container(
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withValues(
+                                        color: context.c.textPrimary.withValues(
                                           alpha: 0.05,
                                         ),
                                         borderRadius: BorderRadius.circular(12),
@@ -792,17 +748,17 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                           Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Icons.location_on,
                                                 size: 16,
-                                                color: Color(0xFF10B981),
+                                                color: context.c.accent,
                                               ),
                                               const SizedBox(width: 8),
                                               Text(
                                                 'Lat: ${active.latitude.toStringAsFixed(5)}, Lng: ${active.longitude.toStringAsFixed(5)}',
                                                 style: GoogleFonts.outfit(
                                                   fontSize: 13,
-                                                  color: Colors.white70,
+                                                  color: context.c.textSecondary,
                                                 ),
                                               ),
                                             ],
@@ -810,17 +766,17 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                           Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Icons.radar,
                                                 size: 16,
-                                                color: Color(0xFF10B981),
+                                                color: context.c.accent,
                                               ),
                                               const SizedBox(width: 8),
                                               Text(
                                                 'Radius: ${active.radiusMeters.toStringAsFixed(0)} m',
                                                 style: GoogleFonts.outfit(
                                                   fontSize: 13,
-                                                  color: Colors.white70,
+                                                  color: context.c.textSecondary,
                                                 ),
                                               ),
                                             ],
@@ -842,9 +798,9 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                   icon: const Icon(Icons.stop_circle_outlined),
                                   label: const Text('End Session'),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.white,
+                                    foregroundColor: context.c.textPrimary,
                                     side: BorderSide(
-                                      color: Colors.white.withValues(
+                                      color: context.c.textPrimary.withValues(
                                         alpha: 0.3,
                                       ),
                                     ),
@@ -874,20 +830,20 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withValues(alpha: 0.08),
+        color: context.c.accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: const Color(0xFF10B981).withValues(alpha: 0.22),
+          color: context.c.accent.withValues(alpha: 0.22),
         ),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.verified_user_outlined, color: Color(0xFF34D399)),
+          Icon(Icons.verified_user_outlined, color: context.c.success),
           SizedBox(width: 10),
           Expanded(
             child: Text(
               'Live GPS verification is performed before your session begins.',
-              style: TextStyle(color: Colors.white70, height: 1.35),
+              style: TextStyle(color: context.c.textSecondary, height: 1.35),
             ),
           ),
         ],
@@ -911,17 +867,17 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+              color: context.c.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                color: context.c.warning.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.warning_amber_rounded,
-                  color: Color(0xFFF59E0B),
+                  color: context.c.warning,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -932,7 +888,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                         'No Subjects Added',
                         style: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFFF59E0B),
+                          color: context.c.warning,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -940,7 +896,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                         'Please add subjects in the Subjects page first',
                         style: GoogleFonts.outfit(
                           fontSize: 13,
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -954,28 +910,28 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            color: context.c.textPrimary.withValues(alpha: 0.05),
+            border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               isExpanded: true,
               value: _selectedSubject,
-              dropdownColor: const Color(0xFF1E293B),
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 16),
-              icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
+              dropdownColor: context.c.surface,
+              style: GoogleFonts.outfit(color: context.c.textPrimary, fontSize: 16),
+              icon: Icon(Icons.arrow_drop_down, color: context.c.textSecondary),
               hint: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.book_outlined,
                     size: 20,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     'Select Subject',
-                    style: GoogleFonts.outfit(color: Colors.white70),
+                    style: GoogleFonts.outfit(color: context.c.textSecondary),
                   ),
                 ],
               ),
@@ -987,8 +943,8 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
 
                 final isLab = type == 'Lab';
                 final typeColor = isLab
-                    ? const Color(0xFF10B981)
-                    : const Color(0xFF2F6FED);
+                    ? context.c.accent
+                    : context.c.primary;
                 final typeIcon = isLab
                     ? Icons.science_outlined
                     : Icons.school_outlined;
@@ -1019,7 +975,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
                                 style: GoogleFonts.outfit(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -1053,24 +1009,24 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
       loading: () => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          color: context.c.textPrimary.withValues(alpha: 0.05),
+          border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            const SizedBox(
+            SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(width: 12),
             Text(
               'Loading subjects...',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ],
         ),

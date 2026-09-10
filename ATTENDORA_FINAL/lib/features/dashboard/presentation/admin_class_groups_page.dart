@@ -13,6 +13,8 @@ import '../../auth/providers.dart';
 import '../../institutions/providers.dart';
 import 'admin_shell.dart';
 import '../../../core/responsive_utils.dart';
+import 'widgets/group_member_manager.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for all teachers (for assignment dropdown)
 final allTeachersProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
@@ -106,17 +108,17 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                             final confirmed = await showDialog<bool>(
                               context: context,
                               builder: (ctx) => AlertDialog(
-                                backgroundColor: const Color(0xFF1E293B),
+                                backgroundColor: context.c.surface,
                                 title: Text(
                                   'Sync Group Counts',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 content: Text(
                                   'This will rebuild teacher and subject counts for all groups based on the subjects catalog. Use this if counts appear incorrect.',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 actions: [
@@ -125,14 +127,14 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                                     child: Text(
                                       'Cancel',
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                       ),
                                     ),
                                   ),
                                   FilledButton(
                                     onPressed: () => Navigator.pop(ctx, true),
                                     style: FilledButton.styleFrom(
-                                      backgroundColor: FluentColors.accentColor,
+                                      backgroundColor: context.c.accent,
                                     ),
                                     child: Text(
                                       'Sync',
@@ -175,17 +177,17 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                             final confirmed = await showDialog<bool>(
                               context: context,
                               builder: (ctx) => AlertDialog(
-                                backgroundColor: const Color(0xFF1E293B),
+                                backgroundColor: context.c.surface,
                                 title: Text(
                                   'Backfill Institution Tags',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 content: Text(
                                   'This will set institutionCode on legacy class groups by inferring it from assigned teachers/students. Continue?',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 actions: [
@@ -194,14 +196,14 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                                     child: Text(
                                       'Cancel',
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                       ),
                                     ),
                                   ),
                                   FilledButton(
                                     onPressed: () => Navigator.pop(ctx, true),
                                     style: FilledButton.styleFrom(
-                                      backgroundColor: FluentColors.accentColor,
+                                      backgroundColor: context.c.accent,
                                     ),
                                     child: Text(
                                       'Run',
@@ -247,17 +249,17 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                             final confirmed = await showDialog<bool>(
                               context: context,
                               builder: (ctx) => AlertDialog(
-                                backgroundColor: const Color(0xFF1E293B),
+                                backgroundColor: context.c.surface,
                                 title: Text(
                                   'Cleanup Invalid Users',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 content: Text(
                                   'This will scan all class groups and remove users that no longer exist OR have incorrect roles (e.g. teachers who became admins). This fixes "ghost" users and data discrepancies.',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 actions: [
@@ -266,14 +268,14 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                                     child: Text(
                                       'Cancel',
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                       ),
                                     ),
                                   ),
                                   FilledButton(
                                     onPressed: () => Navigator.pop(ctx, true),
                                     style: FilledButton.styleFrom(
-                                      backgroundColor: Colors.redAccent,
+                                      backgroundColor: context.c.danger,
                                     ),
                                     child: Text(
                                       'Cleanup',
@@ -308,14 +310,14 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                               }
                             }
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.person_off,
-                            color: Colors.redAccent,
+                            color: context.c.danger,
                             size: 18,
                           ),
-                          label: const Text(
+                          label: Text(
                             'Cleanup Users',
-                            style: TextStyle(color: Colors.redAccent),
+                            style: TextStyle(color: context.c.danger),
                           ),
                         ),
                       ]
@@ -407,7 +409,7 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
               error: (e, st) => Center(
                 child: Text(
                   'Error loading groups: $e',
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.c.danger),
                 ),
               ),
             ),
@@ -427,6 +429,12 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
     // null institutionCode and become invisible to institution-scoped
     // queries (e.g. the signup dropdown).
     String? selectedInstitutionCode;
+    // Firestore writes over a slow/emulated connection can take several
+    // seconds. Without visible feedback the button looked inert, which is
+    // exactly what read as "unable to create a group": the write was
+    // actually succeeding, just silently and slowly, and nothing stopped a
+    // second click from firing a duplicate create.
+    var saving = false;
     final auth = ref.read(authControllerProvider);
     final needsInstitutionPicker =
         auth.institutionCode == null || auth.institutionCode!.isEmpty;
@@ -435,17 +443,17 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: context.c.surface,
           title: Text(
             'Create Class Group',
-            style: GoogleFonts.outfit(color: Colors.white),
+            style: GoogleFonts.outfit(color: context.c.textPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Group Name',
@@ -455,7 +463,7 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: descController,
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Description (optional)',
@@ -466,8 +474,8 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedType,
-                dropdownColor: const Color(0xFF1E293B),
-                style: GoogleFonts.outfit(color: Colors.white),
+                dropdownColor: context.c.surface,
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Group Type',
@@ -478,14 +486,14 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                     value: 'Lecture',
                     child: Text(
                       'Lecture Group',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                   DropdownMenuItem(
                     value: 'Lab',
                     child: Text(
                       'Lab Group',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                 ],
@@ -506,8 +514,8 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                       data: (institutions) {
                         return DropdownButtonFormField<String>(
                           initialValue: selectedInstitutionCode,
-                          dropdownColor: const Color(0xFF1E293B),
-                          style: GoogleFonts.outfit(color: Colors.white),
+                          dropdownColor: context.c.surface,
+                          style: GoogleFonts.outfit(color: context.c.textPrimary),
                           decoration: fluentInputDecoration(
                             context: context,
                             labelText: 'Institution',
@@ -521,7 +529,7 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                                   child: Text(
                                     '${inst.name} (${inst.code})',
                                     style: GoogleFonts.outfit(
-                                      color: Colors.white,
+                                      color: context.c.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -536,7 +544,7 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
                           const Center(child: CircularProgressIndicator()),
                       error: (e, st) => Text(
                         'Error loading institutions: $e',
-                        style: GoogleFonts.outfit(color: Colors.red),
+                        style: GoogleFonts.outfit(color: context.c.danger),
                       ),
                     );
                   },
@@ -546,73 +554,91 @@ class _AdminClassGroupsPageState extends ConsumerState<AdminClassGroupsPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: saving ? null : () => Navigator.pop(context),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
             ),
             FilledButton(
-              onPressed: () async {
-                if (nameController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a group name')),
-                  );
-                  return;
-                }
+              // Disabled while saving: a slow write with no visible feedback
+              // otherwise invites a second click, which fires a duplicate
+              // create.
+              onPressed: saving
+                  ? null
+                  : () async {
+                      if (nameController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please enter a group name'),
+                          ),
+                        );
+                        return;
+                      }
 
-                final resolvedInstitutionCode = needsInstitutionPicker
-                    ? selectedInstitutionCode
-                    : auth.institutionCode;
+                      final resolvedInstitutionCode = needsInstitutionPicker
+                          ? selectedInstitutionCode
+                          : auth.institutionCode;
 
-                if (resolvedInstitutionCode == null ||
-                    resolvedInstitutionCode.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Please select an institution for this group',
-                      ),
-                    ),
-                  );
-                  return;
-                }
+                      if (resolvedInstitutionCode == null ||
+                          resolvedInstitutionCode.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please select an institution for this group',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
 
-                try {
-                  final repo = ref.read(classGroupRepositoryProvider);
-                  await repo.createGroup(
-                    name: nameController.text.trim(),
-                    description: descController.text.trim().isEmpty
-                        ? null
-                        : descController.text.trim(),
-                    institutionCode: resolvedInstitutionCode,
-                    type: selectedType,
-                  );
+                      setState(() => saving = true);
+                      try {
+                        final repo = ref.read(classGroupRepositoryProvider);
+                        await repo.createGroup(
+                          name: nameController.text.trim(),
+                          description: descController.text.trim().isEmpty
+                              ? null
+                              : descController.text.trim(),
+                          institutionCode: resolvedInstitutionCode,
+                          type: selectedType,
+                        );
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Class group created successfully'),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ErrorHandler.showErrorSnackBar(
-                      context,
-                      e,
-                      customMessage: 'Unable to create class group',
-                    );
-                  }
-                }
-              },
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Class group created successfully'),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setState(() => saving = false);
+                          ErrorHandler.showErrorSnackBar(
+                            context,
+                            e,
+                            customMessage: 'Unable to create class group',
+                          );
+                        }
+                      }
+                    },
               style: FilledButton.styleFrom(
-                backgroundColor: FluentColors.accentColor,
+                backgroundColor: context.c.accent,
               ),
-              child: Text(
-                'Create',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-              ),
+              child: saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Create',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
             ),
           ],
         ),
@@ -640,13 +666,13 @@ class _GroupCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: (isLab ? Colors.green : FluentColors.accentColor)
+                  color: (isLab ? context.c.success : context.c.accent)
                       .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   isLab ? Icons.science : Icons.groups,
-                  color: isLab ? Colors.green : FluentColors.accentColor,
+                  color: isLab ? context.c.success : context.c.accent,
                   size: 24,
                 ),
               ),
@@ -669,11 +695,11 @@ class _GroupCard extends ConsumerWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: (isLab ? Colors.green : Colors.blue)
+                            color: (isLab ? context.c.success : context.c.info)
                                 .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: (isLab ? Colors.green : Colors.blue)
+                              color: (isLab ? context.c.success : context.c.info)
                                   .withValues(alpha: 0.3),
                             ),
                           ),
@@ -681,7 +707,7 @@ class _GroupCard extends ConsumerWidget {
                             group.type,
                             style: TextStyle(
                               fontSize: 10,
-                              color: isLab ? Colors.green : Colors.blue,
+                              color: isLab ? context.c.success : context.c.info,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -692,28 +718,28 @@ class _GroupCard extends ConsumerWidget {
                       Text(
                         group.description!,
                         style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: FluentColors.textSecondary),
+                            ?.copyWith(color: context.c.textSecondary),
                       ),
                   ],
                 ),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white70),
-                color: const Color(0xFF1E293B),
+                icon: Icon(Icons.more_vert, color: context.c.textSecondary),
+                color: context.c.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                  side: BorderSide(color: context.c.textPrimary.withValues(alpha: 0.1)),
                 ),
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 'edit',
                     child: Row(
                       children: [
-                        const Icon(Icons.edit, size: 20, color: Colors.white70),
+                        Icon(Icons.edit, size: 20, color: context.c.textSecondary),
                         const SizedBox(width: 8),
                         Text(
                           'Edit',
-                          style: GoogleFonts.outfit(color: Colors.white),
+                          style: GoogleFonts.outfit(color: context.c.textPrimary),
                         ),
                       ],
                     ),
@@ -722,15 +748,15 @@ class _GroupCard extends ConsumerWidget {
                     value: 'delete',
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.delete,
                           size: 20,
-                          color: Colors.redAccent,
+                          color: context.c.danger,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Delete',
-                          style: GoogleFonts.outfit(color: Colors.redAccent),
+                          style: GoogleFonts.outfit(color: context.c.danger),
                         ),
                       ],
                     ),
@@ -756,19 +782,19 @@ class _GroupCard extends ConsumerWidget {
               _StatChip(
                 icon: Icons.person,
                 label: '${group.studentUids.length} Students',
-                color: Colors.blue,
+                color: context.c.info,
               ),
               const SizedBox(width: 8),
               _StatChip(
                 icon: Icons.school,
                 label: '${group.teacherUids.length} Teachers',
-                color: Colors.green,
+                color: context.c.success,
               ),
               const SizedBox(width: 8),
               _StatChip(
                 icon: Icons.book,
                 label: '${group.subjectIds.length} Subjects',
-                color: Colors.orange,
+                color: context.c.warning,
               ),
             ],
           ),
@@ -795,22 +821,23 @@ class _GroupCard extends ConsumerWidget {
     final nameController = TextEditingController(text: group.name);
     final descController = TextEditingController(text: group.description ?? '');
     String selectedType = group.type;
+    var saving = false;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: context.c.surface,
           title: Text(
             'Edit Class Group',
-            style: GoogleFonts.outfit(color: Colors.white),
+            style: GoogleFonts.outfit(color: context.c.textPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Group Name',
@@ -819,7 +846,7 @@ class _GroupCard extends ConsumerWidget {
               const SizedBox(height: 12),
               TextField(
                 controller: descController,
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Description',
@@ -829,8 +856,8 @@ class _GroupCard extends ConsumerWidget {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedType,
-                dropdownColor: const Color(0xFF1E293B),
-                style: GoogleFonts.outfit(color: Colors.white),
+                dropdownColor: context.c.surface,
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Group Type',
@@ -841,14 +868,14 @@ class _GroupCard extends ConsumerWidget {
                     value: 'Lecture',
                     child: Text(
                       'Lecture Group',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                   DropdownMenuItem(
                     value: 'Lab',
                     child: Text(
                       'Lab Group',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                 ],
@@ -862,50 +889,63 @@ class _GroupCard extends ConsumerWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: saving ? null : () => Navigator.pop(context),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
             ),
             FilledButton(
-              onPressed: () async {
-                try {
-                  final repo = ref.read(classGroupRepositoryProvider);
-                  await repo.updateGroup(
-                    groupId: group.id,
-                    name: nameController.text.trim(),
-                    description: descController.text.trim().isEmpty
-                        ? null
-                        : descController.text.trim(),
-                    type: selectedType,
-                  );
+              onPressed: saving
+                  ? null
+                  : () async {
+                      setState(() => saving = true);
+                      try {
+                        final repo = ref.read(classGroupRepositoryProvider);
+                        await repo.updateGroup(
+                          groupId: group.id,
+                          name: nameController.text.trim(),
+                          description: descController.text.trim().isEmpty
+                              ? null
+                              : descController.text.trim(),
+                          type: selectedType,
+                        );
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Group updated successfully'),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ErrorHandler.showErrorSnackBar(
-                      context,
-                      e,
-                      customMessage: 'Unable to add class group',
-                    );
-                  }
-                }
-              },
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Group updated successfully'),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setState(() => saving = false);
+                          ErrorHandler.showErrorSnackBar(
+                            context,
+                            e,
+                            customMessage: 'Unable to update class group',
+                          );
+                        }
+                      }
+                    },
               style: FilledButton.styleFrom(
-                backgroundColor: FluentColors.accentColor,
+                backgroundColor: context.c.accent,
               ),
-              child: Text(
-                'Update',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-              ),
+              child: saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Update',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
             ),
           ],
         ),
@@ -921,25 +961,25 @@ class _GroupCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Delete Class Group',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to delete "${group.name}"? This action cannot be undone.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             onPressed: () async {
               try {
                 final repo = ref.read(classGroupRepositoryProvider);
@@ -985,10 +1025,10 @@ class _GroupCard extends ConsumerWidget {
           final height = isMobile ? constraints.maxHeight * 0.8 : 500.0;
 
           return AlertDialog(
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: context.c.surface,
             title: Text(
               '${group.name} Details',
-              style: GoogleFonts.outfit(color: Colors.white),
+              style: GoogleFonts.outfit(color: context.c.textPrimary),
             ),
             content: SizedBox(
               width: width,
@@ -998,9 +1038,9 @@ class _GroupCard extends ConsumerWidget {
                 child: Column(
                   children: [
                     TabBar(
-                      labelColor: FluentColors.accentColor,
-                      unselectedLabelColor: Colors.white60,
-                      indicatorColor: FluentColors.accentColor,
+                      labelColor: context.c.accent,
+                      unselectedLabelColor: context.c.textSecondary,
+                      indicatorColor: context.c.accent,
                       labelStyle: GoogleFonts.outfit(
                         fontWeight: FontWeight.w600,
                       ),
@@ -1013,126 +1053,13 @@ class _GroupCard extends ConsumerWidget {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          // Students Tab
-                          Consumer(
-                            builder: (context, ref, _) {
-                              final studentsAsync = ref.watch(
-                                allStudentsProvider,
-                              );
-                              return studentsAsync.when(
-                                data: (allStudents) {
-                                  final groupStudents = allStudents
-                                      .where(
-                                        (s) =>
-                                            group.studentUids.contains(s['id']),
-                                      )
-                                      .toList();
-                                  if (groupStudents.isEmpty) {
-                                    return Center(
-                                      child: Text(
-                                        'No students assigned',
-                                        style: GoogleFonts.outfit(
-                                          color: Colors.white54,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return ListView.builder(
-                                    itemCount: groupStudents.length,
-                                    itemBuilder: (context, index) {
-                                      final student = groupStudents[index];
-                                      return ListTile(
-                                        leading: const Icon(
-                                          Icons.person,
-                                          color: Colors.blueAccent,
-                                        ),
-                                        title: Text(
-                                          student['displayName'] ?? 'Unknown',
-                                          style: GoogleFonts.outfit(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          student['email'] ?? '',
-                                          style: GoogleFonts.outfit(
-                                            color: Colors.white54,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                loading: () => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                error: (e, _) => ErrorHandler.buildErrorWidget(
-                                  e,
-                                  customMessage: 'Unable to load subjects',
-                                ),
-                              );
-                            },
-                          ),
-
+                          // Students Tab: assign or remove members. Membership
+                          // is mirrored onto each student's lectureGroup /
+                          // labGroup field, which is what drives subject
+                          // resolution for them.
+                          GroupMemberManager(group: group, role: 'student'),
                           // Teachers Tab
-                          Consumer(
-                            builder: (context, ref, _) {
-                              final teachersAsync = ref.watch(
-                                allTeachersProvider,
-                              );
-                              return teachersAsync.when(
-                                data: (allTeachers) {
-                                  final groupTeachers = allTeachers
-                                      .where(
-                                        (t) =>
-                                            group.teacherUids.contains(t['id']),
-                                      )
-                                      .toList();
-                                  if (groupTeachers.isEmpty) {
-                                    return Center(
-                                      child: Text(
-                                        'No teachers assigned',
-                                        style: GoogleFonts.outfit(
-                                          color: Colors.white54,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return ListView.builder(
-                                    itemCount: groupTeachers.length,
-                                    itemBuilder: (context, index) {
-                                      final teacher = groupTeachers[index];
-                                      return ListTile(
-                                        leading: const Icon(
-                                          Icons.school,
-                                          color: Colors.greenAccent,
-                                        ),
-                                        title: Text(
-                                          teacher['displayName'] ?? 'Unknown',
-                                          style: GoogleFonts.outfit(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          teacher['email'] ?? '',
-                                          style: GoogleFonts.outfit(
-                                            color: Colors.white54,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                loading: () => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                error: (e, _) => ErrorHandler.buildErrorWidget(
-                                  e,
-                                  customMessage: 'Unable to load teachers',
-                                ),
-                              );
-                            },
-                          ),
-
+                          GroupMemberManager(group: group, role: 'teacher'),
                           // Subjects Tab
                           Consumer(
                             builder: (context, ref, _) {
@@ -1152,7 +1079,7 @@ class _GroupCard extends ConsumerWidget {
                                       child: Text(
                                         'No subjects assigned',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white54,
+                                          color: context.c.textTertiary,
                                         ),
                                       ),
                                     );
@@ -1162,14 +1089,14 @@ class _GroupCard extends ConsumerWidget {
                                     itemBuilder: (context, index) {
                                       final subject = groupSubjects[index];
                                       return ListTile(
-                                        leading: const Icon(
+                                        leading: Icon(
                                           Icons.book,
-                                          color: Colors.orangeAccent,
+                                          color: context.c.warning,
                                         ),
                                         title: Text(
                                           subject['name'] ?? 'Unknown',
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white,
+                                            color: context.c.textPrimary,
                                           ),
                                         ),
                                         subtitle: Column(
@@ -1179,7 +1106,7 @@ class _GroupCard extends ConsumerWidget {
                                             Text(
                                               subject['code'] ?? '',
                                               style: GoogleFonts.outfit(
-                                                color: Colors.white54,
+                                                color: context.c.textTertiary,
                                               ),
                                             ),
                                             // Show current teacher name
@@ -1203,7 +1130,7 @@ class _GroupCard extends ConsumerWidget {
                                                     return Text(
                                                       'Teacher: ${teacher['displayName']}',
                                                       style: GoogleFonts.outfit(
-                                                        color: Colors.white38,
+                                                        color: context.c.textTertiary,
                                                         fontSize: 12,
                                                       ),
                                                     );
@@ -1218,9 +1145,9 @@ class _GroupCard extends ConsumerWidget {
                                           ],
                                         ),
                                         trailing: IconButton(
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.edit,
-                                            color: FluentColors.accentColor,
+                                            color: context.c.accent,
                                           ),
                                           tooltip: 'Transfer Subject',
                                           onPressed: () =>
@@ -1257,7 +1184,7 @@ class _GroupCard extends ConsumerWidget {
                 onPressed: () => Navigator.pop(context),
                 child: Text(
                   'Close',
-                  style: GoogleFonts.outfit(color: Colors.white70),
+                  style: GoogleFonts.outfit(color: context.c.textSecondary),
                 ),
               ),
             ],
@@ -1279,10 +1206,10 @@ class _GroupCard extends ConsumerWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: context.c.surface,
           title: Text(
             'Transfer Subject',
-            style: GoogleFonts.outfit(color: Colors.white),
+            style: GoogleFonts.outfit(color: context.c.textPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1290,7 +1217,7 @@ class _GroupCard extends ConsumerWidget {
             children: [
               Text(
                 'Transfer "${subject['name']}" to a new teacher.\nThis will preserve past session history for the previous teacher.',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
               const SizedBox(height: 16),
               Consumer(
@@ -1306,14 +1233,14 @@ class _GroupCard extends ConsumerWidget {
                       if (availableTeachers.isEmpty) {
                         return Text(
                           'No other teachers available.',
-                          style: GoogleFonts.outfit(color: Colors.orange),
+                          style: GoogleFonts.outfit(color: context.c.warning),
                         );
                       }
 
                       return DropdownButtonFormField<String>(
                         initialValue: selectedTeacherUid,
-                        dropdownColor: const Color(0xFF1E293B),
-                        style: GoogleFonts.outfit(color: Colors.white),
+                        dropdownColor: context.c.surface,
+                        style: GoogleFonts.outfit(color: context.c.textPrimary),
                         decoration: fluentInputDecoration(
                           context: context,
                           labelText: 'New Teacher',
@@ -1324,7 +1251,7 @@ class _GroupCard extends ConsumerWidget {
                             value: t['id'] as String,
                             child: Text(
                               t['displayName'] ?? 'Unknown',
-                              style: GoogleFonts.outfit(color: Colors.white),
+                              style: GoogleFonts.outfit(color: context.c.textPrimary),
                             ),
                           );
                         }).toList(),
@@ -1344,7 +1271,7 @@ class _GroupCard extends ConsumerWidget {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
             ),
             FilledButton(
@@ -1379,7 +1306,7 @@ class _GroupCard extends ConsumerWidget {
                       }
                     },
               style: FilledButton.styleFrom(
-                backgroundColor: FluentColors.accentColor,
+                backgroundColor: context.c.accent,
               ),
               child: Text(
                 'Transfer',

@@ -8,6 +8,7 @@ import '../../notifications/providers.dart';
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../features/auth/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class StudentNotificationsPage extends ConsumerWidget {
   const StudentNotificationsPage({super.key});
@@ -58,9 +59,9 @@ class StudentNotificationsPage extends ConsumerWidget {
                               icon: const Icon(Icons.done_all, size: 18),
                               label: const Text('Mark all read'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFF00B0FF),
-                                side: const BorderSide(
-                                  color: Color(0xFF00B0FF),
+                                foregroundColor: context.c.info,
+                                side: BorderSide(
+                                  color: context.c.info,
                                 ),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -85,8 +86,8 @@ class StudentNotificationsPage extends ConsumerWidget {
                               icon: const Icon(Icons.delete_outline, size: 18),
                               label: const Text('Clear all'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.redAccent,
-                                side: const BorderSide(color: Colors.redAccent),
+                                foregroundColor: context.c.danger,
+                                side: BorderSide(color: context.c.danger),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
@@ -127,7 +128,7 @@ class StudentNotificationsPage extends ConsumerWidget {
                           icon: const Icon(Icons.done_all, size: 18),
                           label: const Text('Mark all as read'),
                           style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF00B0FF),
+                            foregroundColor: context.c.info,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -150,7 +151,7 @@ class StudentNotificationsPage extends ConsumerWidget {
                           icon: const Icon(Icons.delete_outline, size: 18),
                           label: const Text('Clear all'),
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
+                            foregroundColor: context.c.danger,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -208,12 +209,12 @@ class StudentNotificationsPage extends ConsumerWidget {
                             decoration: BoxDecoration(
                               color: isRead
                                   ? Colors.grey.withValues(alpha: 0.1)
-                                  : FluentColors.info.withValues(alpha: 0.1),
+                                  : context.c.info.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               _getIconForType(notification.type),
-                              color: isRead ? Colors.grey : FluentColors.info,
+                              color: isRead ? context.c.textTertiary : context.c.info,
                               size: 24,
                             ),
                           ),
@@ -232,7 +233,7 @@ class StudentNotificationsPage extends ConsumerWidget {
                                               ? FontWeight.normal
                                               : FontWeight.bold,
                                           fontSize: 16,
-                                          color: isRead ? Colors.grey : null,
+                                          color: isRead ? context.c.textTertiary : null,
                                         ),
                                       ),
                                     ),
@@ -253,7 +254,7 @@ class StudentNotificationsPage extends ConsumerWidget {
                                 Text(
                                   notification.message,
                                   style: TextStyle(
-                                    color: isRead ? Colors.grey : null,
+                                    color: isRead ? context.c.textTertiary : null,
                                   ),
                                 ),
                               ],

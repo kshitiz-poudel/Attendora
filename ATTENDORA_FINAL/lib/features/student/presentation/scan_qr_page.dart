@@ -23,6 +23,8 @@ import 'dart:io';
 import '../../shared/widgets/glass_card.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import '../../attendance/qr_token.dart';
+import '../../../core/design/app_colors.dart';
 
 class ScanQrPage extends ConsumerStatefulWidget {
   const ScanQrPage({super.key});
@@ -63,19 +65,19 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
     _handled = true;
 
     final raw = barcode.rawValue!;
-    final parts = raw.split(':');
+    final payload = QrPayload.tryParse(raw);
     String result = 'Rejected';
     String note = '';
     String subject = 'Attendance Session';
     try {
-      if (parts.length < 2) {
-        note = 'Invalid code.';
+      if (payload == null) {
+        note = 'This is not a valid Attendora attendance code.';
       } else {
-        final sessionId = parts.first;
-        final slotStr = parts[1];
-        final nowSlot = DateTime.now().millisecondsSinceEpoch ~/ 5000;
-        final codeSlot = int.tryParse(slotStr) ?? -1;
-        if ((codeSlot - nowSlot).abs() > 1) {
+        final sessionId = payload.sessionId;
+        // Local freshness check for a fast, clear message. The binding check
+        // that actually matters runs server-side in the security rules, which
+        // compare the token against the session's live secret.
+        if (!payload.isFresh()) {
           note = 'QR code outdated. Please rescan.';
           throw Exception(note);
         }
@@ -162,6 +164,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
               idNumber: idNumber,
               rollNumber: rollNumber,
               distanceMeters: distance,
+              qrToken: payload.token,
             );
             result = 'Present';
             note = bypassLocation
@@ -217,7 +220,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
         .read(attendanceListProvider.notifier)
         .add(
           AttendanceRecord(
-            sessionId: parts.isNotEmpty ? parts.first : 'unknown',
+            sessionId: payload?.sessionId ?? 'unknown',
             timestamp: DateTime.now(),
             subject: subject,
             result: result,
@@ -232,7 +235,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
     } else {
       setState(() {
         _message = 'Scan failed: $note';
-        _messageColor = Colors.red;
+        _messageColor = context.c.danger;
       });
       _clearTimer = Timer(const Duration(seconds: 2), () {
         if (mounted) {
@@ -259,12 +262,12 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  color: context.c.accent.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle_rounded,
-                  color: Color(0xFF10B981),
+                  color: context.c.accent,
                   size: 64,
                 ),
               ),
@@ -272,7 +275,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
               Text(
                 'Attendance Marked!',
                 style: GoogleFonts.outfit(
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -281,7 +284,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
               const SizedBox(height: 8),
               Text(
                 'You have been marked present.',
-                style: GoogleFonts.outfit(color: Colors.white70, fontSize: 16),
+                style: GoogleFonts.outfit(color: context.c.textSecondary, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -310,17 +313,17 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
 
     if (isDesktopOrWeb) {
       return Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: context.c.canvas,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: context.c.textPrimary),
             onPressed: () => context.pop(),
           ),
           title: Text(
             'Scan QR Code',
-            style: GoogleFonts.outfit(color: Colors.white),
+            style: GoogleFonts.outfit(color: context.c.textPrimary),
           ),
         ),
         body: Center(
@@ -330,10 +333,10 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.mobile_friendly,
                     size: 64,
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -341,7 +344,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -351,7 +354,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -366,7 +369,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                     icon: const Icon(Icons.download_rounded),
                     label: const Text('Download APK'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: context.c.accent,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -379,7 +382,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                     icon: const Icon(Icons.arrow_back),
                     label: const Text('Go Back'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: context.c.accent,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -421,9 +424,9 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                           onPressed: () => context.pop(),
                         ),
@@ -441,7 +444,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                         child: Text(
                           'Scan QR Code',
                           style: GoogleFonts.outfit(
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -459,7 +462,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                     height: 280,
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: context.c.textPrimary.withValues(alpha: 0.5),
                         width: 2,
                       ),
                       borderRadius: BorderRadius.circular(24),
@@ -470,14 +473,14 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                         Positioned(
                           top: 0,
                           left: 0,
-                          child: _Corner(color: const Color(0xFF10B981)),
+                          child: _Corner(color: context.c.accent),
                         ),
                         Positioned(
                           top: 0,
                           right: 0,
                           child: Transform.rotate(
                             angle: 1.57,
-                            child: _Corner(color: const Color(0xFF10B981)),
+                            child: _Corner(color: context.c.accent),
                           ),
                         ),
                         Positioned(
@@ -485,7 +488,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                           left: 0,
                           child: Transform.rotate(
                             angle: -1.57,
-                            child: _Corner(color: const Color(0xFF10B981)),
+                            child: _Corner(color: context.c.accent),
                           ),
                         ),
                         Positioned(
@@ -493,7 +496,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                           right: 0,
                           child: Transform.rotate(
                             angle: 3.14,
-                            child: _Corner(color: const Color(0xFF10B981)),
+                            child: _Corner(color: context.c.accent),
                           ),
                         ),
                       ],
@@ -513,7 +516,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                   child: Text(
                     'Align QR code within the frame',
                     style: GoogleFonts.outfit(
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                       fontSize: 14,
                     ),
                   ),
@@ -534,13 +537,13 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                   children: [
                     Icon(
                       Icons.error_outline,
-                      color: _messageColor ?? Colors.red,
+                      color: _messageColor ?? context.c.danger,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         _message!,
-                        style: GoogleFonts.outfit(color: Colors.white),
+                        style: GoogleFonts.outfit(color: context.c.textPrimary),
                         textAlign: TextAlign.center,
                       ),
                     ),

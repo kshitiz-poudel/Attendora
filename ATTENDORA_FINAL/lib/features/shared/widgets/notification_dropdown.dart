@@ -8,6 +8,9 @@ import '../../dashboard/providers.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../dashboard/notification_provider.dart';
 import 'alerts_card.dart';
+import '../../dashboard/services/faculty_approval_service.dart';
+import '../../auth/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 /// Dropdown widget that shows notifications and quick actions
 class NotificationDropdown extends ConsumerWidget {
@@ -23,9 +26,9 @@ class NotificationDropdown extends ConsumerWidget {
       width: 400,
       constraints: const BoxConstraints(maxHeight: 600),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -45,7 +48,7 @@ class NotificationDropdown extends ConsumerWidget {
               children: [
                 Icon(
                   Icons.notifications_rounded,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -54,13 +57,13 @@ class NotificationDropdown extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Colors.white12),
+          Divider(height: 1, color: context.c.border),
 
           // Content
           Flexible(
@@ -85,9 +88,9 @@ class NotificationDropdown extends ConsumerWidget {
                                     color: Colors.blue.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.person_add_rounded,
-                                    color: Colors.blue,
+                                    color: context.c.info,
                                     size: 16,
                                   ),
                                 ),
@@ -97,7 +100,7 @@ class NotificationDropdown extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -107,7 +110,7 @@ class NotificationDropdown extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue,
+                                    color: context.c.info,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
@@ -115,7 +118,7 @@ class NotificationDropdown extends ConsumerWidget {
                                     style: GoogleFonts.outfit(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: context.c.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -125,7 +128,7 @@ class NotificationDropdown extends ConsumerWidget {
                           ...users
                               .take(3)
                               .map((user) => _buildNewUserItem(context, user)),
-                          const Divider(height: 1, color: Colors.white12),
+                          Divider(height: 1, color: context.c.border),
                         ],
                       );
                     },
@@ -151,9 +154,9 @@ class NotificationDropdown extends ConsumerWidget {
                                     color: Colors.orange.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.pending_actions_rounded,
-                                    color: Colors.orange,
+                                    color: context.c.warning,
                                     size: 16,
                                   ),
                                 ),
@@ -163,7 +166,7 @@ class NotificationDropdown extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -173,7 +176,7 @@ class NotificationDropdown extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange,
+                                    color: context.c.warning,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
@@ -181,7 +184,7 @@ class NotificationDropdown extends ConsumerWidget {
                                     style: GoogleFonts.outfit(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: context.c.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -210,12 +213,12 @@ class NotificationDropdown extends ConsumerWidget {
                                 },
                                 style: TextButton.styleFrom(
                                   minimumSize: const Size(double.infinity, 36),
-                                  foregroundColor: const Color(0xFF00B0FF),
+                                  foregroundColor: context.c.info,
                                 ),
                                 child: const Text('View All Pending Approvals'),
                               ),
                             ),
-                          const Divider(height: 1, color: Colors.white12),
+                          Divider(height: 1, color: context.c.border),
                         ],
                       );
                     },
@@ -239,7 +242,7 @@ class NotificationDropdown extends ConsumerWidget {
                               children: [
                                 Icon(
                                   Icons.check_circle_outline,
-                                  color: Colors.green,
+                                  color: context.c.success,
                                   size: 48,
                                 ),
                                 const SizedBox(height: 12),
@@ -248,7 +251,7 @@ class NotificationDropdown extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -256,7 +259,7 @@ class NotificationDropdown extends ConsumerWidget {
                                   'No pending notifications',
                                   style: GoogleFonts.outfit(
                                     fontSize: 13,
-                                    color: Colors.white54,
+                                    color: context.c.textTertiary,
                                   ),
                                 ),
                               ],
@@ -277,13 +280,13 @@ class NotificationDropdown extends ConsumerWidget {
                                 Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF59E0B)
+                                    color: context.c.warning
                                         .withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.warning_amber_rounded,
-                                    color: Color(0xFFF59E0B),
+                                    color: context.c.warning,
                                     size: 16,
                                   ),
                                 ),
@@ -293,7 +296,7 @@ class NotificationDropdown extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -303,7 +306,7 @@ class NotificationDropdown extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF59E0B),
+                                    color: context.c.warning,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
@@ -311,7 +314,7 @@ class NotificationDropdown extends ConsumerWidget {
                                     style: GoogleFonts.outfit(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: context.c.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -350,9 +353,9 @@ class NotificationDropdown extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,7 +370,7 @@ class NotificationDropdown extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: context.c.warning,
                   ),
                 ),
               ),
@@ -381,7 +384,7 @@ class NotificationDropdown extends ConsumerWidget {
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -390,7 +393,7 @@ class NotificationDropdown extends ConsumerWidget {
                       teacher['email'] as String? ?? '',
                       style: GoogleFonts.outfit(
                         fontSize: 11,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -406,11 +409,11 @@ class NotificationDropdown extends ConsumerWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () =>
-                      _approveTeacher(context, teacher['id'] as String),
+                      _approveTeacher(context, ref, teacher['id'] as String),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    side: const BorderSide(color: Colors.green, width: 1),
-                    foregroundColor: Colors.green,
+                    side: BorderSide(color: context.c.success, width: 1),
+                    foregroundColor: context.c.success,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -428,8 +431,8 @@ class NotificationDropdown extends ConsumerWidget {
                       _rejectTeacher(context, teacher['id'] as String),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    side: const BorderSide(color: Colors.red, width: 1),
-                    foregroundColor: Colors.red,
+                    side: BorderSide(color: context.c.danger, width: 1),
+                    foregroundColor: context.c.danger,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -456,24 +459,24 @@ class NotificationDropdown extends ConsumerWidget {
     switch (type) {
       case 'low_attendance':
         icon = Icons.warning_amber_rounded;
-        color = const Color(0xFFF59E0B);
+        color = context.c.warning;
         final name = alert['studentName'] as String;
         final percentage = (alert['percentage'] as double).toStringAsFixed(0);
         message = '$name has low attendance ($percentage%)';
         break;
       case 'pending_approval':
         icon = Icons.approval;
-        color = const Color(0xFF2F6FED);
+        color = context.c.primary;
         message = 'Teacher ${alert['teacherName']} pending approval';
         break;
       case 'new_institution':
         icon = Icons.corporate_fare;
-        color = const Color(0xFF10B981);
+        color = context.c.accent;
         message = 'New institution: ${alert['institutionName']}';
         break;
       default:
         icon = Icons.info_outline;
-        color = Colors.grey;
+        color = context.c.textTertiary;
         message = 'New alert';
     }
 
@@ -481,9 +484,9 @@ class NotificationDropdown extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -499,7 +502,7 @@ class NotificationDropdown extends ConsumerWidget {
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.outfit(fontSize: 12, color: Colors.white),
+              style: GoogleFonts.outfit(fontSize: 12, color: context.c.textPrimary),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -509,22 +512,26 @@ class NotificationDropdown extends ConsumerWidget {
     );
   }
 
-  Future<void> _approveTeacher(BuildContext context, String teacherId) async {
+  Future<void> _approveTeacher(
+    BuildContext context,
+    WidgetRef ref,
+    String teacherId,
+  ) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(teacherId)
-          .update({
-            'approved': true,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'approvedAt': FieldValue.serverTimestamp(),
-          });
+      await ref
+          .read(facultyApprovalServiceProvider)
+          .approve(
+            teacherId: teacherId,
+            adminInstitutionCode: ref
+                .read(authControllerProvider)
+                .institutionCode,
+          );
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher approved successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -549,9 +556,9 @@ class NotificationDropdown extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher registration rejected'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -576,9 +583,9 @@ class NotificationDropdown extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -590,7 +597,7 @@ class NotificationDropdown extends ConsumerWidget {
               style: GoogleFonts.outfit(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                color: context.c.info,
               ),
             ),
           ),
@@ -604,7 +611,7 @@ class NotificationDropdown extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -613,7 +620,7 @@ class NotificationDropdown extends ConsumerWidget {
                   '$role • $email',
                   style: GoogleFonts.outfit(
                     fontSize: 11,
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

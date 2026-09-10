@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/design/app_colors.dart';
 
 class GlassTextField extends StatelessWidget {
   const GlassTextField({
@@ -35,9 +36,9 @@ class GlassTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: TextFormField(
         controller: controller,
@@ -48,14 +49,14 @@ class GlassTextField extends StatelessWidget {
         validator: validator,
         keyboardType: keyboardType,
         onChanged: onChanged,
-        style: GoogleFonts.outfit(color: Colors.white),
+        style: GoogleFonts.outfit(color: context.c.textPrimary),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.outfit(color: Colors.white70),
+          labelStyle: GoogleFonts.outfit(color: context.c.textSecondary),
           hintText: hintText,
-          hintStyle: GoogleFonts.outfit(color: Colors.white38),
+          hintStyle: GoogleFonts.outfit(color: context.c.textTertiary),
           prefixIcon: prefixIcon != null
-              ? Icon(prefixIcon, color: Colors.white70, size: 20)
+              ? Icon(prefixIcon, color: context.c.textSecondary, size: 20)
               : null,
           suffixIcon: suffixIcon,
           border: InputBorder.none,

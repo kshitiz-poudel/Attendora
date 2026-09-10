@@ -14,6 +14,7 @@ import 'teacher_subjects_page.dart';
 import '../../../core/responsive_utils.dart';
 import '../../notifications/repository.dart';
 import '../../notifications/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for students grouped by Subject, with attendance stats
 final studentsProvider =
@@ -302,7 +303,7 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                       subtitle: _searchQuery.isEmpty
                           ? 'No subjects assigned to you yet'
                           : 'No subjects match "$_searchQuery"',
-                      color: FluentColors.info,
+                      color: context.c.info,
                     ),
                   ),
                 );
@@ -328,15 +329,15 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            const Color(0xFF10B981).withValues(alpha: 0.15),
-                            const Color(0xFF10B981).withValues(alpha: 0.05),
+                            context.c.accent.withValues(alpha: 0.15),
+                            context.c.accent.withValues(alpha: 0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                          color: context.c.accent.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -344,13 +345,13 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981)
+                              color: context.c.accent
                                   .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.people_alt_rounded,
-                              color: Color(0xFF10B981),
+                              color: context.c.accent,
                               size: 28,
                             ),
                           ),
@@ -363,8 +364,8 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                               color:
                                   Theme.of(context).brightness ==
                                       Brightness.dark
-                                  ? FluentColors.textPrimaryDark
-                                  : FluentColors.textPrimary,
+                                  ? context.c.textPrimary
+                                  : context.c.textPrimary,
                             ),
                           ),
                           const Spacer(),
@@ -374,16 +375,16 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981)
+                              color: context.c.accent
                                   .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               '$totalStudents',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF10B981),
+                                color: context.c.accent,
                               ),
                             ),
                           ),
@@ -416,8 +417,8 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                           'Institution: ${groupedStudents['__DEBUG_INFO__']![0]['debug_institutionCode']}\n'
                           'Raw Students Fetched: ${groupedStudents['__DEBUG_INFO__']![0]['debug_rawStudentCount']}\n'
                           'Sample Groups:\n${groupedStudents['__DEBUG_INFO__']![0]['debug_sampleGroups']}',
-                          style: const TextStyle(
-                            color: Colors.greenAccent,
+                          style: TextStyle(
+                            color: context.c.success,
                             fontFamily: 'monospace',
                             fontSize: 12,
                           ),
@@ -459,15 +460,15 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFF10B981).withValues(alpha: 0.2),
-                        const Color(0xFF10B981).withValues(alpha: 0.1),
+                        context.c.accent.withValues(alpha: 0.2),
+                        context.c.accent.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.people_alt_rounded,
-                    color: Color(0xFF10B981),
+                    color: context.c.accent,
                     size: 32,
                   ),
                 ),
@@ -489,8 +490,8 @@ class _TeacherStudentsPageState extends ConsumerState<TeacherStudentsPage> {
                         style: TextStyle(
                           fontSize: 14,
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? FluentColors.textSecondaryDark
-                              : FluentColors.textSecondary,
+                              ? context.c.textSecondary
+                              : context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -579,26 +580,26 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981)
+                            color: context.c.accent
                                 .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.class_,
-                                color: Color(0xFF10B981),
+                                color: context.c.accent,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
                                   widget.subjectName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF10B981),
+                                    color: context.c.accent,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -614,7 +615,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: FluentColors.textSecondary.withValues(
+                          color: context.c.textSecondary.withValues(
                             alpha: 0.1,
                           ),
                           borderRadius: BorderRadius.circular(8),
@@ -626,8 +627,8 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                             fontWeight: FontWeight.w600,
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                ? FluentColors.textSecondaryDark
-                                : FluentColors.textSecondary,
+                                ? context.c.textSecondary
+                                : context.c.textSecondary,
                           ),
                         ),
                       ),
@@ -636,7 +637,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                         _isExpanded
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
-                        color: FluentColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ],
                   ),
@@ -687,13 +688,13 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                                     Icon(
                                       Icons.notifications_outlined,
                                       size: 16,
-                                      color: FluentColors.info,
+                                      color: context.c.info,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
                                       'Notify All',
                                       style: TextStyle(
-                                        color: FluentColors.info,
+                                        color: context.c.info,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -715,7 +716,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                                           ? 'No students enrolled in this subject yet.'
                                           : 'No students match "$_studentSearchQuery"',
                                       style: TextStyle(
-                                        color: FluentColors.textSecondary,
+                                        color: context.c.textSecondary,
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
@@ -723,9 +724,9 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                                     SelectableText(
                                       'Debug: Subject Group = "${widget.subjectName}" (Group ID logic hidden)\n'
                                       'Students found: ${widget.students.length}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 10,
-                                        color: Colors.grey,
+                                        color: context.c.textTertiary,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -842,7 +843,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Sent notifications to $sentCount students'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -873,9 +874,9 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
     final rollNumber = rollNum ?? 'N/A';
 
     final colors = [
-      const Color(0xFF10B981),
-      const Color(0xFF2F6FED),
-      const Color(0xFFF59E0B),
+      context.c.accent,
+      context.c.primary,
+      context.c.warning,
       const Color(0xFFEC4899),
     ];
     final color = colors[name.length % colors.length];
@@ -927,7 +928,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                     Icon(
                       Icons.email_outlined,
                       size: 14,
-                      color: FluentColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -936,8 +937,8 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                         style: TextStyle(
                           fontSize: 13,
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? FluentColors.textSecondaryDark
-                              : FluentColors.textSecondary,
+                              ? context.c.textSecondary
+                              : context.c.textSecondary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -950,7 +951,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                     Icon(
                       Icons.badge_outlined,
                       size: 14,
-                      color: FluentColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -958,8 +959,8 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                       style: TextStyle(
                         fontSize: 13,
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? FluentColors.textSecondaryDark
-                            : FluentColors.textSecondary,
+                            ? context.c.textSecondary
+                            : context.c.textSecondary,
                       ),
                     ),
                   ],
@@ -971,7 +972,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                       Icon(
                         Icons.analytics_outlined,
                         size: 14,
-                        color: FluentColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -997,27 +998,27 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                      color: context.c.danger.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+                        color: context.c.danger.withValues(alpha: 0.4),
                       ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.block_rounded,
                           size: 14,
-                          color: Color(0xFFEF4444),
+                          color: context.c.danger,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           'DETAINED',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFFEF4444),
+                            color: context.c.danger,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -1033,7 +1034,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
             _buildDetainButton(context, ref, student),
           IconButton(
             onPressed: () => _showStudentDetails(context, student),
-            icon: const Icon(Icons.info_outline, color: Color(0xFF10B981)),
+            icon: Icon(Icons.info_outline, color: context.c.accent),
             tooltip: 'View Details',
           ),
         ],
@@ -1059,7 +1060,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
       onPressed: () => _confirmToggleDetention(context, ref, student),
       icon: Icon(
         isDetained ? Icons.lock_open_rounded : Icons.block_rounded,
-        color: const Color(0xFFEF4444),
+        color: context.c.danger,
       ),
       tooltip: isDetained ? 'Remove Detention' : 'Detain Student',
     );
@@ -1095,7 +1096,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: context.c.danger,
             ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(isDetained ? 'Remove Detention' : 'Detain'),
@@ -1162,10 +1163,10 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                color: context.c.accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.person, color: Color(0xFF10B981)),
+              child: Icon(Icons.person, color: context.c.accent),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1205,8 +1206,8 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
               'Status',
               student['approved'] == true ? 'Active' : 'Pending',
               valueColor: student['approved'] == true
-                  ? Colors.green
-                  : Colors.orange,
+                  ? context.c.success
+                  : context.c.warning,
             ),
           ],
         ),
@@ -1221,9 +1222,9 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
   }
 
   Color _getAttendanceColor(double percentage) {
-    if (percentage >= 75) return Colors.green;
-    if (percentage >= 60) return Colors.orange;
-    return Colors.red;
+    if (percentage >= 75) return context.c.success;
+    if (percentage >= 60) return context.c.warning;
+    return context.c.danger;
   }
 }
 
@@ -1239,7 +1240,7 @@ class _DetailRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: FluentColors.textSecondary),
+        Icon(icon, size: 20, color: context.c.textSecondary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -1250,8 +1251,8 @@ class _DetailRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? FluentColors.textSecondaryDark
-                      : FluentColors.textSecondary,
+                      ? context.c.textSecondary
+                      : context.c.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1422,9 +1423,9 @@ class _EditStudentDialogState extends State<_EditStudentDialog> {
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Student updated'),
-                    backgroundColor: FluentColors.success,
+                    backgroundColor: context.c.success,
                   ),
                 );
               }
@@ -1535,17 +1536,17 @@ class _AddStudentDialogState extends State<_AddStudentDialog> {
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                      color: context.c.warning.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                        color: context.c.warning.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.warning_amber_rounded,
-                          color: Color(0xFFF59E0B),
+                          color: context.c.warning,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -1553,7 +1554,7 @@ class _AddStudentDialogState extends State<_AddStudentDialog> {
                             'Please add subjects first to create groups',
                             style: TextStyle(
                               fontSize: 13,
-                              color: FluentColors.textSecondary,
+                              color: context.c.textSecondary,
                             ),
                           ),
                         ),
@@ -1592,13 +1593,13 @@ class _AddStudentDialogState extends State<_AddStudentDialog> {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981)
+                                  color: context.c.accent
                                       .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.class_,
-                                  color: Color(0xFF10B981),
+                                  color: context.c.accent,
                                   size: 18,
                                 ),
                               ),
@@ -1670,9 +1671,9 @@ class _AddStudentDialogState extends State<_AddStudentDialog> {
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Student added successfully!'),
-                    backgroundColor: FluentColors.success,
+                    backgroundColor: context.c.success,
                   ),
                 );
               }

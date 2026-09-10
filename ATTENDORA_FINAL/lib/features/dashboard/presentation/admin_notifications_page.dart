@@ -10,6 +10,8 @@ import '../../dashboard/notification_provider.dart';
 import '../../../core/fluent_theme.dart';
 import '../../notifications/providers.dart'; // Added
 import '../../../features/auth/providers.dart'; // Added
+import '../services/faculty_approval_service.dart';
+import '../../../core/design/app_colors.dart';
 
 class AdminNotificationsPage extends ConsumerWidget {
   const AdminNotificationsPage({super.key});
@@ -37,7 +39,7 @@ class AdminNotificationsPage extends ConsumerWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -80,9 +82,9 @@ class AdminNotificationsPage extends ConsumerWidget {
                               ),
                               label: const Text('Mark all read'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: FluentColors.accentColor,
+                                foregroundColor: context.c.accent,
                                 side: BorderSide(
-                                  color: FluentColors.accentColor,
+                                  color: context.c.accent,
                                 ),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -109,8 +111,8 @@ class AdminNotificationsPage extends ConsumerWidget {
                               icon: const Icon(Icons.delete_outline, size: 18),
                               label: const Text('Clear all'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.redAccent,
-                                side: const BorderSide(color: Colors.redAccent),
+                                foregroundColor: context.c.danger,
+                                side: BorderSide(color: context.c.danger),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
@@ -131,7 +133,7 @@ class AdminNotificationsPage extends ConsumerWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     Row(
@@ -173,7 +175,7 @@ class AdminNotificationsPage extends ConsumerWidget {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            foregroundColor: FluentColors.accentColor,
+                            foregroundColor: context.c.accent,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -197,7 +199,7 @@ class AdminNotificationsPage extends ConsumerWidget {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
+                            foregroundColor: context.c.danger,
                           ),
                         ),
                       ],
@@ -252,12 +254,12 @@ class AdminNotificationsPage extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: isRead
                                     ? Colors.grey.withValues(alpha: 0.1)
-                                    : FluentColors.info.withValues(alpha: 0.1),
+                                    : context.c.info.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 _getIconForType(notification.type),
-                                color: isRead ? Colors.grey : FluentColors.info,
+                                color: isRead ? context.c.textTertiary : context.c.info,
                                 size: 24,
                               ),
                             ),
@@ -277,8 +279,8 @@ class AdminNotificationsPage extends ConsumerWidget {
                                                 : FontWeight.bold,
                                             fontSize: 16,
                                             color: isRead
-                                                ? Colors.grey
-                                                : Colors.white,
+                                                ? context.c.textTertiary
+                                                : context.c.textPrimary,
                                           ),
                                         ),
                                       ),
@@ -300,8 +302,8 @@ class AdminNotificationsPage extends ConsumerWidget {
                                     notification.message,
                                     style: TextStyle(
                                       color: isRead
-                                          ? Colors.grey
-                                          : Colors.white70,
+                                          ? context.c.textTertiary
+                                          : context.c.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -314,9 +316,9 @@ class AdminNotificationsPage extends ConsumerWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.close,
-                                      color: Colors.red,
+                                      color: context.c.danger,
                                     ),
                                     tooltip: 'Reject',
                                     onPressed: () => _rejectTeacher(
@@ -326,9 +328,9 @@ class AdminNotificationsPage extends ConsumerWidget {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.check,
-                                      color: Colors.green,
+                                      color: context.c.success,
                                     ),
                                     tooltip: 'Approve',
                                     onPressed: () => _approveTeacher(
@@ -341,9 +343,9 @@ class AdminNotificationsPage extends ConsumerWidget {
                               ),
                             ] else if (!isRead)
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.check_circle_outline,
-                                  color: Colors.white54,
+                                  color: context.c.textTertiary,
                                 ),
                                 tooltip: 'Mark as read',
                                 onPressed: () {
@@ -411,16 +413,19 @@ class AdminNotificationsPage extends ConsumerWidget {
   ) async {
     if (teacherId == null) return;
     try {
-      await FirebaseFirestore.instance.collection('users').doc(teacherId).set({
-        'approved': true,
-        'approvedAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await ref
+          .read(facultyApprovalServiceProvider)
+          .approve(
+            teacherId: teacherId,
+            adminInstitutionCode: ref
+                .read(authControllerProvider)
+                .institutionCode,
+          );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher approved successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -429,7 +434,7 @@ class AdminNotificationsPage extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error approving teacher: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -456,7 +461,7 @@ class AdminNotificationsPage extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Reject'),
           ),

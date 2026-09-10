@@ -9,6 +9,8 @@ import '../../institutions/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/error_dialog.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/responsive_utils.dart';
 
 class InitialSignupPage extends ConsumerStatefulWidget {
   const InitialSignupPage({super.key});
@@ -96,7 +98,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
           BackgroundPattern(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(context.isMobile ? 12 : 24),
                 child: FadeInUp(
                   duration: const Duration(milliseconds: 800),
                   child: ConstrainedBox(
@@ -113,9 +115,9 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(0xFF10B981)
+                                  context.c.accent
                                       .withValues(alpha: 0.2),
-                                  const Color(0xFF059669)
+                                  context.c.success
                                       .withValues(alpha: 0.2),
                                 ],
                               ),
@@ -129,27 +131,27 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        Color(0xFF10B981),
-                                        Color(0xFF059669),
+                                        context.c.accent,
+                                        context.c.success,
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF10B981)
+                                        color: context.c.accent
                                             .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.person_add_rounded,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                     size: 32,
                                   ),
                                 ),
@@ -159,14 +161,14 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                   style: GoogleFonts.outfit(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   'Join Attendora to streamline your attendance tracking.',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                     fontSize: 14,
                                   ),
                                   textAlign: TextAlign.center,
@@ -177,7 +179,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
 
                           // Form section
                           Padding(
-                            padding: const EdgeInsets.all(32),
+                            padding: EdgeInsets.all(context.isMobile ? 20 : 32),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -188,7 +190,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                     Text(
                                       'Select Your Institution',
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -214,21 +216,21 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                   16,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.orange
+                                                  color: context.c.warning
                                                       .withValues(alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(12),
                                                   border: Border.all(
-                                                    color: Colors.orange
+                                                    color: context.c.warning
                                                         .withValues(alpha: 0.3),
                                                   ),
                                                 ),
                                                 child: Row(
                                                   children: [
-                                                    const Icon(
+                                                    Icon(
                                                       Icons
                                                           .warning_amber_rounded,
-                                                      color: Colors.orange,
+                                                      color: context.c.warning,
                                                       size: 20,
                                                     ),
                                                     const SizedBox(width: 12),
@@ -238,7 +240,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                         style:
                                                             GoogleFonts.outfit(
                                                               color:
-                                                                  Colors.orange,
+                                                                  context.c.warning,
                                                               fontSize: 13,
                                                             ),
                                                       ),
@@ -252,28 +254,25 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                             >(
                                               initialValue:
                                                   _selectedInstitutionCode,
-                                              dropdownColor: const Color(
-                                                0xFF1E293B,
-                                              ),
+                                              dropdownColor: context.c.surface,
                                               decoration: InputDecoration(
-                                                hintText:
-                                                    'Choose your institution',
+                                                hintText: 'Choose institution',
                                                 hintStyle: GoogleFonts.outfit(
-                                                  color: Colors.white
+                                                  color: context.c.textPrimary
                                                       .withValues(alpha: 0.3),
                                                 ),
-                                                prefixIcon: const Icon(
+                                                prefixIcon: Icon(
                                                   Icons.school_outlined,
-                                                  color: Colors.white54,
+                                                  color: context.c.textTertiary,
                                                 ),
                                                 filled: true,
-                                                fillColor: Colors.white
+                                                fillColor: context.c.textPrimary
                                                     .withValues(alpha: 0.05),
                                                 border: OutlineInputBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(12),
                                                   borderSide: BorderSide(
-                                                    color: Colors.white
+                                                    color: context.c.textPrimary
                                                         .withValues(alpha: 0.1),
                                                   ),
                                                 ),
@@ -284,7 +283,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                             12,
                                                           ),
                                                       borderSide: BorderSide(
-                                                        color: Colors.white
+                                                        color: context.c.textPrimary
                                                             .withValues(
                                                               alpha: 0.1,
                                                             ),
@@ -297,10 +296,8 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                             12,
                                                           ),
                                                       borderSide:
-                                                          const BorderSide(
-                                                            color: Color(
-                                                              0xFF10B981,
-                                                            ),
+                                                          BorderSide(
+                                                            color: context.c.accent,
                                                             width: 2,
                                                           ),
                                                     ),
@@ -310,10 +307,10 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                       vertical: 16,
                                                     ),
                                               ),
-                                              icon: const Icon(
+                                              icon: Icon(
                                                 Icons
                                                     .keyboard_arrow_down_rounded,
-                                                color: Colors.white54,
+                                                color: context.c.textTertiary,
                                               ),
                                               isExpanded: true,
                                               items: activeInstitutions.map((
@@ -326,7 +323,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: GoogleFonts.outfit(
-                                                      color: Colors.white,
+                                                      color: context.c.textPrimary,
                                                     ),
                                                   ),
                                                 );
@@ -342,7 +339,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                           loading: () => Container(
                                             padding: const EdgeInsets.all(16),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withValues(
+                                              color: context.c.textPrimary.withValues(
                                                 alpha: 0.05,
                                               ),
                                               borderRadius:
@@ -371,7 +368,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                             child: Text(
                                               'Error loading institutions: $e',
                                               style: GoogleFonts.outfit(
-                                                color: Colors.red,
+                                                color: context.c.danger,
                                                 fontSize: 13,
                                               ),
                                             ),
@@ -396,12 +393,12 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                           return Container(
                                             padding: const EdgeInsets.all(16),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFF2F6FED)
+                                              color: context.c.primary
                                                   .withValues(alpha: 0.1),
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                               border: Border.all(
-                                                color: const Color(0xFF2F6FED)
+                                                color: context.c.primary
                                                     .withValues(alpha: 0.3),
                                               ),
                                             ),
@@ -409,9 +406,9 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                const Icon(
+                                                Icon(
                                                   Icons.info_outline,
-                                                  color: Color(0xFF2F6FED),
+                                                  color: context.c.primary,
                                                   size: 20,
                                                 ),
                                                 const SizedBox(width: 12),
@@ -419,9 +416,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                   child: Text(
                                                     'Please select your institution first to continue',
                                                     style: GoogleFonts.outfit(
-                                                      color: const Color(
-                                                        0xFF2F6FED,
-                                                      ),
+                                                      color: context.c.primary,
                                                       fontSize: 13,
                                                       height: 1.4,
                                                     ),
@@ -451,13 +446,13 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                         return Container(
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFF2F6FED)
+                                            color: context.c.primary
                                                 .withValues(alpha: 0.1),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
                                             border: Border.all(
-                                              color: const Color(0xFF2F6FED)
+                                              color: context.c.primary
                                                   .withValues(alpha: 0.3),
                                             ),
                                           ),
@@ -465,9 +460,9 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Icons.info_outline,
-                                                color: Color(0xFF2F6FED),
+                                                color: context.c.primary,
                                                 size: 20,
                                               ),
                                               const SizedBox(width: 12),
@@ -479,9 +474,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                     Text(
                                                       'Use your institutional email',
                                                       style: GoogleFonts.outfit(
-                                                        color: const Color(
-                                                          0xFF2F6FED,
-                                                        ),
+                                                        color: context.c.primary,
                                                         fontSize: 13,
                                                         fontWeight:
                                                             FontWeight.w600,
@@ -493,9 +486,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                       'Please sign in with your $emailDomain or @gmail.com email address',
                                                       style: GoogleFonts.outfit(
                                                         color:
-                                                            const Color(
-                                                              0xFF2F6FED,
-                                                            ).withValues(
+                                                            context.c.primary.withValues(
                                                               alpha: 0.8,
                                                             ),
                                                         fontSize: 12,
@@ -510,7 +501,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                             vertical: 6,
                                                           ),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.white
+                                                        color: context.c.textPrimary
                                                             .withValues(
                                                               alpha: 0.1,
                                                             ),
@@ -524,7 +515,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                         style:
                                                             GoogleFonts.jetBrainsMono(
                                                               color:
-                                                                  Colors.white,
+                                                                  context.c.textPrimary,
                                                               fontSize: 11,
                                                             ),
                                                       ),
@@ -564,7 +555,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                                     style: GoogleFonts.outfit(),
                                                   ),
                                                   backgroundColor:
-                                                      Colors.orange,
+                                                      context.c.warning,
                                                 ),
                                               );
                                               return;
@@ -599,12 +590,12 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                             }
                                           },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF1F2937),
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: context.c.surface,
+                                      foregroundColor: context.c.textPrimary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         side: BorderSide(
-                                          color: Colors.white.withValues(
+                                          color: context.c.textPrimary.withValues(
                                             alpha: 0.1,
                                           ),
                                           width: 1,
@@ -613,22 +604,22 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                       elevation: 0,
                                     ),
                                     icon: state.loading
-                                        ? const SizedBox(
+                                        ? SizedBox(
                                             width: 24,
                                             height: 24,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: context.c.textPrimary,
                                             ),
                                           )
                                         : Container(
                                             padding: const EdgeInsets.all(2),
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
+                                              color: context.c.textPrimary,
                                               borderRadius:
                                                   BorderRadius.circular(4),
                                               border: Border.all(
-                                                color: Colors.white.withValues(
+                                                color: context.c.textPrimary.withValues(
                                                   alpha: 0.1,
                                                 ),
                                               ),
@@ -641,8 +632,9 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                           ),
                                     label: Text(
                                       'Continue with Google',
+                                      overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.outfit(
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -659,7 +651,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                       Text(
                                         'Already have an account? ',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white70,
+                                          color: context.c.textSecondary,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -676,7 +668,7 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                                         child: Text(
                                           'Log in',
                                           style: GoogleFonts.outfit(
-                                            color: const Color(0xFF10B981),
+                                            color: context.c.accent,
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -703,12 +695,12 @@ class _InitialSignupPageState extends ConsumerState<InitialSignupPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircularProgressIndicator(color: Color(0xFF10B981)),
+                    CircularProgressIndicator(color: context.c.accent),
                     const SizedBox(height: 16),
                     Text(
                       'Processing...',
                       style: GoogleFonts.outfit(
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),

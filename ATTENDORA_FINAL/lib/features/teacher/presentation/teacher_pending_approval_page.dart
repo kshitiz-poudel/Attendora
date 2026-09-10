@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../auth/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class TeacherPendingApprovalPage extends ConsumerWidget {
   const TeacherPendingApprovalPage({super.key});
@@ -44,7 +45,7 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                       child: Icon(
                         Icons.hourglass_empty,
                         size: 64,
-                        color: Colors.orange[700],
+                        color: context.c.warning,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -62,7 +63,7 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                     Text(
                       'Your teacher account is awaiting admin approval.',
                       style: Theme.of(context).textTheme.bodyLarge
-                          ?.copyWith(color: Colors.grey[700]),
+                          ?.copyWith(color: context.c.textTertiary),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
@@ -71,7 +72,7 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: context.c.textTertiary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -82,7 +83,7 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                               Icon(
                                 Icons.person,
                                 size: 20,
-                                color: Colors.grey[600],
+                                color: context.c.textTertiary,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -101,14 +102,14 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                               Icon(
                                 Icons.email,
                                 size: 20,
-                                color: Colors.grey[600],
+                                color: context.c.textTertiary,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   authState.email ?? '',
                                   style: TextStyle(
-                                    color: Colors.grey[700],
+                                    color: context.c.textTertiary,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -122,14 +123,14 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                                 Icon(
                                   Icons.badge,
                                   size: 20,
-                                  color: Colors.grey[600],
+                                  color: context.c.textTertiary,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     'ID: ${authState.rollNumber}',
                                     style: TextStyle(
-                                      color: Colors.grey[700],
+                                      color: context.c.textTertiary,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -146,20 +147,20 @@ class TeacherPendingApprovalPage extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.blue[50],
+                        color: context.c.infoSubtle,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.blue[200]!),
+                        border: Border.all(color: context.c.info.withValues(alpha: 0.4)),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.info_outline, color: Colors.blue[700]),
+                          Icon(Icons.info_outline, color: context.c.info),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               'You will be able to access your dashboard once an admin approves your account. This usually takes 24-48 hours.',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.blue[900],
+                                color: context.c.textPrimary,
                               ),
                             ),
                           ),

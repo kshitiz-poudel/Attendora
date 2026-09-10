@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../shared/widgets/background_pattern.dart';
+import '../../../core/design/app_colors.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
@@ -44,11 +45,11 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: context.c.textPrimary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                        color: context.c.accent.withValues(alpha: 0.3),
                         blurRadius: 30,
                         offset: const Offset(0, 10),
                       ),
@@ -72,7 +73,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                   style: GoogleFonts.outfit(
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -88,7 +89,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                   style: GoogleFonts.outfit(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
-                    color: Colors.white38,
+                    color: context.c.textTertiary,
                     letterSpacing: 0.6,
                   ),
                 ),

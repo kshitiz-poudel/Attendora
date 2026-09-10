@@ -16,10 +16,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../auth/providers.dart';
 import '../../shared/providers.dart';
+import '../services/faculty_approval_service.dart';
 import 'admin_shell.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import '../../../core/design/app_colors.dart';
 
 // A single stable listener is used for the complete teacher directory.  The
 // pending/approved lists are derived in memory. This avoids rapidly adding and
@@ -93,6 +95,11 @@ class _AdminTeacherApprovalPageState
   late TabController _tabController;
   final _searchController = TextEditingController();
   String _searchQuery = '';
+  // Guards against a duplicate approve/reject/revoke firing from a second
+  // click while the first write is still in flight against a slow
+  // connection - without this, "nothing happened" reads as an invitation to
+  // click again.
+  final Set<String> _pendingActions = {};
 
   @override
   void initState() {
@@ -133,7 +140,7 @@ class _AdminTeacherApprovalPageState
                             style: GoogleFonts.outfit(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -141,7 +148,7 @@ class _AdminTeacherApprovalPageState
                             'Review and approve requests',
                             style: GoogleFonts.outfit(
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: context.c.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -169,7 +176,7 @@ class _AdminTeacherApprovalPageState
                                 style: GoogleFonts.outfit(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -177,7 +184,7 @@ class _AdminTeacherApprovalPageState
                                 'Review and approve teacher registration requests',
                                 style: GoogleFonts.outfit(
                                   fontSize: 16,
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                 ),
                               ),
                             ],
@@ -216,7 +223,7 @@ class _AdminTeacherApprovalPageState
                         count:
                             ref.watch(pendingTeachersProvider).value?.length ??
                             0,
-                        color: Colors.orange,
+                        color: context.c.warning,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -228,7 +235,7 @@ class _AdminTeacherApprovalPageState
                         count:
                             ref.watch(approvedTeachersProvider).value?.length ??
                             0,
-                        color: Colors.green,
+                        color: context.c.success,
                       ),
                     ),
                   ],
@@ -239,9 +246,9 @@ class _AdminTeacherApprovalPageState
               // Tabs
               TabBar(
                 controller: _tabController,
-                indicatorColor: const Color(0xFF10B981),
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white54,
+                indicatorColor: context.c.accent,
+                labelColor: context.c.textPrimary,
+                unselectedLabelColor: context.c.textTertiary,
                 labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                 tabs: const [
                   Tab(text: 'Pending Approval'),
@@ -297,7 +304,7 @@ class _AdminTeacherApprovalPageState
               ),
               Text(
                 title,
-                style: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+                style: GoogleFonts.outfit(fontSize: 14, color: context.c.textSecondary),
               ),
             ],
           ),
@@ -312,13 +319,13 @@ class _AdminTeacherApprovalPageState
     return teachersAsync.when(
       data: (teachers) {
         if (teachers.isEmpty) {
-          return const Center(
+          return Center(
             child: EmptyState(
               icon: Icons.check_circle_outline,
               title: 'No Pending Approvals',
               subtitle:
                   'All teacher registration requests have been processed.',
-              color: Colors.white54,
+              color: context.c.textTertiary,
             ),
           );
         }
@@ -340,7 +347,7 @@ class _AdminTeacherApprovalPageState
               icon: Icons.search_off,
               title: 'No Results',
               subtitle: 'No teachers match "$_searchQuery"',
-              color: Colors.white54,
+              color: context.c.textTertiary,
             ),
           );
         }
@@ -352,30 +359,41 @@ class _AdminTeacherApprovalPageState
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final teacher = filteredTeachers[index];
+              final teacherId = teacher['id'] as String;
+              // null disables the button (Flutter's normal onPressed:null
+              // behaviour) while a previous action for this teacher is
+              // still in flight, instead of allowing a second click to fire
+              // a duplicate approve/reject.
+              final busy = _pendingActions.contains(teacherId);
               return _TeacherCard(
                 teacher: teacher,
                 isPending: true,
-                onApprove: () => _approveTeacher(
-                  teacher['id'] as String,
-                  teacher['email'] as String?,
-                  teacher['displayName'] as String?,
-                ),
-                onReject: () => _rejectTeacher(
-                  teacher['id'] as String,
-                  teacher['email'] as String?,
-                  teacher['displayName'] as String?,
-                ),
+                isBusy: busy,
+                onApprove: busy
+                    ? null
+                    : () => _approveTeacher(
+                        teacherId,
+                        teacher['email'] as String?,
+                        teacher['displayName'] as String?,
+                      ),
+                onReject: busy
+                    ? null
+                    : () => _rejectTeacher(
+                        teacherId,
+                        teacher['email'] as String?,
+                        teacher['displayName'] as String?,
+                      ),
               );
             },
           ),
         );
       },
       loading: () =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
+          Center(child: CircularProgressIndicator(color: context.c.textPrimary)),
       error: (e, st) => Center(
         child: Text(
           'Error loading teachers: $e',
-          style: GoogleFonts.outfit(color: Colors.red),
+          style: GoogleFonts.outfit(color: context.c.danger),
         ),
       ),
     );
@@ -387,12 +405,12 @@ class _AdminTeacherApprovalPageState
     return teachersAsync.when(
       data: (teachers) {
         if (teachers.isEmpty) {
-          return const Center(
+          return Center(
             child: EmptyState(
               icon: Icons.person_off,
               title: 'No Approved Teachers',
               subtitle: 'No teachers have been approved yet.',
-              color: Colors.white54,
+              color: context.c.textTertiary,
             ),
           );
         }
@@ -414,7 +432,7 @@ class _AdminTeacherApprovalPageState
               icon: Icons.search_off,
               title: 'No Results',
               subtitle: 'No teachers match "$_searchQuery"',
-              color: Colors.white54,
+              color: context.c.textTertiary,
             ),
           );
         }
@@ -426,25 +444,30 @@ class _AdminTeacherApprovalPageState
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final teacher = filteredTeachers[index];
+              final teacherId = teacher['id'] as String;
+              final busy = _pendingActions.contains(teacherId);
               return _TeacherCard(
                 teacher: teacher,
                 isPending: false,
-                onRevoke: () => _revokeApproval(
-                  teacher['id'] as String,
-                  teacher['email'] as String?,
-                  teacher['displayName'] as String?,
-                ),
+                isBusy: busy,
+                onRevoke: busy
+                    ? null
+                    : () => _revokeApproval(
+                        teacherId,
+                        teacher['email'] as String?,
+                        teacher['displayName'] as String?,
+                      ),
               );
             },
           ),
         );
       },
       loading: () =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
+          Center(child: CircularProgressIndicator(color: context.c.textPrimary)),
       error: (e, st) => Center(
         child: Text(
           'Error loading teachers: $e',
-          style: GoogleFonts.outfit(color: Colors.red),
+          style: GoogleFonts.outfit(color: context.c.danger),
         ),
       ),
     );
@@ -455,18 +478,23 @@ class _AdminTeacherApprovalPageState
     String? email,
     String? name,
   ) async {
+    if (!_pendingActions.add(teacherId)) return;
+    setState(() {});
     try {
-      await FirebaseFirestore.instance.collection('users').doc(teacherId).set({
-        'approved': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-        'approvedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await ref
+          .read(facultyApprovalServiceProvider)
+          .approve(
+            teacherId: teacherId,
+            adminInstitutionCode: ref
+                .read(authControllerProvider)
+                .institutionCode,
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher approved successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -513,6 +541,9 @@ class _AdminTeacherApprovalPageState
           context,
         ).showSnackBar(SnackBar(content: Text('Error approving teacher: $e')));
       }
+    } finally {
+      _pendingActions.remove(teacherId);
+      if (mounted) setState(() {});
     }
   }
 
@@ -521,28 +552,29 @@ class _AdminTeacherApprovalPageState
     String? email,
     String? name,
   ) async {
+    if (_pendingActions.contains(teacherId)) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Reject Teacher Application',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to reject this application? The user will be deleted from the system.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               'Reject',
@@ -554,6 +586,8 @@ class _AdminTeacherApprovalPageState
     );
 
     if (confirmed == true) {
+      _pendingActions.add(teacherId);
+      setState(() {});
       try {
         // Remove the teacher from any class groups they were added to
         // during signup, before deleting their profile.
@@ -582,9 +616,9 @@ class _AdminTeacherApprovalPageState
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Teacher application rejected'),
-              backgroundColor: Colors.red,
+              backgroundColor: context.c.danger,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -633,6 +667,9 @@ class _AdminTeacherApprovalPageState
             SnackBar(content: Text('Error rejecting teacher: $e')),
           );
         }
+      } finally {
+        _pendingActions.remove(teacherId);
+        if (mounted) setState(() {});
       }
     }
   }
@@ -642,28 +679,29 @@ class _AdminTeacherApprovalPageState
     String? email,
     String? name,
   ) async {
+    if (_pendingActions.contains(teacherId)) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Revoke Approval',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to revoke approval for this teacher? They will no longer be able to access the system.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.orangeAccent),
+            style: FilledButton.styleFrom(backgroundColor: context.c.warning),
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               'Revoke',
@@ -675,20 +713,23 @@ class _AdminTeacherApprovalPageState
     );
 
     if (confirmed == true) {
+      _pendingActions.add(teacherId);
+      setState(() {});
       try {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(teacherId)
-            .update({
-              'approved': false,
-              'updatedAt': FieldValue.serverTimestamp(),
-            });
+        await ref
+            .read(facultyApprovalServiceProvider)
+            .revoke(
+              teacherId: teacherId,
+              adminInstitutionCode: ref
+                  .read(authControllerProvider)
+                  .institutionCode,
+            );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Teacher approval revoked'),
-              backgroundColor: Colors.orange,
+              backgroundColor: context.c.warning,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -736,6 +777,9 @@ class _AdminTeacherApprovalPageState
             SnackBar(content: Text('Error revoking approval: $e')),
           );
         }
+      } finally {
+        _pendingActions.remove(teacherId);
+        if (mounted) setState(() {});
       }
     }
   }
@@ -754,6 +798,7 @@ class _TeacherCard extends ConsumerWidget {
   const _TeacherCard({
     required this.teacher,
     required this.isPending,
+    this.isBusy = false,
     this.onApprove,
     this.onReject,
     this.onRevoke,
@@ -761,9 +806,22 @@ class _TeacherCard extends ConsumerWidget {
 
   final Map<String, dynamic> teacher;
   final bool isPending;
+  /// True while an approve/reject/revoke for this teacher is in flight.
+  /// Callbacks are already null in that state (disabling the buttons); this
+  /// additionally swaps the action icon for a spinner so a slow write still
+  /// reads as "working" instead of "did nothing".
+  final bool isBusy;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
   final VoidCallback? onRevoke;
+
+  /// A small inline spinner matching [size], swapped in for the action icon
+  /// while [isBusy] is true.
+  Widget _spinner(double size, Color color) => SizedBox(
+    width: size,
+    height: size,
+    child: CircularProgressIndicator(strokeWidth: 2, color: color),
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -797,8 +855,8 @@ class _TeacherCard extends ConsumerWidget {
                           ? Icons.hourglass_empty
                           : Icons.check_circle,
                       foregroundColor: isPending
-                          ? Colors.orange[700]
-                          : Colors.green[700],
+                          ? context.c.warning
+                          : context.c.success,
                     ),
                     const SizedBox(width: 12),
                     // Info
@@ -811,7 +869,7 @@ class _TeacherCard extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontWeight: FontWeight.w600,
                               fontSize: 16,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -821,7 +879,7 @@ class _TeacherCard extends ConsumerWidget {
                               Icon(
                                 Icons.email,
                                 size: 14,
-                                color: Colors.white54,
+                                color: context.c.textTertiary,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
@@ -829,7 +887,7 @@ class _TeacherCard extends ConsumerWidget {
                                   email,
                                   style: GoogleFonts.outfit(
                                     fontSize: 13,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -845,21 +903,21 @@ class _TeacherCard extends ConsumerWidget {
                 // Additional Info
                 Row(
                   children: [
-                    Icon(Icons.badge, size: 14, color: Colors.white54),
+                    Icon(Icons.badge, size: 14, color: context.c.textTertiary),
                     const SizedBox(width: 4),
                     Text(
                       'ID: $idNumber',
                       style: GoogleFonts.outfit(
                         fontSize: 13,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                     ),
                     if (institutionCode.isNotEmpty) ...[
                       const SizedBox(width: 12),
-                      Icon(Icons.school, size: 14, color: Colors.white54),
+                      Icon(Icons.school, size: 14, color: context.c.textTertiary),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: _buildInstitutionText(ref, institutionCode),
+                        child: _buildInstitutionText(context, ref, institutionCode),
                       ),
                     ],
                   ],
@@ -868,13 +926,13 @@ class _TeacherCard extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.access_time, size: 14, color: Colors.white54),
+                      Icon(Icons.access_time, size: 14, color: context.c.textTertiary),
                       const SizedBox(width: 4),
                       Text(
                         'Registered: ${_formatDate(createdAt)}',
                         style: GoogleFonts.outfit(
                           fontSize: 13,
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -889,10 +947,12 @@ class _TeacherCard extends ConsumerWidget {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: onReject,
-                          icon: const Icon(Icons.close, size: 18),
+                          icon: isBusy
+                              ? _spinner(18, context.c.danger)
+                              : const Icon(Icons.close, size: 18),
                           label: const Text('Reject'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
+                            foregroundColor: context.c.danger,
                             side: BorderSide(
                               color: Colors.red.withValues(alpha: 0.5),
                             ),
@@ -903,10 +963,12 @@ class _TeacherCard extends ConsumerWidget {
                       Expanded(
                         child: FilledButton.icon(
                           onPressed: onApprove,
-                          icon: const Icon(Icons.check, size: 18),
+                          icon: isBusy
+                              ? _spinner(18, Colors.white)
+                              : const Icon(Icons.check, size: 18),
                           label: const Text('Approve'),
                           style: FilledButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: context.c.success,
                           ),
                         ),
                       ),
@@ -914,10 +976,12 @@ class _TeacherCard extends ConsumerWidget {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: onRevoke,
-                          icon: const Icon(Icons.block, size: 18),
+                          icon: isBusy
+                              ? _spinner(18, context.c.warning)
+                              : const Icon(Icons.block, size: 18),
                           label: const Text('Revoke'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.orange,
+                            foregroundColor: context.c.warning,
                             side: BorderSide(
                               color: Colors.orange.withValues(alpha: 0.5),
                             ),
@@ -943,8 +1007,8 @@ class _TeacherCard extends ConsumerWidget {
                       ? Icons.hourglass_empty
                       : Icons.check_circle,
                   foregroundColor: isPending
-                      ? Colors.orange[700]
-                      : Colors.green[700],
+                      ? context.c.warning
+                      : context.c.success,
                 ),
                 const SizedBox(width: 16),
 
@@ -958,21 +1022,21 @@ class _TeacherCard extends ConsumerWidget {
                         style: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.email, size: 14, color: Colors.white54),
+                          Icon(Icons.email, size: 14, color: context.c.textTertiary),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
                               email,
                               style: GoogleFonts.outfit(
                                 fontSize: 13,
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -982,21 +1046,21 @@ class _TeacherCard extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Icon(Icons.badge, size: 14, color: Colors.white54),
+                          Icon(Icons.badge, size: 14, color: context.c.textTertiary),
                           const SizedBox(width: 4),
                           Text(
                             'ID: $idNumber',
                             style: GoogleFonts.outfit(
                               fontSize: 13,
-                              color: Colors.white70,
+                              color: context.c.textSecondary,
                             ),
                           ),
                           if (institutionCode.isNotEmpty) ...[
                             const SizedBox(width: 12),
-                            Icon(Icons.school, size: 14, color: Colors.white54),
+                            Icon(Icons.school, size: 14, color: context.c.textTertiary),
                             const SizedBox(width: 4),
                             Flexible(
-                              child: _buildInstitutionText(
+                              child: _buildInstitutionText(context, 
                                 ref,
                                 institutionCode,
                               ),
@@ -1011,14 +1075,14 @@ class _TeacherCard extends ConsumerWidget {
                             Icon(
                               Icons.access_time,
                               size: 14,
-                              color: Colors.white54,
+                              color: context.c.textTertiary,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'Registered: ${_formatDate(createdAt)}',
                               style: GoogleFonts.outfit(
                                 fontSize: 13,
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                               ),
                             ),
                           ],
@@ -1033,7 +1097,9 @@ class _TeacherCard extends ConsumerWidget {
                   const SizedBox(width: 16),
                   IconButton(
                     onPressed: onReject,
-                    icon: const Icon(Icons.close, color: Colors.red),
+                    icon: isBusy
+                        ? _spinner(20, context.c.danger)
+                        : Icon(Icons.close, color: context.c.danger),
                     tooltip: 'Reject',
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.red.withValues(alpha: 0.1),
@@ -1042,7 +1108,9 @@ class _TeacherCard extends ConsumerWidget {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: onApprove,
-                    icon: const Icon(Icons.check, color: Colors.green),
+                    icon: isBusy
+                        ? _spinner(20, context.c.success)
+                        : Icon(Icons.check, color: context.c.success),
                     tooltip: 'Approve',
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.green.withValues(alpha: 0.1),
@@ -1052,7 +1120,9 @@ class _TeacherCard extends ConsumerWidget {
                   const SizedBox(width: 16),
                   IconButton(
                     onPressed: onRevoke,
-                    icon: const Icon(Icons.block, color: Colors.orange),
+                    icon: isBusy
+                        ? _spinner(20, context.c.warning)
+                        : Icon(Icons.block, color: context.c.warning),
                     tooltip: 'Revoke Approval',
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.orange.withValues(alpha: 0.1),
@@ -1064,12 +1134,12 @@ class _TeacherCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildInstitutionText(WidgetRef ref, String code) {
+  Widget _buildInstitutionText(BuildContext context, WidgetRef ref, String code) {
     // We could fetch institution name here if we had a provider for it
     // For now just show code
     return Text(
       'Inst: $code',
-      style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
+      style: GoogleFonts.outfit(fontSize: 13, color: context.c.textSecondary),
       overflow: TextOverflow.ellipsis,
     );
   }

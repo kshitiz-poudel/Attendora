@@ -82,6 +82,11 @@ class AttendanceRepository {
       'institutionCode': institutionCode,
       'bypassLocation': bypassLocation,
       'attendeeUids': [], // Initialize empty array for performance optimization
+      // Opts this session into server-side QR verification. Sessions created
+      // by older builds omit the flag, so the rules keep accepting their
+      // unsigned codes for the migration window rather than breaking
+      // attendance for clients that have not updated yet.
+      'requireSignedQr': true,
       if (group != null) 'group': group,
     });
     return doc.id;
@@ -120,6 +125,11 @@ class AttendanceRepository {
     required String idNumber,
     required String rollNumber,
     required double distanceMeters,
+    /// The rotating secret read from the scanned QR code. Firestore rules
+    /// compare it against the session's current (or immediately previous)
+    /// token, so a screenshotted or forwarded code stops working within one
+    /// rotation interval.
+    String? qrToken,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -142,6 +152,7 @@ class AttendanceRepository {
               'idNumber': idNumber,
               'rollNumber': rollNumber,
               'distanceMeters': distanceMeters,
+              if (qrToken != null) 'qrToken': qrToken,
             },
             timestamp: DateTime.now(),
           ),
@@ -177,6 +188,7 @@ class AttendanceRepository {
       'status': 'present',
       'distanceMeters': distanceMeters,
       'timestamp': FieldValue.serverTimestamp(),
+      if (qrToken != null) 'qrToken': qrToken,
       if (institutionCode != null) 'institutionCode': institutionCode,
       if (subject != null) 'subject': subject,
     }, SetOptions(merge: true));

@@ -7,6 +7,8 @@ import 'package:attendora/features/auth/providers.dart';
 import 'package:attendora/core/utils/responsive_builder.dart';
 import 'package:attendora/features/shared/widgets/session_notification_initializer.dart';
 import 'package:attendora/features/notifications/providers.dart';
+import '../../../core/design/app_colors.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class TeacherShell extends ConsumerWidget {
   final Widget child;
@@ -98,8 +100,8 @@ class TeacherShell extends ConsumerWidget {
                   child: IgnorePointer(
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
+                      decoration: BoxDecoration(
+                        color: context.c.danger,
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(
@@ -108,8 +110,8 @@ class TeacherShell extends ConsumerWidget {
                       ),
                       child: Text(
                         unreadCount > 9 ? '9+' : '$unreadCount',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.c.textPrimary,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -135,10 +137,15 @@ class TeacherShell extends ConsumerWidget {
             appBar: isMobile
                 ? AppBar(
                     title: const Text('Attendora'),
-                    backgroundColor: const Color(0xFF0B1121),
-                    foregroundColor: Colors.white,
+                    backgroundColor: context.c.canvas,
+                    foregroundColor: context.c.textPrimary,
                     leading: context.canPop() ? const BackButton() : null,
                     actions: [
+                    // Light / dark / system switcher.
+                    const Padding(
+                      padding: EdgeInsets.only(right: 4),
+                      child: ThemeToggleButton(),
+                    ),
                       _OfflineIndicator(),
                       if (!location.contains('/teacher/notifications'))
                         notificationIcon,
@@ -160,16 +167,16 @@ class TeacherShell extends ConsumerWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.visibility,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'You are impersonating this user',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -181,8 +188,8 @@ class TeacherShell extends ConsumerWidget {
                                   .stopImpersonation();
                             },
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
+                              foregroundColor: context.c.textPrimary,
+                              side: BorderSide(color: context.c.textPrimary),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 0,
@@ -247,8 +254,8 @@ class _LogoutButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      leading: const Icon(Icons.logout, color: Colors.white70),
-      title: Text('Logout', style: GoogleFonts.outfit(color: Colors.white70)),
+      leading: Icon(Icons.logout, color: context.c.textSecondary),
+      title: Text('Logout', style: GoogleFonts.outfit(color: context.c.textSecondary)),
       onTap: () {
         ref.read(authControllerProvider.notifier).signOut();
       },

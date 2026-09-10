@@ -13,6 +13,7 @@ import '../../teacher/providers.dart';
 import '../../../core/utils/error_handler.dart';
 import 'empty_state.dart';
 import 'shimmer_loading.dart';
+import '../../../core/design/app_colors.dart';
 
 final upcomingSessionsProvider =
     StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) async* {
@@ -157,12 +158,12 @@ DateTime _getSessionTime(Map<String, dynamic> session) {
 class UpcomingSessionsCard extends ConsumerWidget {
   const UpcomingSessionsCard({super.key});
 
-  Color _getSessionColor(int index) {
+  Color _getSessionColor(BuildContext context, int index) {
     final colors = [
-      const Color(0xFF10B981), // emerald
-      const Color(0xFF2F6FED), // blue
-      const Color(0xFF10B981), // purple
-      const Color(0xFFF59E0B), // amber
+      context.c.accent, // emerald
+      context.c.primary, // blue
+      context.c.accent, // purple
+      context.c.warning, // amber
       const Color(0xFFEC4899), // pink
     ];
     return colors[index % colors.length];
@@ -280,7 +281,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Started session: ${subject ?? "Session"}'),
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
         context.go('/teacher/generate');
@@ -314,14 +315,14 @@ class UpcomingSessionsCard extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF2F6FED), Color(0xFF2563EB)],
+                        gradient: LinearGradient(
+                          colors: [context.c.primary, Color(0xFF2563EB)],
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.event_note_rounded,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                         size: 24,
                       ),
                     ),
@@ -341,12 +342,12 @@ class UpcomingSessionsCard extends ConsumerWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2F6FED).withValues(alpha: 0.1),
+                    color: context.c.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add_circle_outline_rounded,
-                    color: Color(0xFF2F6FED),
+                    color: context.c.primary,
                     size: 20,
                   ),
                 ),
@@ -356,11 +357,11 @@ class UpcomingSessionsCard extends ConsumerWidget {
             sessionsAsync.when(
               data: (sessions) {
                 if (sessions.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.event_busy_outlined,
                     title: 'No Upcoming Sessions',
                     subtitle: 'Sessions will appear here once scheduled',
-                    color: Color(0xFF2F6FED),
+                    color: context.c.primary,
                   );
                 }
                 return ListView.separated(
@@ -370,7 +371,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final session = sessions[index];
-                    final color = _getSessionColor(index);
+                    final color = _getSessionColor(context, index);
                     final icon = _getSessionIcon(index);
                     final isScheduled = session['type'] == 'scheduled';
 
@@ -434,7 +435,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                         text: TextSpan(
                                           style: GoogleFonts.outfit(
                                             fontSize: 12,
-                                            color: const Color(0xFF64748B),
+                                            color: context.c.textTertiary,
                                           ),
                                           children: [
                                             TextSpan(
@@ -471,7 +472,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                           color: canStart
-                                              ? const Color(0xFF10B981)
+                                              ? context.c.accent
                                               : color,
                                         ),
                                       ),
@@ -483,7 +484,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                       ),
                                       decoration: BoxDecoration(
                                         color: isScheduled
-                                            ? const Color(0xFFF59E0B)
+                                            ? context.c.warning
                                                   .withValues(alpha: 0.15)
                                             : color.withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(12),
@@ -494,7 +495,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                           color: isScheduled
-                                              ? const Color(0xFFF59E0B)
+                                              ? context.c.warning
                                               : color,
                                         ),
                                       ),
@@ -519,8 +520,8 @@ class UpcomingSessionsCard extends ConsumerWidget {
                                   ),
                                   label: const Text('Start Now'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF10B981),
-                                    foregroundColor: Colors.white,
+                                    backgroundColor: context.c.accent,
+                                    foregroundColor: context.c.textPrimary,
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 12,
                                     ),

@@ -13,6 +13,7 @@ import '../../../core/responsive_utils.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for subjects grouped by type (Lecture/Lab), then by class/group
 final subjectsProvider =
@@ -78,11 +79,11 @@ class TeacherSubjectsPage extends ConsumerWidget {
                     duration: const Duration(milliseconds: 500),
                     child: GlassCard(
                       padding: const EdgeInsets.all(48),
-                      child: const EmptyState(
+                      child: EmptyState(
                         icon: Icons.book_outlined,
                         title: 'No Subjects Added',
                         subtitle: 'Add your first subject to get started',
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                     ),
                   );
@@ -106,8 +107,8 @@ class TeacherSubjectsPage extends ConsumerWidget {
                   ],
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.c.textPrimary),
               ),
               error: (error, _) => Center(
                 child: GlassCard(
@@ -140,14 +141,14 @@ class TeacherSubjectsPage extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF10B981), Color(0xFF7C3AED)],
+                          gradient: LinearGradient(
+                            colors: [context.c.accent, Color(0xFF7C3AED)],
                           ),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.book,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                           size: 32,
                         ),
                       ),
@@ -161,14 +162,14 @@ class TeacherSubjectsPage extends ConsumerWidget {
                               style: GoogleFonts.outfit(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 24,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Manage your teaching subjects',
                               style: GoogleFonts.outfit(
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                                 fontSize: 14,
                               ),
                             ),
@@ -185,8 +186,8 @@ class TeacherSubjectsPage extends ConsumerWidget {
                       icon: const Icon(Icons.add_circle_outline),
                       label: const Text('Add Subject'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                        foregroundColor: Colors.white,
+                        backgroundColor: context.c.accent,
+                        foregroundColor: context.c.textPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -201,14 +202,14 @@ class TeacherSubjectsPage extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF7C3AED)],
+                      gradient: LinearGradient(
+                        colors: [context.c.accent, Color(0xFF7C3AED)],
                       ),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.book,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       size: 32,
                     ),
                   ),
@@ -222,14 +223,14 @@ class TeacherSubjectsPage extends ConsumerWidget {
                           style: GoogleFonts.outfit(
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Manage your teaching subjects and classes',
                           style: GoogleFonts.outfit(
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                             fontSize: 14,
                           ),
                         ),
@@ -242,8 +243,8 @@ class TeacherSubjectsPage extends ConsumerWidget {
                     icon: const Icon(Icons.add_circle_outline),
                     label: const Text('Add Subject'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
-                      foregroundColor: Colors.white,
+                      backgroundColor: context.c.accent,
+                      foregroundColor: context.c.textPrimary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 16,
@@ -266,7 +267,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
     Map<String, List<Map<String, dynamic>>> groups,
   ) {
     final isLab = type == 'Lab';
-    final typeColor = isLab ? const Color(0xFF10B981) : const Color(0xFF2F6FED);
+    final typeColor = isLab ? context.c.accent : context.c.primary;
     final typeIcon = isLab ? Icons.science_outlined : Icons.school_outlined;
 
     // Count total subjects in this type
@@ -377,14 +378,14 @@ class TeacherSubjectsPage extends ConsumerWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                      color: context.c.accent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.class_,
-                          color: Color(0xFF10B981),
+                          color: context.c.accent,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -393,7 +394,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
                           style: GoogleFonts.outfit(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF10B981),
+                            color: context.c.accent,
                           ),
                         ),
                       ],
@@ -406,7 +407,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: context.c.textPrimary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -414,7 +415,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ),
@@ -444,9 +445,9 @@ class TeacherSubjectsPage extends ConsumerWidget {
     Map<String, dynamic> subject,
   ) {
     final colors = [
-      const Color(0xFF10B981), // emerald
-      const Color(0xFF2F6FED), // blue
-      const Color(0xFFF59E0B), // amber
+      context.c.accent, // emerald
+      context.c.primary, // blue
+      context.c.warning, // amber
       const Color(0xFFEC4899), // pink
     ];
     final color = colors[subject['name'].toString().length % colors.length];
@@ -488,13 +489,13 @@ class TeacherSubjectsPage extends ConsumerWidget {
                         style: GoogleFonts.outfit(
                           fontSize: isMobile ? 14 : 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _buildTypeBadge(subject['type'] ?? 'Lecture'),
+                    _buildTypeBadge(context, subject['type'] ?? 'Lecture'),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -502,7 +503,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
                   subject['code'] ?? 'No Code',
                   style: GoogleFonts.outfit(
                     fontSize: isMobile ? 12 : 14,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -510,8 +511,8 @@ class TeacherSubjectsPage extends ConsumerWidget {
           ),
           if (isMobile)
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.white70),
-              color: const Color(0xFF1F2937),
+              icon: Icon(Icons.more_vert, color: context.c.textSecondary),
+              color: context.c.surface,
               onSelected: (value) {
                 if (value == 'edit') {
                   _showEditSubjectDialog(context, ref, subject);
@@ -525,27 +526,27 @@ class TeacherSubjectsPage extends ConsumerWidget {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
                   child: Row(
                     children: [
                       Icon(
                         Icons.edit_outlined,
-                        color: Color(0xFF10B981),
+                        color: context.c.accent,
                         size: 20,
                       ),
                       SizedBox(width: 12),
-                      Text('Edit', style: TextStyle(color: Colors.white)),
+                      Text('Edit', style: TextStyle(color: context.c.textPrimary)),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                      Icon(Icons.delete_outline, color: context.c.danger, size: 20),
                       SizedBox(width: 12),
-                      Text('Delete', style: TextStyle(color: Colors.white)),
+                      Text('Delete', style: TextStyle(color: context.c.textPrimary)),
                     ],
                   ),
                 ),
@@ -554,7 +555,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
           else ...[
             IconButton(
               onPressed: () => _showEditSubjectDialog(context, ref, subject),
-              icon: const Icon(Icons.edit_outlined, color: Color(0xFF10B981)),
+              icon: Icon(Icons.edit_outlined, color: context.c.accent),
               tooltip: 'Edit Subject',
             ),
             IconButton(
@@ -564,7 +565,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
                 subject['id'],
                 subject['name'],
               ),
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: Icon(Icons.delete_outline, color: context.c.danger),
               tooltip: 'Delete Subject',
             ),
           ],
@@ -573,9 +574,9 @@ class TeacherSubjectsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTypeBadge(String type) {
+  Widget _buildTypeBadge(BuildContext context, String type) {
     final isLab = type == 'Lab';
-    final color = isLab ? const Color(0xFF10B981) : const Color(0xFF2F6FED);
+    final color = isLab ? context.c.accent : context.c.primary;
     final icon = isLab ? Icons.science_outlined : Icons.school_outlined;
 
     return Container(
@@ -630,21 +631,21 @@ class TeacherSubjectsPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1F2937),
+        backgroundColor: context.c.surface,
         title: Text(
           'Delete Subject',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to delete "$subjectName"?',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
@@ -656,9 +657,9 @@ class TeacherSubjectsPage extends ConsumerWidget {
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('Subject deleted successfully!'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: context.c.danger,
                     ),
                   );
                 }
@@ -673,7 +674,7 @@ class TeacherSubjectsPage extends ConsumerWidget {
                 }
               }
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             child: Text(
               'Delete',
               style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
@@ -737,10 +738,10 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
     final catalogAsync = ref.watch(subjectCatalogProvider);
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF1F2937),
+      backgroundColor: context.c.surface,
       title: Text(
         'Add New Subject',
-        style: GoogleFonts.outfit(color: Colors.white),
+        style: GoogleFonts.outfit(color: context.c.textPrimary),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -756,7 +757,7 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                       Text(
                         'Subject Name',
                         style: GoogleFonts.outfit(
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -825,7 +826,7 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                             child: Material(
                               elevation: 8.0,
                               borderRadius: BorderRadius.circular(12),
-                              color: const Color(0xFF1F2937),
+                              color: context.c.surface,
                               clipBehavior: Clip.antiAlias,
                               child: SizedBox(
                                 width: 300, // Fixed safe width for dialog
@@ -845,36 +846,36 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
 
                                           if (option['id'] == 'NO_MATCH') {
                                             return ListTile(
-                                              leading: const Icon(
+                                              leading: Icon(
                                                 Icons.warning_amber_rounded,
-                                                color: Colors.orange,
+                                                color: context.c.warning,
                                               ),
                                               title: Text(
                                                 option['name'],
-                                                style: const TextStyle(
-                                                  color: Colors.orange,
+                                                style: TextStyle(
+                                                  color: context.c.warning,
                                                 ),
                                               ),
                                             );
                                           }
 
                                           return ListTile(
-                                            leading: const Icon(
+                                            leading: Icon(
                                               Icons.book_outlined,
                                               size: 20,
-                                              color: Colors.white70,
+                                              color: context.c.textSecondary,
                                             ),
                                             title: Text(
                                               option['name'],
                                               style: GoogleFonts.outfit(
-                                                color: Colors.white,
+                                                color: context.c.textPrimary,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                             subtitle: Text(
                                               option['code'],
                                               style: GoogleFonts.outfit(
-                                                color: Colors.white54,
+                                                color: context.c.textTertiary,
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -912,18 +913,18 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                color: context.c.textPrimary.withValues(alpha: 0.05),
+                border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   isExpanded: true,
                   value: selectedType,
-                  dropdownColor: const Color(0xFF1F2937),
-                  icon: const Icon(
+                  dropdownColor: context.c.surface,
+                  icon: Icon(
                     Icons.arrow_drop_down,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                   items: [
                     DropdownMenuItem(
@@ -933,20 +934,20 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2F6FED)
+                              color: context.c.primary
                                   .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.school_outlined,
-                              color: Color(0xFF2F6FED),
+                              color: context.c.primary,
                               size: 18,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             'Lecture',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         ],
                       ),
@@ -958,20 +959,20 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981)
+                              color: context.c.accent
                                   .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.science_outlined,
-                              color: Color(0xFF10B981),
+                              color: context.c.accent,
                               size: 18,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             'Lab',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         ],
                       ),
@@ -996,9 +997,9 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: context.c.textPrimary.withValues(alpha: 0.05),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: context.c.textPrimary.withValues(alpha: 0.1),
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1008,19 +1009,19 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                       value: selectedGroupId,
                       hint: Text(
                         'Select Class Group',
-                        style: GoogleFonts.outfit(color: Colors.white54),
+                        style: GoogleFonts.outfit(color: context.c.textTertiary),
                       ),
-                      dropdownColor: const Color(0xFF1F2937),
-                      icon: const Icon(
+                      dropdownColor: context.c.surface,
+                      icon: Icon(
                         Icons.arrow_drop_down,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                       items: groups.map((group) {
                         return DropdownMenuItem<String>(
                           value: group.id,
                           child: Text(
                             group.name,
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         );
                       }).toList(),
@@ -1037,9 +1038,9 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
                 );
               },
               loading: () => const LinearProgressIndicator(),
-              error: (_, __) => const Text(
+              error: (_, __) => Text(
                 'Error loading groups',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: context.c.danger),
               ),
             ),
           ],
@@ -1050,7 +1051,7 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancel',
-            style: GoogleFonts.outfit(color: Colors.white70),
+            style: GoogleFonts.outfit(color: context.c.textSecondary),
           ),
         ),
         FilledButton(
@@ -1082,9 +1083,9 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Subject added successfully!'),
-                    backgroundColor: Color(0xFF10B981),
+                    backgroundColor: context.c.accent,
                   ),
                 );
               }
@@ -1099,7 +1100,7 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
             }
           },
           style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: context.c.accent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -1152,10 +1153,10 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
     final groupsAsync = ref.watch(allClassGroupsListProvider);
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF1F2937),
+      backgroundColor: context.c.surface,
       title: Text(
         'Edit Subject',
-        style: GoogleFonts.outfit(color: Colors.white),
+        style: GoogleFonts.outfit(color: context.c.textPrimary),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -1178,18 +1179,18 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                color: context.c.textPrimary.withValues(alpha: 0.05),
+                border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   isExpanded: true,
                   value: selectedType,
-                  dropdownColor: const Color(0xFF1F2937),
-                  icon: const Icon(
+                  dropdownColor: context.c.surface,
+                  icon: Icon(
                     Icons.arrow_drop_down,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                   items: [
                     DropdownMenuItem(
@@ -1199,20 +1200,20 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2F6FED)
+                              color: context.c.primary
                                   .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.school_outlined,
-                              color: Color(0xFF2F6FED),
+                              color: context.c.primary,
                               size: 18,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             'Lecture',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         ],
                       ),
@@ -1224,20 +1225,20 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981)
+                              color: context.c.accent
                                   .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.science_outlined,
-                              color: Color(0xFF10B981),
+                              color: context.c.accent,
                               size: 18,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             'Lab',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         ],
                       ),
@@ -1269,9 +1270,9 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: context.c.textPrimary.withValues(alpha: 0.05),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: context.c.textPrimary.withValues(alpha: 0.1),
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1281,19 +1282,19 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                       value: selectedGroupId,
                       hint: Text(
                         'Select Class Group',
-                        style: GoogleFonts.outfit(color: Colors.white54),
+                        style: GoogleFonts.outfit(color: context.c.textTertiary),
                       ),
-                      dropdownColor: const Color(0xFF1F2937),
-                      icon: const Icon(
+                      dropdownColor: context.c.surface,
+                      icon: Icon(
                         Icons.arrow_drop_down,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                       items: groups.map((group) {
                         return DropdownMenuItem<String>(
                           value: group.id,
                           child: Text(
                             group.name,
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         );
                       }).toList(),
@@ -1310,9 +1311,9 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
                 );
               },
               loading: () => const LinearProgressIndicator(),
-              error: (_, __) => const Text(
+              error: (_, __) => Text(
                 'Error loading groups',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: context.c.danger),
               ),
             ),
           ],
@@ -1323,7 +1324,7 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancel',
-            style: GoogleFonts.outfit(color: Colors.white70),
+            style: GoogleFonts.outfit(color: context.c.textSecondary),
           ),
         ),
         FilledButton(
@@ -1353,9 +1354,9 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Subject updated successfully!'),
-                    backgroundColor: Color(0xFF10B981),
+                    backgroundColor: context.c.accent,
                   ),
                 );
               }
@@ -1370,7 +1371,7 @@ class _EditSubjectDialogState extends ConsumerState<_EditSubjectDialog> {
             }
           },
           style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: context.c.accent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),

@@ -16,6 +16,8 @@ import '../../admin/backfill_institution_codes.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import 'admin_shell.dart';
+import '../services/faculty_approval_service.dart';
+import '../../../core/design/app_colors.dart';
 
 class AdminDashboardPage extends ConsumerWidget {
   const AdminDashboardPage({super.key});
@@ -89,14 +91,14 @@ class _HeroHeader extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF7C3AED)],
+                        gradient: LinearGradient(
+                          colors: [context.c.accent, Color(0xFF7C3AED)],
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.dashboard_rounded,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                         size: 24,
                       ),
                     ),
@@ -107,7 +109,7 @@ class _HeroHeader extends StatelessWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                     ),
@@ -118,7 +120,7 @@ class _HeroHeader extends StatelessWidget {
                   'Welcome back, $name!',
                   style: GoogleFonts.outfit(
                     fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: context.c.textPrimary.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -128,14 +130,14 @@ class _HeroHeader extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF10B981), Color(0xFF7C3AED)],
+                    gradient: LinearGradient(
+                      colors: [context.c.accent, Color(0xFF7C3AED)],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.dashboard_rounded,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                     size: 32,
                   ),
                 ),
@@ -149,7 +151,7 @@ class _HeroHeader extends StatelessWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -157,7 +159,7 @@ class _HeroHeader extends StatelessWidget {
                         'Welcome back, $name! Monitor attendance, manage institutions, users, and review system analytics.',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: context.c.textPrimary.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -190,9 +192,9 @@ class _PendingTeachersCard extends ConsumerWidget {
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.pending_actions_rounded,
-                  color: Colors.orange,
+                  color: context.c.warning,
                   size: 20,
                 ),
               ),
@@ -203,7 +205,7 @@ class _PendingTeachersCard extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -214,7 +216,7 @@ class _PendingTeachersCard extends ConsumerWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color: context.c.warning,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -227,18 +229,18 @@ class _PendingTeachersCard extends ConsumerWidget {
                   child: Text(
                     '$pendingCount',
                     style: GoogleFonts.outfit(
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
                   ),
                 ),
-                loading: () => const SizedBox(
+                loading: () => SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 error: (_, __) => const SizedBox(),
@@ -254,7 +256,7 @@ class _PendingTeachersCard extends ConsumerWidget {
                   child: Center(
                     child: Text(
                       'No pending approvals',
-                      style: GoogleFonts.outfit(color: Colors.white54),
+                      style: GoogleFonts.outfit(color: context.c.textTertiary),
                     ),
                   ),
                 );
@@ -274,9 +276,9 @@ class _PendingTeachersCard extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      foregroundColor: Colors.white,
+                      foregroundColor: context.c.textPrimary,
                       side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.3),
+                        color: context.c.textPrimary.withValues(alpha: 0.3),
                       ),
                     ),
                     child: const Text('View All'),
@@ -284,10 +286,10 @@ class _PendingTeachersCard extends ConsumerWidget {
                 ],
               );
             },
-            loading: () => const Center(
+            loading: () => Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(color: context.c.textPrimary),
               ),
             ),
             error: (error, _) => Center(
@@ -311,9 +313,9 @@ class _PendingTeachersCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,7 +330,7 @@ class _PendingTeachersCard extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: context.c.warning,
                   ),
                 ),
               ),
@@ -342,7 +344,7 @@ class _PendingTeachersCard extends ConsumerWidget {
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -351,7 +353,7 @@ class _PendingTeachersCard extends ConsumerWidget {
                       teacher['email'] as String? ?? '',
                       style: GoogleFonts.outfit(
                         fontSize: 12,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -367,11 +369,11 @@ class _PendingTeachersCard extends ConsumerWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () =>
-                      _approveTeacher(context, teacher['id'] as String),
+                      _approveTeacher(context, ref, teacher['id'] as String),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: Colors.green),
-                    foregroundColor: Colors.green,
+                    side: BorderSide(color: context.c.success),
+                    foregroundColor: context.c.success,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -389,8 +391,8 @@ class _PendingTeachersCard extends ConsumerWidget {
                       _rejectTeacher(context, teacher['id'] as String),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    side: const BorderSide(color: Colors.red),
-                    foregroundColor: Colors.red,
+                    side: BorderSide(color: context.c.danger),
+                    foregroundColor: context.c.danger,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -408,22 +410,26 @@ class _PendingTeachersCard extends ConsumerWidget {
     );
   }
 
-  Future<void> _approveTeacher(BuildContext context, String teacherId) async {
+  Future<void> _approveTeacher(
+    BuildContext context,
+    WidgetRef ref,
+    String teacherId,
+  ) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(teacherId)
-          .update({
-            'approved': true,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'approvedAt': FieldValue.serverTimestamp(),
-          });
+      await ref
+          .read(facultyApprovalServiceProvider)
+          .approve(
+            teacherId: teacherId,
+            adminInstitutionCode: ref
+                .read(authControllerProvider)
+                .institutionCode,
+          );
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher approved successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -448,9 +454,9 @@ class _PendingTeachersCard extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher registration rejected'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -499,21 +505,21 @@ class _TopStats extends ConsumerWidget {
               value: '$v',
               subtitle: 'In System',
               icon: Icons.people_alt_rounded,
-              color: const Color(0xFF2F6FED),
+              color: context.c.primary,
             ),
-            loading: () => const _FluentMetricCard(
+            loading: () => _FluentMetricCard(
               title: 'Total Users',
               value: '—',
               subtitle: 'Loading...',
               icon: Icons.people_alt_rounded,
-              color: Color(0xFF2F6FED),
+              color: context.c.primary,
             ),
-            error: (e, _) => const _FluentMetricCard(
+            error: (e, _) => _FluentMetricCard(
               title: 'Total Users',
               value: '—',
               subtitle: 'Error',
               icon: Icons.people_alt_rounded,
-              color: Color(0xFFEF4444),
+              color: context.c.danger,
             ),
           ),
           registrations.when(
@@ -522,21 +528,21 @@ class _TopStats extends ConsumerWidget {
               value: '$v',
               subtitle: 'Today',
               icon: Icons.person_add_rounded,
-              color: const Color(0xFF10B981),
+              color: context.c.accent,
             ),
-            loading: () => const _FluentMetricCard(
+            loading: () => _FluentMetricCard(
               title: 'New Registrations',
               value: '—',
               subtitle: 'Loading...',
               icon: Icons.person_add_rounded,
-              color: Color(0xFF10B981),
+              color: context.c.accent,
             ),
-            error: (e, _) => const _FluentMetricCard(
+            error: (e, _) => _FluentMetricCard(
               title: 'New Registrations',
               value: '—',
               subtitle: 'Error',
               icon: Icons.person_add_rounded,
-              color: Color(0xFFEF4444),
+              color: context.c.danger,
             ),
           ),
           sessions.when(
@@ -554,12 +560,12 @@ class _TopStats extends ConsumerWidget {
               icon: Icons.qr_code_2_rounded,
               color: Color(0xFFEC4899),
             ),
-            error: (e, _) => const _FluentMetricCard(
+            error: (e, _) => _FluentMetricCard(
               title: 'Active Sessions',
               value: '—',
               subtitle: 'Error',
               icon: Icons.qr_code_2_rounded,
-              color: Color(0xFFEF4444),
+              color: context.c.danger,
             ),
           ),
           const _SystemStatusCard(),
@@ -671,7 +677,7 @@ class _FluentMetricCardState extends State<_FluentMetricCard> {
                           style: GoogleFonts.outfit(
                             fontSize: 28, // Slightly smaller base font
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                             height: 1.2,
                           ),
                         ),
@@ -681,7 +687,7 @@ class _FluentMetricCardState extends State<_FluentMetricCard> {
                         widget.title,
                         style: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                           fontSize: 13,
                         ),
                         // Removed maxLines/overflow to prevent truncation
@@ -689,7 +695,7 @@ class _FluentMetricCardState extends State<_FluentMetricCard> {
                       Text(
                         widget.subtitle,
                         style: GoogleFonts.outfit(
-                          color: Colors.white38,
+                          color: context.c.textTertiary,
                           fontSize: 11,
                         ),
                         // Removed maxLines/overflow to prevent truncation
@@ -720,8 +726,8 @@ class _SystemStatusCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF10B981).withValues(alpha: 0.1),
-              const Color(0xFF10B981).withValues(alpha: 0.05),
+              context.c.accent.withValues(alpha: 0.1),
+              context.c.accent.withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
@@ -735,19 +741,19 @@ class _SystemStatusCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                    color: context.c.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.admin_panel_settings_rounded,
-                    color: Color(0xFF10B981),
+                    color: context.c.accent,
                     size: 20,
                   ),
                 ),
                 const Spacer(),
-                const Icon(
+                Icon(
                   Icons.check_circle_rounded,
-                  color: Color(0xFF10B981),
+                  color: context.c.accent,
                   size: 20,
                 ),
               ],
@@ -765,7 +771,7 @@ class _SystemStatusCard extends StatelessWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                   ),
@@ -774,7 +780,7 @@ class _SystemStatusCard extends StatelessWidget {
                     'All Systems Operational',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF10B981),
+                      color: context.c.accent,
                       fontSize: 13,
                     ),
                     // Removed maxLines/overflow
@@ -782,7 +788,7 @@ class _SystemStatusCard extends StatelessWidget {
                   Text(
                     'Everything running smoothly',
                     style: GoogleFonts.outfit(
-                      color: Colors.white38,
+                      color: context.c.textTertiary,
                       fontSize: 11,
                     ),
                     // Removed maxLines/overflow
@@ -828,7 +834,7 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
             '✅ Backfill Complete!\n'
             'Updated: $updated | Skipped: $skipped | Errors: $errors',
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: context.c.success,
           duration: const Duration(seconds: 5),
           behavior: SnackBarBehavior.floating,
         ),
@@ -859,9 +865,9 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.build_circle_outlined,
-                  color: Colors.orange,
+                  color: context.c.warning,
                   size: 24,
                 ),
               ),
@@ -871,7 +877,7 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
                 style: GoogleFonts.outfit(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
             ],
@@ -879,18 +885,18 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
           const SizedBox(height: 16),
           Text(
             'Add missing institutionCode fields to all sessions, scheduled_sessions, attendance records, and class groups. This is needed if you see permission errors or a group not showing up during signup.',
-            style: GoogleFonts.outfit(color: Colors.white70),
+            style: GoogleFonts.outfit(color: context.c.textSecondary),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: _isBackfilling ? null : _runBackfill,
             icon: _isBackfilling
-                ? const SizedBox(
+                ? SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   )
                 : const Icon(Icons.play_arrow),
@@ -899,7 +905,7 @@ class _MaintenanceToolsState extends ConsumerState<_MaintenanceTools> {
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange.shade700,
-              foregroundColor: Colors.white,
+              foregroundColor: context.c.textPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

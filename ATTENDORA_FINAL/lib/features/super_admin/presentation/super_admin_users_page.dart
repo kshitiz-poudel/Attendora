@@ -13,6 +13,7 @@ import '../providers/user_management_provider.dart';
 import '../services/user_management_service.dart';
 import '../../dashboard/providers.dart'; // For activeInstitutionsProvider (need to create or verify)
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class SuperAdminUsersPage extends ConsumerStatefulWidget {
   const SuperAdminUsersPage({super.key});
@@ -61,7 +62,7 @@ class _SuperAdminUsersPageState extends ConsumerState<SuperAdminUsersPage> {
                   style: GoogleFonts.outfit(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -69,7 +70,7 @@ class _SuperAdminUsersPageState extends ConsumerState<SuperAdminUsersPage> {
                   'Find and manage any user across all institutions.',
                   style: GoogleFonts.outfit(
                     fontSize: 16,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -98,7 +99,7 @@ class _SuperAdminUsersPageState extends ConsumerState<SuperAdminUsersPage> {
                       data: (institutions) => GlassDropdown<String>(
                         value: _selectedInstitution,
                         hint: 'All Institutions',
-                        icon: const Icon(Icons.business, color: Colors.white54),
+                        icon: Icon(Icons.business, color: context.c.textTertiary),
                         items: [
                           const DropdownMenuItem(
                             value: null,
@@ -131,7 +132,7 @@ class _SuperAdminUsersPageState extends ConsumerState<SuperAdminUsersPage> {
                   return Center(
                     child: Text(
                       'No users found matching "${_searchController.text}"',
-                      style: GoogleFonts.outfit(color: Colors.white54),
+                      style: GoogleFonts.outfit(color: context.c.textTertiary),
                     ),
                   );
                 }
@@ -143,12 +144,12 @@ class _SuperAdminUsersPageState extends ConsumerState<SuperAdminUsersPage> {
                         Icon(
                           Icons.person_search_rounded,
                           size: 64,
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: context.c.textPrimary.withValues(alpha: 0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Start typing to search users',
-                          style: GoogleFonts.outfit(color: Colors.white38),
+                          style: GoogleFonts.outfit(color: context.c.textTertiary),
                         ),
                       ],
                     ),
@@ -170,7 +171,7 @@ class _SuperAdminUsersPageState extends ConsumerState<SuperAdminUsersPage> {
               error: (e, _) => Center(
                 child: Text(
                   'Error: $e',
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.c.danger),
                 ),
               ),
             ),
@@ -199,11 +200,11 @@ class _UserListItem extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.2),
+            backgroundColor: context.c.accent.withValues(alpha: 0.2),
             child: Text(
               (user['displayName'] as String? ?? 'U')[0].toUpperCase(),
-              style: const TextStyle(
-                color: Color(0xFF10B981),
+              style: TextStyle(
+                color: context.c.accent,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -217,14 +218,14 @@ class _UserListItem extends StatelessWidget {
                   user['displayName'] ?? 'Unknown User',
                   style: GoogleFonts.outfit(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                     fontSize: 16,
                   ),
                 ),
                 Text(
                   user['email'] ?? '',
                   style: GoogleFonts.outfit(
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                     fontSize: 14,
                   ),
                 ),
@@ -236,7 +237,7 @@ class _UserListItem extends StatelessWidget {
                     Text(
                       '•  $institutionCode',
                       style: GoogleFonts.outfit(
-                        color: Colors.white38,
+                        color: context.c.textTertiary,
                         fontSize: 12,
                       ),
                     ),
@@ -246,7 +247,7 @@ class _UserListItem extends StatelessWidget {
             ),
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.white54),
+            icon: Icon(Icons.more_vert, color: context.c.textTertiary),
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 'impersonate',
@@ -256,7 +257,7 @@ class _UserListItem extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Login As',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ],
                 ),
@@ -265,11 +266,11 @@ class _UserListItem extends StatelessWidget {
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(Icons.edit, color: Colors.blueAccent, size: 20),
+                    Icon(Icons.edit, color: context.c.info, size: 20),
                     const SizedBox(width: 12),
                     Text(
                       'Edit User',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ],
                 ),
@@ -280,13 +281,13 @@ class _UserListItem extends StatelessWidget {
                   children: [
                     Icon(
                       isActive ? Icons.block : Icons.check_circle,
-                      color: isActive ? Colors.redAccent : Colors.greenAccent,
+                      color: isActive ? context.c.danger : context.c.success,
                       size: 20,
                     ),
                     const SizedBox(width: 12),
                     Text(
                       isActive ? 'Deactivate' : 'Activate',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ],
                 ),
@@ -315,21 +316,21 @@ class _UserListItem extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Impersonate User?',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'You are about to log in as ${user['displayName']}. You will see exactly what they see.\n\nTo return, click the "Stop Impersonation" banner.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
@@ -362,29 +363,29 @@ class _UserListItem extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           isActive ? 'Deactivate User?' : 'Activate User?',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           isActive
               ? 'This will prevent ${user['displayName']} from logging in.'
               : 'This will allow ${user['displayName']} to log in again.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
-              backgroundColor: isActive ? Colors.redAccent : Colors.greenAccent,
+              backgroundColor: isActive ? context.c.danger : context.c.success,
             ),
             child: Text(
               isActive ? 'Deactivate' : 'Activate',
@@ -418,10 +419,10 @@ class _UserListItem extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Edit User',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -452,7 +453,7 @@ class _UserListItem extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
@@ -469,7 +470,7 @@ class _UserListItem extends StatelessWidget {
               ref.invalidate(superAdminUserSearchProvider);
             },
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF10B981),
+              backgroundColor: context.c.accent,
             ),
             child: Text(
               'Save Changes',
@@ -492,16 +493,16 @@ class _RoleChip extends StatelessWidget {
     Color color;
     switch (role) {
       case 'admin':
-        color = Colors.redAccent;
+        color = context.c.danger;
         break;
       case 'teacher':
-        color = Colors.orangeAccent;
+        color = context.c.warning;
         break;
       case 'student':
-        color = Colors.blueAccent;
+        color = context.c.info;
         break;
       default:
-        color = Colors.grey;
+        color = context.c.textTertiary;
     }
 
     return Container(

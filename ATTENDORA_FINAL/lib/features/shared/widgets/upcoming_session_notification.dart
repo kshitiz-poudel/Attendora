@@ -6,10 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
 import '../../teacher/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider to get the next session starting soon
 final nextSessionProvider = StreamProvider<Map<String, dynamic>?>((ref) {
@@ -145,7 +145,7 @@ class _UpcomingSessionNotificationState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Started session: ${subject ?? "Session"}'),
-            backgroundColor: FluentColors.success,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -195,13 +195,13 @@ class _UpcomingSessionNotificationState
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isUrgent
-                      ? [const Color(0xFFEF4444), const Color(0xFFF59E0B)]
-                      : [const Color(0xFF2F6FED), const Color(0xFF10B981)],
+                      ? [context.c.danger, context.c.warning]
+                      : [context.c.primary, context.c.accent],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: (isUrgent ? Colors.red : Colors.blue).withValues(
+                    color: (isUrgent ? context.c.danger : context.c.info).withValues(
                       alpha: 0.3,
                     ),
                     blurRadius: 12,
@@ -214,12 +214,12 @@ class _UpcomingSessionNotificationState
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: context.c.textPrimary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       isUrgent ? Icons.alarm : Icons.schedule,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       size: 32,
                     ),
                   ),
@@ -230,8 +230,8 @@ class _UpcomingSessionNotificationState
                       children: [
                         Text(
                           session['subject'] ?? 'Upcoming Session',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.c.textPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
@@ -242,7 +242,7 @@ class _UpcomingSessionNotificationState
                               ? 'Starting in $countdown - Tap to start'
                               : 'Starts at ${DateFormat('h:mm a').format(scheduledFor)} • $countdown',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: context.c.textPrimary.withValues(alpha: 0.9),
                             fontSize: 14,
                           ),
                         ),
@@ -255,10 +255,10 @@ class _UpcomingSessionNotificationState
                     icon: const Icon(Icons.play_arrow, size: 20),
                     label: const Text('Start Now'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: context.c.textPrimary,
                       foregroundColor: isUrgent
-                          ? const Color(0xFFEF4444)
-                          : const Color(0xFF2F6FED),
+                          ? context.c.danger
+                          : context.c.primary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,

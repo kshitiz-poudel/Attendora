@@ -8,6 +8,7 @@ import '../../../core/responsive_utils.dart';
 import '../../shared/services/export_service.dart';
 import '../../auth/providers.dart';
 import 'admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 // Report types
 enum ReportType { attendance, teachers, students, sessions }
@@ -55,7 +56,7 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).colorScheme.primary.withValues(alpha: .08),
-              const Color(0xFF1E293B),
+              context.c.surface,
             ],
           ),
         ),
@@ -84,7 +85,7 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
                     'Generate Reports',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   if (!isMobile) ...[
@@ -92,7 +93,7 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
                     Text(
                       'Create detailed PDF reports for attendance, teachers, students, and sessions.',
                       style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(color: Colors.white70),
+                          ?.copyWith(color: context.c.textSecondary),
                     ),
                   ],
                 ],
@@ -112,10 +113,10 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
       delay: const Duration(milliseconds: 100),
       child: Card(
         elevation: 0,
-        color: const Color(0xFF1E293B),
+        color: context.c.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          side: BorderSide(color: context.c.textPrimary.withValues(alpha: 0.1)),
         ),
         child: Padding(
           padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -126,7 +127,7 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
                 'Report Configuration',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -135,7 +136,7 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
                 'Select Report Type',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.white70,
+                  color: context.c.textSecondary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -234,12 +235,12 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
                 child: FilledButton.icon(
                   onPressed: _isGenerating ? null : _generateReport,
                   icon: _isGenerating
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         )
                       : const Icon(Icons.analytics),
@@ -297,12 +298,12 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
         decoration: BoxDecoration(
           color: isSelected
               ? scheme.primary.withValues(alpha: .2)
-              : Colors.white.withValues(alpha: 0.05),
+              : context.c.textPrimary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? scheme.primary
-                : Colors.white.withValues(alpha: 0.1),
+                : context.c.textPrimary.withValues(alpha: 0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -311,14 +312,14 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
           children: [
             Icon(
               icon,
-              color: isSelected ? scheme.primary : Colors.white70,
+              color: isSelected ? scheme.primary : context.c.textSecondary,
               size: 28,
             ),
             const SizedBox(height: 8),
             Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: isSelected ? scheme.primary : Colors.white,
+                color: isSelected ? scheme.primary : context.c.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
@@ -357,9 +358,9 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Report downloaded successfully'),
-            backgroundColor: Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
       }
@@ -400,9 +401,9 @@ class _AdminReportsPageState extends ConsumerState<AdminReportsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Full report downloaded successfully'),
-            backgroundColor: Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
       }

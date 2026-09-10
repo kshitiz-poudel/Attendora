@@ -8,6 +8,7 @@ import '../../../core/fluent_theme.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../providers/institution_details_provider.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class InstitutionDetailsPage extends ConsumerWidget {
   final String institutionId;
@@ -44,7 +45,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: FluentColors.accentColor.withValues(
+                                  color: context.c.accent.withValues(
                                     alpha: 0.1,
                                   ),
                                   borderRadius: BorderRadius.circular(16),
@@ -52,7 +53,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                                 child: Icon(
                                   Icons.business,
                                   size: 32,
-                                  color: FluentColors.accentColor,
+                                  color: context.c.accent,
                                 ),
                               ),
                               _StatusChip(status: institution.status),
@@ -64,7 +65,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -72,7 +73,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             'Code: ${institution.code} • Domain: @${institution.emailDomain}',
                             style: GoogleFonts.outfit(
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: context.c.textSecondary,
                             ),
                           ),
                         ],
@@ -83,7 +84,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: FluentColors.accentColor.withValues(
+                              color: context.c.accent.withValues(
                                 alpha: 0.1,
                               ),
                               borderRadius: BorderRadius.circular(16),
@@ -91,7 +92,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             child: Icon(
                               Icons.business,
                               size: 32,
-                              color: FluentColors.accentColor,
+                              color: context.c.accent,
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -104,14 +105,14 @@ class InstitutionDetailsPage extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 Text(
                                   'Code: ${institution.code} • Domain: @${institution.emailDomain}',
                                   style: GoogleFonts.outfit(
                                     fontSize: 14,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                               ],
@@ -135,19 +136,19 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             title: 'Students',
                             value: stats['students'].toString(),
                             icon: Icons.people,
-                            color: Colors.blue,
+                            color: context.c.info,
                           ),
                           _StatCard(
                             title: 'Teachers',
                             value: stats['teachers'].toString(),
                             icon: Icons.school,
-                            color: Colors.green,
+                            color: context.c.success,
                           ),
                           _StatCard(
                             title: 'Total Classes',
                             value: stats['classes'].toString(),
                             icon: Icons.class_,
-                            color: Colors.orange,
+                            color: context.c.warning,
                           ),
                           _StatCard(
                             title: 'Total Sessions',
@@ -159,7 +160,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             title: 'Active Sessions',
                             value: stats['activeSessions'].toString(),
                             icon: Icons.timer,
-                            color: Colors.redAccent,
+                            color: context.c.danger,
                           ),
                         ],
                       ),
@@ -167,7 +168,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                           const Center(child: CircularProgressIndicator()),
                       error: (e, _) => Text(
                         'Error loading stats: $e',
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: context.c.danger),
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -182,7 +183,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -197,7 +198,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                               icon: const Icon(Icons.person_add),
                               label: const Text('Add Admin'),
                               style: FilledButton.styleFrom(
-                                backgroundColor: FluentColors.accentColor,
+                                backgroundColor: context.c.accent,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
@@ -215,7 +216,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           FilledButton.icon(
@@ -227,7 +228,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             icon: const Icon(Icons.person_add),
                             label: const Text('Add Admin'),
                             style: FilledButton.styleFrom(
-                              backgroundColor: FluentColors.accentColor,
+                              backgroundColor: context.c.accent,
                             ),
                           ),
                         ],
@@ -236,13 +237,13 @@ class InstitutionDetailsPage extends ConsumerWidget {
                     adminsAsync.when(
                       data: (admins) {
                         if (admins.isEmpty) {
-                          return const GlassCard(
+                          return GlassCard(
                             child: Padding(
                               padding: EdgeInsets.all(24),
                               child: Center(
                                 child: Text(
                                   'No admins assigned',
-                                  style: TextStyle(color: Colors.white54),
+                                  style: TextStyle(color: context.c.textTertiary),
                                 ),
                               ),
                             ),
@@ -254,34 +255,34 @@ class InstitutionDetailsPage extends ConsumerWidget {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: admins.length,
                             separatorBuilder: (_, __) =>
-                                const Divider(color: Colors.white10),
+                                Divider(color: context.c.border),
                             itemBuilder: (context, index) {
                               final admin = admins[index];
                               return ListTile(
                                 leading: CircleAvatar(
-                                  backgroundColor: FluentColors.accentColor,
+                                  backgroundColor: context.c.accent,
                                   child: Text(
                                     (admin['displayName'] as String? ?? 'A')[0]
                                         .toUpperCase(),
-                                    style: const TextStyle(color: Colors.white),
+                                    style: TextStyle(color: context.c.textPrimary),
                                   ),
                                 ),
                                 title: Text(
                                   admin['displayName'] ?? 'Unknown',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 subtitle: Text(
                                   admin['email'] ?? '',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 trailing: IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.remove_circle_outline,
-                                    color: Colors.redAccent,
+                                    color: context.c.danger,
                                   ),
                                   tooltip: 'Remove Admin Access',
                                   onPressed: () =>
@@ -296,7 +297,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
                           const Center(child: CircularProgressIndicator()),
                       error: (e, _) => Text(
                         'Error loading admins: $e',
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: context.c.danger),
                       ),
                     ),
                   ],
@@ -320,22 +321,22 @@ class InstitutionDetailsPage extends ConsumerWidget {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Add Institution Admin',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Enter the email of an EXISTING user to promote them to Admin for this institution.',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: emailController,
-              style: GoogleFonts.outfit(color: Colors.white),
+              style: GoogleFonts.outfit(color: context.c.textPrimary),
               decoration: fluentInputDecoration(
                 context: context,
                 labelText: 'User Email',
@@ -349,7 +350,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
@@ -404,7 +405,7 @@ class InstitutionDetailsPage extends ConsumerWidget {
               }
             },
             style: FilledButton.styleFrom(
-              backgroundColor: FluentColors.accentColor,
+              backgroundColor: context.c.accent,
             ),
             child: Text(
               'Promote',
@@ -424,26 +425,26 @@ class InstitutionDetailsPage extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Remove Admin?',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to remove admin access for ${admin['displayName']}? They will be demoted to "Teacher".',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             child: Text(
               'Remove',
               style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
@@ -506,12 +507,12 @@ class _StatCard extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           Text(
             title,
-            style: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+            style: GoogleFonts.outfit(fontSize: 14, color: context.c.textSecondary),
           ),
         ],
       ),
@@ -529,13 +530,13 @@ class _StatusChip extends StatelessWidget {
     Color color;
     switch (status.toLowerCase()) {
       case 'active':
-        color = Colors.green;
+        color = context.c.success;
         break;
       case 'pending':
-        color = Colors.orange;
+        color = context.c.warning;
         break;
       default:
-        color = Colors.red;
+        color = context.c.danger;
     }
 
     return Container(

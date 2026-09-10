@@ -14,6 +14,9 @@ import '../../../core/responsive_utils.dart';
 import '../../shared/widgets/shimmer_loading.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../../shared/widgets/app_download_card.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '../../../core/design/app_colors.dart';
 
 class TeacherDashboardPage extends ConsumerWidget {
   const TeacherDashboardPage({super.key});
@@ -49,6 +52,10 @@ class TeacherDashboardPage extends ConsumerWidget {
             // Auto-start notification banner
             const UpcomingSessionNotification(),
 
+            // Mobile app download. Renders nothing outside the web build.
+            const AppDownloadCard(audience: 'teacher'),
+            if (kIsWeb) const SizedBox(height: 20),
+
             // Hero Header
             FadeInDown(
               duration: const Duration(milliseconds: 800),
@@ -78,7 +85,7 @@ class TeacherDashboardPage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -87,7 +94,7 @@ class TeacherDashboardPage extends ConsumerWidget {
                             'Manage your classes, track attendance, and engage with students.',
                             style: GoogleFonts.outfit(
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: context.c.textSecondary,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -100,7 +107,7 @@ class TeacherDashboardPage extends ConsumerWidget {
                               label: const Text('Start Session'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: scheme.primary,
-                                foregroundColor: Colors.white,
+                                foregroundColor: context.c.textPrimary,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24,
                                   vertical: 16,
@@ -143,7 +150,7 @@ class TeacherDashboardPage extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -151,7 +158,7 @@ class TeacherDashboardPage extends ConsumerWidget {
                                   'Manage your classes, track attendance, and engage with students.',
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                               ],
@@ -164,7 +171,7 @@ class TeacherDashboardPage extends ConsumerWidget {
                             label: const Text('Start Session'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: scheme.primary,
-                              foregroundColor: Colors.white,
+                              foregroundColor: context.c.textPrimary,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
                                 vertical: 16,
@@ -207,28 +214,28 @@ class TeacherDashboardPage extends ConsumerWidget {
                         icon: Icons.people_alt_rounded,
                         title: 'Students',
                         subtitle: 'Manage list',
-                        color: const Color(0xFF2F6FED),
+                        color: context.c.primary,
                         onTap: () => context.go('/teacher/students'),
                       ),
                       _QuickActionCard(
                         icon: Icons.book_rounded,
                         title: 'Subjects',
                         subtitle: 'View subjects',
-                        color: const Color(0xFF10B981),
+                        color: context.c.accent,
                         onTap: () => context.go('/teacher/subjects'),
                       ),
                       _QuickActionCard(
                         icon: Icons.fact_check_rounded,
                         title: 'Attendance',
                         subtitle: 'View records',
-                        color: const Color(0xFF10B981),
+                        color: context.c.accent,
                         onTap: () => context.go('/teacher/attendance'),
                       ),
                       _QuickActionCard(
                         icon: Icons.file_download_rounded,
                         title: 'Reports',
                         subtitle: 'Export data',
-                        color: const Color(0xFFF59E0B),
+                        color: context.c.warning,
                         onTap: () => context.go('/teacher/exports'),
                       ),
                       _QuickActionCard(
@@ -337,14 +344,14 @@ class _QuickActionCardState extends State<_QuickActionCard> {
                   style: GoogleFonts.outfit(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.subtitle,
                   style: GoogleFonts.outfit(
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                     fontSize: 14,
                   ),
                 ),

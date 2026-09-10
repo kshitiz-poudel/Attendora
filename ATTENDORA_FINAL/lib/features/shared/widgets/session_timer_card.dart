@@ -10,6 +10,7 @@ import '../../../core/logger.dart';
 import '../../auth/providers.dart';
 import 'empty_state.dart';
 import 'glass_card.dart';
+import '../../../core/design/app_colors.dart';
 
 final dashboardActiveSessionProvider = StreamProvider<Map<String, dynamic>?>((
   ref,
@@ -151,12 +152,12 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: context.c.textPrimary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.timer_outlined,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                         size: 24,
                       ),
                     ),
@@ -166,17 +167,17 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                       style: GoogleFonts.outfit(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                const EmptyState(
+                EmptyState(
                   icon: Icons.timer_off_outlined,
                   title: 'No Active Session',
                   subtitle: 'Start a session to begin tracking time',
-                  color: Colors.white54,
+                  color: context.c.textTertiary,
                 ),
               ],
             ),
@@ -205,14 +206,14 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF00B0FF), Color(0xFF0081CB)],
+                      gradient: LinearGradient(
+                        colors: [context.c.info, Color(0xFF0081CB)],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.timer_rounded,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       size: 24,
                     ),
                   ),
@@ -222,7 +223,7 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                     style: GoogleFonts.outfit(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ],
@@ -236,7 +237,7 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                       style: GoogleFonts.outfit(
                         fontSize: 48,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF00B0FF),
+                        color: context.c.info,
                         letterSpacing: 4,
                       ),
                     ),
@@ -254,16 +255,16 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                         ),
                         decoration: BoxDecoration(
                           gradient: isExpiringSoon
-                              ? const LinearGradient(
+                              ? LinearGradient(
                                   colors: [
-                                    Color(0xFFDC2626),
+                                    context.c.danger,
                                     Color(0xFFB91C1C),
                                   ],
                                 )
-                              : const LinearGradient(
+                              : LinearGradient(
                                   colors: [
-                                    Color(0xFF10B981),
-                                    Color(0xFF00B0FF),
+                                    context.c.accent,
+                                    context.c.info,
                                   ],
                                 ),
                           borderRadius: BorderRadius.circular(24),
@@ -271,8 +272,8 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                             BoxShadow(
                               color:
                                   (isExpiringSoon
-                                          ? const Color(0xFFDC2626)
-                                          : const Color(0xFF00B0FF))
+                                          ? context.c.danger
+                                          : context.c.info)
                                       .withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
@@ -282,10 +283,10 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.circle,
                               size: 8,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                             const SizedBox(width: 8),
                             Text(
@@ -295,14 +296,14 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                               style: GoogleFonts.outfit(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(
+                            Icon(
                               Icons.qr_code_2,
                               size: 14,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ],
                         ),
@@ -313,7 +314,7 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                       Text(
                         'Expires at ${TimeOfDay.fromDateTime(expiresAt).format(context)}',
                         style: GoogleFonts.outfit(
-                          color: Colors.white54,
+                          color: context.c.textTertiary,
                           fontSize: 12,
                         ),
                       ),
@@ -329,7 +330,7 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
         child: Container(
           height: 200,
           alignment: Alignment.center,
-          child: const CircularProgressIndicator(color: Color(0xFF00B0FF)),
+          child: CircularProgressIndicator(color: context.c.info),
         ),
       ),
       error: (e, _) {
@@ -344,9 +345,9 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.build_circle_outlined,
-                    color: Color(0xFFF59E0B),
+                    color: context.c.warning,
                     size: 48,
                   ),
                   const SizedBox(height: 16),
@@ -355,14 +356,14 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                     style: GoogleFonts.outfit(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Please wait 2-3 minutes for indexes to build',
                     style: GoogleFonts.outfit(
-                      color: Colors.white54,
+                      color: context.c.textTertiary,
                       fontSize: 12,
                     ),
                     textAlign: TextAlign.center,
@@ -376,8 +377,8 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
                     icon: const Icon(Icons.refresh, size: 18),
                     label: const Text('Refresh'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00B0FF),
-                      foregroundColor: Colors.white,
+                      backgroundColor: context.c.info,
+                      foregroundColor: context.c.textPrimary,
                     ),
                   ),
                 ],
@@ -392,15 +393,15 @@ class _SessionTimerCardState extends ConsumerState<SessionTimerCard> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.error_outline,
-                  color: Color(0xFFDC2626),
+                  color: context.c.danger,
                   size: 32,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Unable to load session data',
-                  style: GoogleFonts.outfit(color: const Color(0xFFDC2626)),
+                  style: GoogleFonts.outfit(color: context.c.danger),
                 ),
                 const SizedBox(height: 8),
                 TextButton(

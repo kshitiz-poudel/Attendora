@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/design/app_colors.dart';
+
 class ShimmerLoading extends StatefulWidget {
   const ShimmerLoading({
     super.key,
@@ -54,9 +56,9 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.grey.withValues(alpha: 0.1),
-                Colors.grey.withValues(alpha: 0.3),
-                Colors.grey.withValues(alpha: 0.1),
+                context.c.skeletonBase,
+                context.c.skeletonHighlight,
+                context.c.skeletonBase,
               ],
               stops: const [0.1, 0.3, 0.4],
               transform: _SlidingGradientTransform(
@@ -97,7 +99,7 @@ class Skeleton extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: context.c.skeletonBase,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
     );

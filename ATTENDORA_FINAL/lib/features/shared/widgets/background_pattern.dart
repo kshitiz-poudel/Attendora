@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/design/app_colors.dart';
+
+/// Page canvas: a soft vertical gradient plus a subtle dot grid.
 class BackgroundPattern extends StatelessWidget {
   final Widget child;
 
@@ -7,20 +10,25 @@ class BackgroundPattern extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.c;
     return Stack(
       children: [
-        // Solid background color
-        Container(color: Theme.of(context).scaffoldBackgroundColor),
-        // Dot pattern
         Positioned.fill(
-          child: CustomPaint(
-            painter: DotGridPainter(
-              color: Colors.white.withValues(alpha: 0.05),
-              spacing: 30,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [c.canvasGradientTop, c.canvasGradientBottom],
+              ),
             ),
           ),
         ),
-        // Content
+        Positioned.fill(
+          child: CustomPaint(
+            painter: DotGridPainter(color: c.dotPattern, spacing: 30),
+          ),
+        ),
         child,
       ],
     );
@@ -48,5 +56,6 @@ class DotGridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant DotGridPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.spacing != spacing;
 }

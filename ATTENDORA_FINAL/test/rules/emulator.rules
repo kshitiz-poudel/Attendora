@@ -1,0 +1,9 @@
+// Placeholder only. The emulator needs a rules file at startup, but each test
+// suite loads the real ../../firestore.rules through initializeTestEnvironment,
+// which replaces whatever is configured here.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} { allow read, write: if false; }
+  }
+}

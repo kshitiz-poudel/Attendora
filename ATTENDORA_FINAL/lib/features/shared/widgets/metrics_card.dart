@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/design/app_colors.dart';
 
 class MetricsCard extends StatelessWidget {
   const MetricsCard({
@@ -24,10 +25,10 @@ class MetricsCard extends StatelessWidget {
     final isUp = trend.trim().startsWith('+');
     final isDown = trend.trim().startsWith('-');
     final trendColor = isUp
-        ? const Color(0xFF16A34A)
+        ? context.c.success
         : isDown
-        ? const Color(0xFFDC2626)
-        : const Color(0xFF64748B);
+        ? context.c.danger
+        : context.c.textTertiary;
     return Card(
       child: Stack(
         children: [

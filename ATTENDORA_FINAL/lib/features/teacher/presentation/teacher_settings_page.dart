@@ -9,6 +9,7 @@ import '../../auth/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import '../../../core/design/app_colors.dart';
 
 class TeacherSettingsPage extends ConsumerStatefulWidget {
   const TeacherSettingsPage({super.key});
@@ -46,9 +47,9 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
       setState(() => _oldVerified = true);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Old password verified'),
-            backgroundColor: Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
       }
@@ -72,9 +73,9 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
       await FirebaseAuth.instance.currentUser?.updatePassword(_newPass.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Password changed successfully'),
-            backgroundColor: Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
       }
@@ -89,7 +90,7 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to change password: $e'),
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -127,7 +128,7 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                 style: GoogleFonts.outfit(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
             ),
@@ -137,7 +138,7 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
               delay: const Duration(milliseconds: 100),
               child: Text(
                 'Manage your profile and account security.',
-                style: GoogleFonts.outfit(fontSize: 16, color: Colors.white70),
+                style: GoogleFonts.outfit(fontSize: 16, color: context.c.textSecondary),
               ),
             ),
             const SizedBox(height: 32),
@@ -156,7 +157,7 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                       style: GoogleFonts.outfit(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -168,23 +169,23 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: context.c.textPrimary.withValues(alpha: 0.2),
                                 width: 2,
                               ),
                             ),
                             child: CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.white.withValues(
+                              backgroundColor: context.c.textPrimary.withValues(
                                 alpha: 0.1,
                               ),
                               backgroundImage: state.photoUrl != null
                                   ? NetworkImage(state.photoUrl!)
                                   : null,
                               child: state.photoUrl == null
-                                  ? const Icon(
+                                  ? Icon(
                                       Icons.person_rounded,
                                       size: 50,
-                                      color: Colors.white70,
+                                      color: context.c.textSecondary,
                                     )
                                   : null,
                             ),
@@ -195,17 +196,17 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2F6FED),
+                                color: context.c.primary,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                   width: 2,
                                 ),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.camera_alt_rounded,
                                 size: 16,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                             ),
                           ),
@@ -246,29 +247,29 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                                     );
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
                                         'Profile updated successfully',
                                       ),
-                                      backgroundColor: Color(0xFF10B981),
+                                      backgroundColor: context.c.accent,
                                     ),
                                   );
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2F6FED),
-                          foregroundColor: Colors.white,
+                          backgroundColor: context.c.primary,
+                          foregroundColor: context.c.textPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: state.loading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                   strokeWidth: 2,
                                 ),
                               )
@@ -301,7 +302,7 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                       style: GoogleFonts.outfit(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -318,9 +319,9 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                         child: OutlinedButton(
                           onPressed: _verifyOld,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
+                            foregroundColor: context.c.textPrimary,
                             side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: context.c.textPrimary.withValues(alpha: 0.3),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -355,8 +356,8 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                         child: ElevatedButton(
                           onPressed: _changePassword,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF10B981),
-                            foregroundColor: Colors.white,
+                            backgroundColor: context.c.accent,
+                            foregroundColor: context.c.textPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -377,18 +378,18 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          color: context.c.danger.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: const Color(0xFFEF4444)
+                            color: context.c.danger
                                 .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.error_outline_rounded,
-                              color: Color(0xFFEF4444),
+                              color: context.c.danger,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
@@ -396,7 +397,7 @@ class _TeacherSettingsPageState extends ConsumerState<TeacherSettingsPage> {
                               child: Text(
                                 _error!,
                                 style: GoogleFonts.outfit(
-                                  color: const Color(0xFFEF4444),
+                                  color: context.c.danger,
                                 ),
                               ),
                             ),

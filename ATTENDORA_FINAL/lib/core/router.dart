@@ -287,6 +287,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'pending',
+            // Once an admin approves the account the live profile listener
+            // flips `approved`, which refreshes the router; move the teacher
+            // straight into the dashboard instead of stranding them here.
+            redirect: (context, state) {
+              final authState = ref.read(authControllerProvider);
+              if (authState.role == UserRole.teacher && authState.approved) {
+                return '/teacher';
+              }
+              return null;
+            },
             builder: (context, state) => const TeacherPendingApprovalPage(),
           ),
           GoRoute(

@@ -10,6 +10,7 @@ import '../../shared/widgets/background_pattern.dart';
 import '../../student/providers.dart';
 import 'student_shell.dart';
 import '../../../core/responsive_utils.dart';
+import '../../../core/design/app_colors.dart';
 
 class StudentAnalyticsPage extends ConsumerWidget {
   const StudentAnalyticsPage({super.key});
@@ -30,7 +31,7 @@ class StudentAnalyticsPage extends ConsumerWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
             ),
@@ -40,7 +41,7 @@ class StudentAnalyticsPage extends ConsumerWidget {
               delay: const Duration(milliseconds: 100),
               child: Text(
                 'Track your attendance trends over time.',
-                style: GoogleFonts.outfit(fontSize: 16, color: Colors.white70),
+                style: GoogleFonts.outfit(fontSize: 16, color: context.c.textSecondary),
               ),
             ),
             const SizedBox(height: 32),
@@ -86,7 +87,7 @@ class _AttendanceTrendChart extends ConsumerWidget {
             style: GoogleFonts.outfit(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 24),
@@ -95,10 +96,10 @@ class _AttendanceTrendChart extends ConsumerWidget {
             child: attendanceAsync.when(
               data: (records) {
                 if (records.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       'No data available',
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(color: context.c.textTertiary),
                     ),
                   );
                 }
@@ -147,7 +148,7 @@ class _AttendanceTrendChart extends ConsumerWidget {
                       horizontalInterval: 20,
                       getDrawingHorizontalLine: (value) {
                         return FlLine(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: context.c.textPrimary.withValues(alpha: 0.1),
                           strokeWidth: 1,
                         );
                       },
@@ -180,8 +181,8 @@ class _AttendanceTrendChart extends ConsumerWidget {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
                                 DateFormat('MMM').format(date),
-                                style: const TextStyle(
-                                  color: Colors.white54,
+                                style: TextStyle(
+                                  color: context.c.textTertiary,
                                   fontSize: 12,
                                 ),
                               ),
@@ -196,8 +197,8 @@ class _AttendanceTrendChart extends ConsumerWidget {
                           getTitlesWidget: (value, meta) {
                             return Text(
                               '${value.toInt()}%',
-                              style: const TextStyle(
-                                color: Colors.white54,
+                              style: TextStyle(
+                                color: context.c.textTertiary,
                                 fontSize: 12,
                               ),
                             );
@@ -215,8 +216,8 @@ class _AttendanceTrendChart extends ConsumerWidget {
                       LineChartBarData(
                         spots: spots,
                         isCurved: true,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF2F6FED)],
+                        gradient: LinearGradient(
+                          colors: [context.c.accent, context.c.primary],
                         ),
                         barWidth: 4,
                         isStrokeCapRound: true,
@@ -225,8 +226,8 @@ class _AttendanceTrendChart extends ConsumerWidget {
                           show: true,
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFF10B981).withValues(alpha: 0.3),
-                              const Color(0xFF2F6FED).withValues(alpha: 0.0),
+                              context.c.accent.withValues(alpha: 0.3),
+                              context.c.primary.withValues(alpha: 0.0),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -241,7 +242,7 @@ class _AttendanceTrendChart extends ConsumerWidget {
               error: (e, _) => Center(
                 child: Text(
                   'Error: $e',
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.c.danger),
                 ),
               ),
             ),
@@ -269,16 +270,16 @@ class _SubjectPerformanceList extends ConsumerWidget {
             style: GoogleFonts.outfit(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
           subjectsAsync.when(
             data: (subjects) {
               if (subjects.isEmpty) {
-                return const Text(
+                return Text(
                   'No subjects found.',
-                  style: TextStyle(color: Colors.white54),
+                  style: TextStyle(color: context.c.textTertiary),
                 );
               }
 
@@ -289,11 +290,11 @@ class _SubjectPerformanceList extends ConsumerWidget {
                   final total = stats?['total'] as int? ?? 0;
                   final attended = stats?['attended'] as int? ?? 0;
 
-                  Color progressColor = const Color(0xFF10B981); // Green
+                  Color progressColor = context.c.accent; // Green
                   if (percentage < 75) {
-                    progressColor = const Color(0xFFEF4444); // Red
+                    progressColor = context.c.danger; // Red
                   } else if (percentage < 85) {
-                    progressColor = const Color(0xFFF59E0B); // Orange
+                    progressColor = context.c.warning; // Orange
                   }
 
                   return Padding(
@@ -307,8 +308,8 @@ class _SubjectPerformanceList extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 subject['name'] ?? 'Unknown',
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: context.c.textPrimary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -327,7 +328,7 @@ class _SubjectPerformanceList extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
                             value: total > 0 ? percentage / 100 : 0,
-                            backgroundColor: Colors.white.withValues(
+                            backgroundColor: context.c.textPrimary.withValues(
                               alpha: 0.1,
                             ),
                             valueColor: AlwaysStoppedAnimation<Color>(
@@ -339,8 +340,8 @@ class _SubjectPerformanceList extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           '$attended / $total sessions attended',
-                          style: const TextStyle(
-                            color: Colors.white54,
+                          style: TextStyle(
+                            color: context.c.textTertiary,
                             fontSize: 12,
                           ),
                         ),
@@ -353,7 +354,7 @@ class _SubjectPerformanceList extends ConsumerWidget {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text(
               'Error loading subjects: $e',
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: context.c.danger),
             ),
           ),
         ],

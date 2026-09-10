@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../shared/widgets/glass_card.dart';
 import 'admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class AdminAboutPage extends StatelessWidget {
   const AdminAboutPage({super.key});
@@ -77,7 +78,7 @@ class AdminAboutPage extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 42,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: context.c.textPrimary,
             letterSpacing: -1.0,
           ),
         ),
@@ -87,7 +88,7 @@ class AdminAboutPage extends StatelessWidget {
           textAlign: TextAlign.center,
           style: GoogleFonts.outfit(
             fontSize: 18,
-            color: Colors.white70,
+            color: context.c.textSecondary,
             letterSpacing: 0.5,
           ),
         ),
@@ -95,14 +96,14 @@ class AdminAboutPage extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: context.c.textPrimary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
           ),
           child: Text(
             'Version 1.0.0',
             style: GoogleFonts.outfit(
-              color: Colors.white60,
+              color: context.c.textSecondary,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -130,7 +131,7 @@ class AdminAboutPage extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
             ],
@@ -141,7 +142,7 @@ class AdminAboutPage extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 16,
               height: 1.6,
-              color: Colors.white70,
+              color: context.c.textSecondary,
             ),
           ),
         ],
@@ -164,7 +165,7 @@ class AdminAboutPage extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
             ],
@@ -187,7 +188,7 @@ class AdminAboutPage extends StatelessWidget {
           width: 8,
           height: 8,
           decoration: BoxDecoration(
-            color: Colors.white24,
+            color: context.c.border,
             shape: BoxShape.circle,
           ),
         ),
@@ -201,12 +202,12 @@ class AdminAboutPage extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
               Text(
                 description,
-                style: GoogleFonts.outfit(fontSize: 14, color: Colors.white54),
+                style: GoogleFonts.outfit(fontSize: 14, color: context.c.textTertiary),
               ),
             ],
           ),
@@ -220,7 +221,7 @@ class AdminAboutPage extends StatelessWidget {
       children: [
         Text(
           '© 2025 Attendora. All rights reserved.',
-          style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12),
+          style: GoogleFonts.outfit(color: context.c.textTertiary, fontSize: 12),
         ),
         const SizedBox(height: 8),
         Row(
@@ -230,15 +231,15 @@ class AdminAboutPage extends StatelessWidget {
               onPressed: () {},
               child: Text(
                 'Privacy Policy',
-                style: GoogleFonts.outfit(color: Colors.white54, fontSize: 12),
+                style: GoogleFonts.outfit(color: context.c.textTertiary, fontSize: 12),
               ),
             ),
-            Text('•', style: TextStyle(color: Colors.white24)),
+            Text('•', style: TextStyle(color: context.c.border)),
             TextButton(
               onPressed: () {},
               child: Text(
                 'Terms of Service',
-                style: GoogleFonts.outfit(color: Colors.white54, fontSize: 12),
+                style: GoogleFonts.outfit(color: context.c.textTertiary, fontSize: 12),
               ),
             ),
           ],

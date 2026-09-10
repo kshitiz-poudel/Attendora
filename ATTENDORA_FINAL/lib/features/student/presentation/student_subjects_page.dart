@@ -12,6 +12,8 @@ import 'package:attendora/features/student/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import '../../shared/widgets/async_section.dart';
+import '../../../core/design/app_colors.dart';
 
 class StudentSubjectsPage extends ConsumerStatefulWidget {
   const StudentSubjectsPage({super.key});
@@ -63,7 +65,7 @@ class _StudentSubjectsPageState extends ConsumerState<StudentSubjectsPage> {
                         subtitle: _searchQuery.isEmpty
                             ? 'You are not enrolled in any subjects yet'
                             : 'No subjects match "$_searchQuery"',
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                     ),
                   );
@@ -75,9 +77,10 @@ class _StudentSubjectsPageState extends ConsumerState<StudentSubjectsPage> {
                   }).toList(),
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              ),
+              // Content-shaped placeholder: the page keeps its layout while
+              // subjects, attendance and sessions finish loading, instead of
+              // briefly showing every subject at 0%.
+              loading: () => const SkeletonList(rows: 5),
               error: (error, _) => Center(
                 child: GlassCard(
                   padding: const EdgeInsets.all(32),
@@ -110,15 +113,15 @@ class _StudentSubjectsPageState extends ConsumerState<StudentSubjectsPage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFF10B981).withValues(alpha: 0.2),
-                        const Color(0xFF10B981).withValues(alpha: 0.1),
+                        context.c.accent.withValues(alpha: 0.2),
+                        context.c.accent.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.library_books_rounded,
-                    color: Color(0xFF10B981),
+                    color: context.c.accent,
                     size: 32,
                   ),
                 ),
@@ -132,7 +135,7 @@ class _StudentSubjectsPageState extends ConsumerState<StudentSubjectsPage> {
                         style: GoogleFonts.outfit(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -140,7 +143,7 @@ class _StudentSubjectsPageState extends ConsumerState<StudentSubjectsPage> {
                         'View your enrolled subjects and attendance',
                         style: GoogleFonts.outfit(
                           fontSize: 14,
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -207,12 +210,12 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                          color: context.c.accent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.class_,
-                          color: Color(0xFF10B981),
+                          color: context.c.accent,
                           size: 24,
                         ),
                       ),
@@ -226,7 +229,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                               style: GoogleFonts.outfit(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             if (code.isNotEmpty) ...[
@@ -235,7 +238,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                 '$code • $type',
                                 style: GoogleFonts.outfit(
                                   fontSize: 14,
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                 ),
                               ),
                             ],
@@ -272,7 +275,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                         _isExpanded
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                     ],
                   ),
@@ -286,17 +289,17 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                   margin: const EdgeInsets.fromLTRB(24, 0, 24, 20),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                    color: context.c.danger.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+                      color: context.c.danger.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.block_rounded,
-                        color: Color(0xFFEF4444),
+                        color: context.c.danger,
                         size: 20,
                       ),
                       const SizedBox(width: 10),
@@ -306,7 +309,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                           style: GoogleFonts.outfit(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFFEF4444),
+                            color: context.c.danger,
                           ),
                         ),
                       ),
@@ -321,7 +324,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                   children: [
                     Divider(
                       height: 1,
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: context.c.textPrimary.withValues(alpha: 0.1),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(24),
@@ -333,7 +336,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -355,7 +358,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                             label: 'Attended',
                                             value: '$attended',
                                             icon: Icons.check_circle_outline,
-                                            color: Colors.green,
+                                            color: context.c.success,
                                           ),
                                         ),
                                         const SizedBox(width: 12),
@@ -364,7 +367,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                             label: 'Total',
                                             value: '$total',
                                             icon: Icons.calendar_today_outlined,
-                                            color: Colors.blue,
+                                            color: context.c.info,
                                           ),
                                         ),
                                       ],
@@ -376,7 +379,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                         label: 'Missed',
                                         value: '${total - attended}',
                                         icon: Icons.cancel_outlined,
-                                        color: Colors.red,
+                                        color: context.c.danger,
                                       ),
                                     ),
                                   ],
@@ -389,7 +392,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                         label: 'Attended',
                                         value: '$attended',
                                         icon: Icons.check_circle_outline,
-                                        color: Colors.green,
+                                        color: context.c.success,
                                       ),
                                     ),
                                     const SizedBox(width: 16),
@@ -398,7 +401,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                         label: 'Total Sessions',
                                         value: '$total',
                                         icon: Icons.calendar_today_outlined,
-                                        color: Colors.blue,
+                                        color: context.c.info,
                                       ),
                                     ),
                                     const SizedBox(width: 16),
@@ -407,7 +410,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                                         label: 'Missed',
                                         value: '${total - attended}',
                                         icon: Icons.cancel_outlined,
-                                        color: Colors.red,
+                                        color: context.c.danger,
                                       ),
                                     ),
                                   ],
@@ -422,7 +425,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
                             child: LinearProgressIndicator(
                               value: total > 0 ? attended / total : 0,
                               minHeight: 8,
-                              backgroundColor: Colors.white.withValues(
+                              backgroundColor: context.c.textPrimary.withValues(
                                 alpha: 0.1,
                               ),
                               valueColor: AlwaysStoppedAnimation<Color>(
@@ -448,9 +451,9 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
   }
 
   Color _getAttendanceColor(double percentage) {
-    if (percentage >= 75) return const Color(0xFF10B981);
-    if (percentage >= 60) return const Color(0xFFF59E0B);
-    return const Color(0xFFEF4444);
+    if (percentage >= 75) return context.c.accent;
+    if (percentage >= 60) return context.c.warning;
+    return context.c.danger;
   }
 }
 
@@ -472,9 +475,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,13 +489,13 @@ class _StatCard extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.outfit(fontSize: 12, color: Colors.white54),
+            style: GoogleFonts.outfit(fontSize: 12, color: context.c.textTertiary),
           ),
         ],
       ),
@@ -527,14 +530,14 @@ class EmptyState extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: GoogleFonts.outfit(color: Colors.white54),
+            style: GoogleFonts.outfit(color: context.c.textTertiary),
           ),
         ],
       ),

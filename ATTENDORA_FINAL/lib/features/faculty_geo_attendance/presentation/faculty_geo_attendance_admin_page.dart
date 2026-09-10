@@ -10,6 +10,8 @@ import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../models/geo_attendance_models.dart';
 import '../providers/faculty_geo_attendance_providers.dart';
+import 'widgets/attendance_evidence_dialog.dart';
+import '../../../core/design/app_colors.dart';
 
 class FacultyGeoAttendanceAdminPage extends ConsumerStatefulWidget {
   const FacultyGeoAttendanceAdminPage({super.key});
@@ -327,9 +329,9 @@ class _SettingsCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'Recommended workflow: set the campus center from a verified location and use a radius large enough to accommodate normal GPS accuracy.',
-          style: TextStyle(color: Colors.white60),
+          style: TextStyle(color: context.c.textSecondary),
         ),
       ],
     ),
@@ -352,45 +354,6 @@ class _RecordCard extends StatelessWidget {
       return '${(v['distanceFromCampus'] as num).round()} m';
     }
     return '--';
-  }
-
-  void _photo(BuildContext context, dynamic event, String title) {
-    if (event is! Map || event['photoUrl'] is! String) return;
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 700, maxHeight: 700),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                child: Image.network(
-                  event['photoUrl'] as String,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -440,25 +403,33 @@ class _RecordCard extends StatelessWidget {
                   Wrap(
                     spacing: 8,
                     children: [
+                      // Opens the full verification record: photo plus the
+                      // exact capture time, GPS fix, accuracy and distance.
                       if (inData is Map && inData['photoUrl'] != null)
                         OutlinedButton.icon(
-                          onPressed: () => _photo(
+                          onPressed: () => AttendanceEvidenceDialog.show(
                             context,
-                            inData,
-                            'Entry verification photo',
+                            event: Map<String, dynamic>.from(inData),
+                            type: 'checkIn',
+                            facultyName:
+                                data['facultyName'] as String? ?? 'Faculty',
+                            date: data['date'] as String?,
                           ),
                           icon: const Icon(Icons.photo_outlined, size: 16),
-                          label: const Text('Entry photo'),
+                          label: const Text('Entry evidence'),
                         ),
                       if (outData is Map && outData['photoUrl'] != null)
                         OutlinedButton.icon(
-                          onPressed: () => _photo(
+                          onPressed: () => AttendanceEvidenceDialog.show(
                             context,
-                            outData,
-                            'Exit verification photo',
+                            event: Map<String, dynamic>.from(outData),
+                            type: 'checkOut',
+                            facultyName:
+                                data['facultyName'] as String? ?? 'Faculty',
+                            date: data['date'] as String?,
                           ),
                           icon: const Icon(Icons.photo_outlined, size: 16),
-                          label: const Text('Exit photo'),
+                          label: const Text('Exit evidence'),
                         ),
                     ],
                   ),
@@ -467,7 +438,7 @@ class _RecordCard extends StatelessWidget {
             ),
             Icon(
               Icons.verified_rounded,
-              color: (inData != null) ? Colors.greenAccent : Colors.white30,
+              color: (inData != null) ? context.c.success : context.c.borderStrong,
             ),
           ],
         ),

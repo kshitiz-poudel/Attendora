@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'student_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class AttendanceHistoryPage extends ConsumerWidget {
   const AttendanceHistoryPage({super.key});
@@ -33,7 +34,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -41,7 +42,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                     'Your complete attendance record',
                     style: GoogleFonts.outfit(
                       fontSize: 14,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -64,7 +65,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                               Icon(
                                 Icons.history_toggle_off_rounded,
                                 size: 64,
-                                color: Colors.white.withValues(alpha: 0.5),
+                                color: context.c.textPrimary.withValues(alpha: 0.5),
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -72,7 +73,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                                 style: GoogleFonts.outfit(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -80,7 +81,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                                 'Sessions will appear here once created',
                                 style: GoogleFonts.outfit(
                                   fontSize: 14,
-                                  color: Colors.white54,
+                                  color: context.c.textTertiary,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -108,10 +109,10 @@ class AttendanceHistoryPage extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: Colors.red,
+                          color: context.c.danger,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -119,7 +120,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                           style: GoogleFonts.outfit(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -127,7 +128,7 @@ class AttendanceHistoryPage extends ConsumerWidget {
                           e.toString(),
                           style: GoogleFonts.outfit(
                             fontSize: 12,
-                            color: Colors.white54,
+                            color: context.c.textTertiary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -157,7 +158,7 @@ class _AttendanceHistoryCard extends StatelessWidget {
     final locationNote = record['locationNote'] as String?;
     final status = record['status'] as String;
 
-    final color = isPresent ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final color = isPresent ? context.c.accent : context.c.danger;
     final icon = isPresent ? Icons.check_circle_rounded : Icons.cancel_rounded;
 
     final dateStr = DateFormat('MMM dd, yyyy').format(timestamp);
@@ -186,7 +187,7 @@ class _AttendanceHistoryCard extends StatelessWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 if (group != null) ...[
@@ -196,14 +197,14 @@ class _AttendanceHistoryCard extends StatelessWidget {
                       Icon(
                         Icons.groups_rounded,
                         size: 14,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         group,
                         style: GoogleFonts.outfit(
                           fontSize: 13,
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -215,28 +216,28 @@ class _AttendanceHistoryCard extends StatelessWidget {
                     Icon(
                       Icons.calendar_today_rounded,
                       size: 12,
-                      color: Colors.white38,
+                      color: context.c.textTertiary,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       dateStr,
                       style: GoogleFonts.outfit(
                         fontSize: 12,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Icon(
                       Icons.access_time_rounded,
                       size: 12,
-                      color: Colors.white38,
+                      color: context.c.textTertiary,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       timeStr,
                       style: GoogleFonts.outfit(
                         fontSize: 12,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                     ),
                   ],
@@ -248,7 +249,7 @@ class _AttendanceHistoryCard extends StatelessWidget {
                       Icon(
                         Icons.location_on_rounded,
                         size: 12,
-                        color: Colors.white38,
+                        color: context.c.textTertiary,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -256,7 +257,7 @@ class _AttendanceHistoryCard extends StatelessWidget {
                           locationNote,
                           style: GoogleFonts.outfit(
                             fontSize: 11,
-                            color: Colors.white38,
+                            color: context.c.textTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

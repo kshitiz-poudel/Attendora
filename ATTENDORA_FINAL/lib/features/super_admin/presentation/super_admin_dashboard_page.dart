@@ -7,6 +7,7 @@ import '../../dashboard/providers.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../providers/system_health_provider.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class SuperAdminDashboardPage extends ConsumerWidget {
   const SuperAdminDashboardPage({super.key});
@@ -32,7 +33,7 @@ class SuperAdminDashboardPage extends ConsumerWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -40,7 +41,7 @@ class SuperAdminDashboardPage extends ConsumerWidget {
                     'System-wide overview and governance.',
                     style: GoogleFonts.outfit(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -63,7 +64,7 @@ class SuperAdminDashboardPage extends ConsumerWidget {
                   title: 'Active Institutions',
                   valueAsync: activeInstitutions,
                   icon: Icons.apartment_rounded,
-                  color: Colors.blue,
+                  color: context.c.info,
                 ),
                 _StatCard(
                   title: 'Total Users',
@@ -109,7 +110,7 @@ class _StatCard extends StatelessWidget {
               Text(
                 title,
                 style: GoogleFonts.outfit(
-                  color: Colors.white70,
+                  color: context.c.textSecondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -128,7 +129,7 @@ class _StatCard extends StatelessWidget {
             data: (value) => Text(
               value.toString(),
               style: GoogleFonts.outfit(
-                color: Colors.white,
+                color: context.c.textPrimary,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
@@ -141,7 +142,7 @@ class _StatCard extends StatelessWidget {
             error: (_, __) => Text(
               '--',
               style: GoogleFonts.outfit(
-                color: Colors.white,
+                color: context.c.textPrimary,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
@@ -172,7 +173,7 @@ class _SystemHealthCard extends StatelessWidget {
               Text(
                 'System Status',
                 style: GoogleFonts.outfit(
-                  color: Colors.white70,
+                  color: context.c.textSecondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -183,15 +184,15 @@ class _SystemHealthCard extends StatelessWidget {
                   IconData icon;
                   switch (status) {
                     case SystemStatus.healthy:
-                      color = Colors.green;
+                      color = context.c.success;
                       icon = Icons.check_circle_rounded;
                       break;
                     case SystemStatus.degraded:
-                      color = Colors.orange;
+                      color = context.c.warning;
                       icon = Icons.warning_rounded;
                       break;
                     case SystemStatus.down:
-                      color = Colors.red;
+                      color = context.c.danger;
                       icon = Icons.error_rounded;
                       break;
                   }
@@ -216,15 +217,15 @@ class _SystemHealthCard extends StatelessWidget {
               switch (status) {
                 case SystemStatus.healthy:
                   text = 'Healthy';
-                  color = Colors.green;
+                  color = context.c.success;
                   break;
                 case SystemStatus.degraded:
                   text = 'Degraded';
-                  color = Colors.orange;
+                  color = context.c.warning;
                   break;
                 case SystemStatus.down:
                   text = 'Down';
-                  color = Colors.red;
+                  color = context.c.danger;
                   break;
               }
               return Text(
@@ -244,7 +245,7 @@ class _SystemHealthCard extends StatelessWidget {
             error: (_, __) => Text(
               'Unknown',
               style: GoogleFonts.outfit(
-                color: Colors.grey,
+                color: context.c.textTertiary,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
@@ -275,7 +276,7 @@ class _ServerLoadCard extends StatelessWidget {
               Text(
                 'Server Load',
                 style: GoogleFonts.outfit(
-                  color: Colors.white70,
+                  color: context.c.textSecondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -286,15 +287,15 @@ class _ServerLoadCard extends StatelessWidget {
                   IconData icon;
                   switch (load) {
                     case ServerLoad.low:
-                      color = Colors.green;
+                      color = context.c.success;
                       icon = Icons.speed_rounded;
                       break;
                     case ServerLoad.medium:
-                      color = Colors.orange;
+                      color = context.c.warning;
                       icon = Icons.speed_rounded;
                       break;
                     case ServerLoad.high:
-                      color = Colors.red;
+                      color = context.c.danger;
                       icon = Icons.speed_rounded;
                       break;
                   }
@@ -319,15 +320,15 @@ class _ServerLoadCard extends StatelessWidget {
               switch (load) {
                 case ServerLoad.low:
                   text = 'Low';
-                  color = Colors.green;
+                  color = context.c.success;
                   break;
                 case ServerLoad.medium:
                   text = 'Medium';
-                  color = Colors.orange;
+                  color = context.c.warning;
                   break;
                 case ServerLoad.high:
                   text = 'High';
-                  color = Colors.red;
+                  color = context.c.danger;
                   break;
               }
               return Text(
@@ -347,7 +348,7 @@ class _ServerLoadCard extends StatelessWidget {
             error: (_, __) => Text(
               'Unknown',
               style: GoogleFonts.outfit(
-                color: Colors.grey,
+                color: context.c.textTertiary,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),

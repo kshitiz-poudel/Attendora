@@ -18,6 +18,7 @@ import 'widgets/edit_session_dialog.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for scheduled AND active sessions
 final scheduledSessionsProvider =
@@ -141,14 +142,14 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF10B981), Color(0xFF6D28D9)],
+                gradient: LinearGradient(
+                  colors: [context.c.accent, Color(0xFF6D28D9)],
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.event_available,
-                color: Colors.white,
+                color: context.c.textPrimary,
                 size: 32,
               ),
             ),
@@ -162,7 +163,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -170,7 +171,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                     'Plan sessions in advance. Location will be captured when you start the session.',
                     style: GoogleFonts.outfit(
                       fontSize: 14,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -196,7 +197,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 24),
@@ -211,17 +212,17 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: context.c.textPrimary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: context.c.textPrimary.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.calendar_today,
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
@@ -231,7 +232,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                               Text(
                                 'Date',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white54,
+                                  color: context.c.textTertiary,
                                   fontSize: 12,
                                 ),
                               ),
@@ -239,7 +240,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                                 DateFormat('MMM dd, yyyy')
                                     .format(_selectedDate),
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                   fontSize: 16,
                                 ),
                               ),
@@ -258,17 +259,17 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: context.c.textPrimary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: context.c.textPrimary.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.access_time,
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
@@ -278,14 +279,14 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                               Text(
                                 'Time',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white54,
+                                  color: context.c.textTertiary,
                                   fontSize: 12,
                                 ),
                               ),
                               Text(
                                 _selectedTime.format(context),
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                   fontSize: 16,
                                 ),
                               ),
@@ -354,8 +355,8 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981),
-                foregroundColor: Colors.white,
+                backgroundColor: context.c.accent,
+                foregroundColor: context.c.textPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -384,18 +385,18 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
             sessionsAsync.when(
               data: (sessions) {
                 if (sessions.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.event_busy_outlined,
                     title: 'No Scheduled Sessions',
                     subtitle: 'Schedule your first session above',
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                   );
                 }
 
@@ -410,8 +411,8 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                   },
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.c.textPrimary),
               ),
               error: (error, _) => ErrorHandler.buildErrorWidget(
                 error,
@@ -436,7 +437,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
 
     final isUpcoming =
         !isActive && targetTime != null && targetTime.isAfter(DateTime.now());
-    final color = isActive ? const Color(0xFF10B981) : const Color(0xFF10B981);
+    final color = isActive ? context.c.accent : context.c.accent;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -456,7 +457,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                   style: GoogleFonts.outfit(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -473,7 +474,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                       ? 'Upcoming'
                       : 'Past',
                   style: GoogleFonts.outfit(
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -487,7 +488,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
               Icon(
                 isActive ? Icons.qr_code_2 : Icons.calendar_today,
                 size: 14,
-                color: Colors.white70,
+                color: context.c.textSecondary,
               ),
               const SizedBox(width: 6),
               Text(
@@ -497,7 +498,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                           : DateFormat('MMM dd, yyyy • h:mm a')
                                 .format(targetTime)
                     : 'No date',
-                style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
+                style: GoogleFonts.outfit(fontSize: 13, color: context.c.textSecondary),
               ),
             ],
           ),
@@ -505,13 +506,13 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.location_on, size: 14, color: Colors.white70),
+                Icon(Icons.location_on, size: 14, color: context.c.textSecondary),
                 const SizedBox(width: 6),
                 Text(
                   'GPS: ${session['latitude']?.toStringAsFixed(4)}, ${session['longitude']?.toStringAsFixed(4)}',
                   style: GoogleFonts.outfit(
                     fontSize: 13,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -533,7 +534,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                       icon: const Icon(Icons.qr_code_2, size: 18),
                       label: const Text('View QR'),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
+                        foregroundColor: context.c.accent,
                         textStyle: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
                         ),
@@ -555,7 +556,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       label: const Text('Edit'),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
+                        foregroundColor: context.c.accent,
                         textStyle: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
                         ),
@@ -585,7 +586,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                       icon: const Icon(Icons.play_arrow_rounded, size: 18),
                       label: const Text('Start'),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
+                        foregroundColor: context.c.accent,
                         textStyle: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
                         ),
@@ -597,7 +598,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                       icon: const Icon(Icons.delete_outline, size: 18),
                       label: const Text('Delete'),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFEF4444),
+                        foregroundColor: context.c.danger,
                         textStyle: GoogleFonts.outfit(
                           fontWeight: FontWeight.w600,
                         ),
@@ -621,14 +622,14 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF10B981),
-              onPrimary: Colors.white,
-              surface: Color(0xFF1F2937),
-              onSurface: Colors.white,
+            colorScheme: ColorScheme.dark(
+              primary: context.c.accent,
+              onPrimary: context.c.textPrimary,
+              surface: context.c.surface,
+              onSurface: context.c.textPrimary,
             ),
             dialogTheme: DialogThemeData(
-              backgroundColor: const Color(0xFF1F2937),
+              backgroundColor: context.c.surface,
             ),
           ),
           child: child!,
@@ -647,14 +648,14 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF10B981),
-              onPrimary: Colors.white,
-              surface: Color(0xFF1F2937),
-              onSurface: Colors.white,
+            colorScheme: ColorScheme.dark(
+              primary: context.c.accent,
+              onPrimary: context.c.textPrimary,
+              surface: context.c.surface,
+              onSurface: context.c.textPrimary,
             ),
             dialogTheme: DialogThemeData(
-              backgroundColor: const Color(0xFF1F2937),
+              backgroundColor: context.c.surface,
             ),
           ),
           child: child!,
@@ -718,7 +719,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                     'running until ${DateFormat('h:mm a').format(expiresAt)}. '
                     'Please end it first or schedule after ${DateFormat('h:mm a').format(expiresAt)}.',
                   ),
-                  backgroundColor: const Color(0xFFF59E0B), // Warning orange
+                  backgroundColor: context.c.warning, // Warning orange
                   duration: const Duration(seconds: 5),
                 ),
               );
@@ -757,7 +758,7 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
                     'at ${DateFormat('h:mm a').format(otherScheduledFor)}. '
                     'Please choose a different time.',
                   ),
-                  backgroundColor: const Color(0xFFF59E0B), // Warning orange
+                  backgroundColor: context.c.warning, // Warning orange
                   duration: const Duration(seconds: 5),
                 ),
               );
@@ -873,9 +874,9 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Session scheduled successfully!'),
-            backgroundColor: Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
       }
@@ -941,23 +942,23 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+              color: context.c.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                color: context.c.warning.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.warning_amber_rounded,
-                  color: Color(0xFFF59E0B),
+                  color: context.c.warning,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'No subjects assigned. Please contact admin.',
-                    style: GoogleFonts.outfit(color: const Color(0xFFF59E0B)),
+                    style: GoogleFonts.outfit(color: context.c.warning),
                   ),
                 ),
               ],
@@ -968,21 +969,21 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: context.c.textPrimary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _selectedSubject,
               hint: Text(
                 'Select Subject',
-                style: GoogleFonts.outfit(color: Colors.white54),
+                style: GoogleFonts.outfit(color: context.c.textTertiary),
               ),
-              dropdownColor: const Color(0xFF1F2937),
+              dropdownColor: context.c.surface,
               isExpanded: true,
-              icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 16),
+              icon: Icon(Icons.arrow_drop_down, color: context.c.textSecondary),
+              style: GoogleFonts.outfit(color: context.c.textPrimary, fontSize: 16),
               items: distinctSubjects.map((subject) {
                 final subjectName = subject['name'];
                 final groupName = subject['group'] ?? 'No Group';
@@ -1003,10 +1004,10 @@ class _TeacherSchedulePageState extends ConsumerState<TeacherSchedulePage> {
         );
       },
       loading: () =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
+          Center(child: CircularProgressIndicator(color: context.c.textPrimary)),
       error: (error, _) => Text(
         'Error loading subjects',
-        style: GoogleFonts.outfit(color: Colors.red),
+        style: GoogleFonts.outfit(color: context.c.danger),
       ),
     );
   }

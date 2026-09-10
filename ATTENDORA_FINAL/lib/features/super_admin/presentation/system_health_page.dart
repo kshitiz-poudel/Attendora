@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../providers/system_health_provider.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class SystemHealthPage extends ConsumerWidget {
   const SystemHealthPage({super.key});
@@ -24,7 +25,7 @@ class SystemHealthPage extends ConsumerWidget {
               style: GoogleFonts.outfit(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 32),
@@ -66,7 +67,7 @@ class _HealthCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.outfit(color: Colors.white70, fontSize: 16),
+            style: GoogleFonts.outfit(color: context.c.textSecondary, fontSize: 16),
           ),
           const SizedBox(height: 24),
           statusAsync.when(
@@ -77,17 +78,17 @@ class _HealthCard extends StatelessWidget {
               switch (status) {
                 case SystemStatus.healthy:
                   icon = Icons.check_circle_outline_rounded;
-                  color = Colors.green;
+                  color = context.c.success;
                   text = 'Operational';
                   break;
                 case SystemStatus.degraded:
                   icon = Icons.warning_amber_rounded;
-                  color = Colors.orange;
+                  color = context.c.warning;
                   text = 'Degraded Performance';
                   break;
                 case SystemStatus.down:
                   icon = Icons.error_outline_rounded;
-                  color = Colors.red;
+                  color = context.c.danger;
                   text = 'System Down';
                   break;
               }
@@ -108,7 +109,7 @@ class _HealthCard extends StatelessWidget {
             },
             loading: () => const CircularProgressIndicator(),
             error: (e, _) =>
-                const Icon(Icons.error, color: Colors.red, size: 64),
+                Icon(Icons.error, color: context.c.danger, size: 64),
           ),
         ],
       ),
@@ -130,7 +131,7 @@ class _LoadCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.outfit(color: Colors.white70, fontSize: 16),
+            style: GoogleFonts.outfit(color: context.c.textSecondary, fontSize: 16),
           ),
           const SizedBox(height: 24),
           loadAsync.when(
@@ -141,17 +142,17 @@ class _LoadCard extends StatelessWidget {
               switch (load) {
                 case ServerLoad.low:
                   icon = Icons.speed_rounded;
-                  color = Colors.green;
+                  color = context.c.success;
                   text = 'Low Traffic';
                   break;
                 case ServerLoad.medium:
                   icon = Icons.speed_rounded;
-                  color = Colors.orange;
+                  color = context.c.warning;
                   text = 'Moderate Traffic';
                   break;
                 case ServerLoad.high:
                   icon = Icons.local_fire_department_rounded;
-                  color = Colors.red;
+                  color = context.c.danger;
                   text = 'High Traffic';
                   break;
               }
@@ -172,7 +173,7 @@ class _LoadCard extends StatelessWidget {
             },
             loading: () => const CircularProgressIndicator(),
             error: (e, _) =>
-                const Icon(Icons.error, color: Colors.red, size: 64),
+                Icon(Icons.error, color: context.c.danger, size: 64),
           ),
         ],
       ),

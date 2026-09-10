@@ -7,6 +7,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../auth/providers.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../../../core/design/app_colors.dart';
 
 class ApprovalPendingPage extends ConsumerWidget {
   const ApprovalPendingPage({super.key});
@@ -31,14 +32,14 @@ class ApprovalPendingPage extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF59E0B)
+                            color: context.c.warning
                                 .withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.hourglass_top_rounded,
                             size: 48,
-                            color: Color(0xFFF59E0B),
+                            color: context.c.warning,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -47,7 +48,7 @@ class ApprovalPendingPage extends ConsumerWidget {
                           style: GoogleFonts.outfit(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -56,7 +57,7 @@ class ApprovalPendingPage extends ConsumerWidget {
                           'Your teacher account has been created and is awaiting administrator approval.',
                           style: GoogleFonts.outfit(
                             fontSize: 16,
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                             height: 1.5,
                           ),
                           textAlign: TextAlign.center,
@@ -65,19 +66,19 @@ class ApprovalPendingPage extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: context.c.textPrimary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.1),
+                              color: context.c.textPrimary.withValues(alpha: 0.1),
                             ),
                           ),
                           child: Column(
                             children: [
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.info_outline_rounded,
-                                    color: Colors.white54,
+                                    color: context.c.textTertiary,
                                     size: 20,
                                   ),
                                   const SizedBox(width: 12),
@@ -86,7 +87,7 @@ class ApprovalPendingPage extends ConsumerWidget {
                                       'You will receive an email once your account is approved.',
                                       style: GoogleFonts.outfit(
                                         fontSize: 14,
-                                        color: Colors.white60,
+                                        color: context.c.textSecondary,
                                       ),
                                     ),
                                   ),
@@ -106,9 +107,9 @@ class ApprovalPendingPage extends ConsumerWidget {
                               context.go('/login');
                             },
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
+                              foregroundColor: context.c.textPrimary,
                               side: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: context.c.textPrimary.withValues(alpha: 0.2),
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(

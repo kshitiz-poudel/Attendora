@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../core/utils/firestore_retry.dart';
 import 'models/class_group.dart';
 
 class ClassGroupRepository {
@@ -33,7 +34,11 @@ class ClassGroupRepository {
       createdAt: DateTime.now(),
       type: type,
     );
-    await doc.set(group.toFirestore());
+    // See withFirestoreRetry: mitigates a documented, intermittent
+    // Firestore Web SDK bug (INTERNAL ASSERTION FAILED) rather than
+    // any problem with this write. Safe to retry: doc.id is already
+    // fixed above, so a retry just re-sets the same document.
+    await withFirestoreRetry(() => doc.set(group.toFirestore()));
     return doc.id;
   }
 
@@ -58,7 +63,9 @@ class ClassGroupRepository {
     if (subjectIds != null) updateData['subjectIds'] = subjectIds;
     if (type != null) updateData['type'] = type;
 
-    await _groupsCollection.doc(groupId).update(updateData);
+    await withFirestoreRetry(
+      () => _groupsCollection.doc(groupId).update(updateData),
+    );
   }
 
   /// Delete a class group
@@ -135,10 +142,12 @@ class ClassGroupRepository {
     required String groupId,
     required String teacherUid,
   }) async {
-    await _groupsCollection.doc(groupId).update({
-      'teacherUids': FieldValue.arrayUnion([teacherUid]),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await withFirestoreRetry(
+      () => _groupsCollection.doc(groupId).update({
+        'teacherUids': FieldValue.arrayUnion([teacherUid]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }),
+    );
   }
 
   /// Remove a teacher from a class group
@@ -146,33 +155,78 @@ class ClassGroupRepository {
     required String groupId,
     required String teacherUid,
   }) async {
-    await _groupsCollection.doc(groupId).update({
-      'teacherUids': FieldValue.arrayRemove([teacherUid]),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await withFirestoreRetry(
+      () => _groupsCollection.doc(groupId).update({
+        'teacherUids': FieldValue.arrayRemove([teacherUid]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }),
+    );
   }
 
-  /// Assign a student to a class group (self-enrollment or admin assignment)
+  /// Assign a student to a class group (self-enrollment or admin assignment).
+  ///
+  /// Membership is stored in two places that must agree: the group's
+  /// `studentUids` array, and the student's own `lectureGroup` / `labGroup`
+  /// field. Subject resolution reads the *user* field
+  /// (see `studentSubjectsFamilyProvider`), so updating only the array would
+  /// put the student in the group while showing them none of its subjects.
+  /// Both are written in one batch.
   Future<void> assignStudent({
     required String groupId,
     required String studentUid,
   }) async {
-    await _groupsCollection.doc(groupId).update({
+    final group = await getGroup(groupId);
+    final batch = _firestore.batch();
+
+    batch.update(_groupsCollection.doc(groupId), {
       'studentUids': FieldValue.arrayUnion([studentUid]),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+
+    if (group != null) {
+      batch.set(_firestore.collection('users').doc(studentUid), {
+        _membershipField(group.type): groupId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    }
+
+    await withFirestoreRetry(batch.commit);
   }
 
-  /// Remove a student from a class group
+  /// Remove a student from a class group, clearing the matching field on the
+  /// student's profile so they stop resolving that group's subjects.
   Future<void> removeStudent({
     required String groupId,
     required String studentUid,
   }) async {
-    await _groupsCollection.doc(groupId).update({
+    final group = await getGroup(groupId);
+    final batch = _firestore.batch();
+
+    batch.update(_groupsCollection.doc(groupId), {
       'studentUids': FieldValue.arrayRemove([studentUid]),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+
+    if (group != null) {
+      final field = _membershipField(group.type);
+      // Only clear the pointer if it still refers to this group; a student
+      // reassigned elsewhere in the meantime must not be unlinked.
+      final userSnap = await _firestore.collection('users').doc(studentUid).get();
+      if (userSnap.data()?[field] == groupId) {
+        batch.set(_firestore.collection('users').doc(studentUid), {
+          field: FieldValue.delete(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+    }
+
+    await withFirestoreRetry(batch.commit);
   }
+
+  /// A group's members are recorded on the user under the field matching the
+  /// group type, so a student can hold one lecture group and one lab group.
+  static String _membershipField(String groupType) =>
+      groupType.toLowerCase() == 'lab' ? 'labGroup' : 'lectureGroup';
 
   /// Add a subject to a class group
   Future<void> addSubject({

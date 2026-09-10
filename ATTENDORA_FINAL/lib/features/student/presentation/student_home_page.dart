@@ -12,6 +12,9 @@ import 'student_shell.dart';
 import '../../../core/responsive_utils.dart';
 import '../../student/providers.dart';
 import '../../shared/widgets/shimmer_loading.dart';
+import '../../shared/widgets/app_download_card.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '../../../core/design/app_colors.dart';
 
 class StudentHomePage extends ConsumerWidget {
   const StudentHomePage({super.key});
@@ -34,6 +37,10 @@ class StudentHomePage extends ConsumerWidget {
         child: ListView(
           padding: EdgeInsets.all(isMobile ? 16 : 24),
           children: [
+            // Mobile app download. Renders nothing outside the web build.
+            const AppDownloadCard(audience: 'student'),
+            if (kIsWeb) const SizedBox(height: 20),
+
             // Hero Header
             FadeInDown(
               duration: const Duration(milliseconds: 800),
@@ -67,7 +74,7 @@ class StudentHomePage extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -76,7 +83,7 @@ class StudentHomePage extends ConsumerWidget {
                             'Mark your attendance, track your progress, and stay updated.',
                             style: GoogleFonts.outfit(
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: context.c.textSecondary,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -89,7 +96,7 @@ class StudentHomePage extends ConsumerWidget {
                               label: const Text('Scan QR'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.colorScheme.primary,
-                                foregroundColor: Colors.white,
+                                foregroundColor: context.c.textPrimary,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24,
                                   vertical: 16,
@@ -136,7 +143,7 @@ class StudentHomePage extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -144,7 +151,7 @@ class StudentHomePage extends ConsumerWidget {
                                   'Mark your attendance, track your progress, and stay updated.',
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                               ],
@@ -157,7 +164,7 @@ class StudentHomePage extends ConsumerWidget {
                             label: const Text('Scan QR'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: Colors.white,
+                              foregroundColor: context.c.textPrimary,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
                                 vertical: 16,
@@ -206,28 +213,28 @@ class StudentHomePage extends ConsumerWidget {
                         title: 'Attendance',
                         subtitle: 'History',
                         icon: Icons.history_rounded,
-                        color: const Color(0xFF2F6FED),
+                        color: context.c.primary,
                         onTap: () => context.go('/student/history'),
                       ),
                       _ActionCard(
                         title: 'Summary',
                         subtitle: 'Monthly',
                         icon: Icons.calendar_month_rounded,
-                        color: const Color(0xFF10B981),
+                        color: context.c.accent,
                         onTap: () => context.go('/student/summary'),
                       ),
                       _ActionCard(
                         title: 'Alerts',
                         subtitle: 'Updates',
                         icon: Icons.notifications_rounded,
-                        color: const Color(0xFFF59E0B),
+                        color: context.c.warning,
                         onTap: () => context.go('/student/notifications'),
                       ),
                       _ActionCard(
                         title: 'Profile',
                         subtitle: 'Account',
                         icon: Icons.person_rounded,
-                        color: const Color(0xFF10B981),
+                        color: context.c.accent,
                         onTap: () => context.go('/student/profile'),
                       ),
                     ],
@@ -306,14 +313,14 @@ class _ActionCardState extends State<_ActionCard> {
                   style: GoogleFonts.outfit(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.subtitle,
                   style: GoogleFonts.outfit(
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                     fontSize: 14,
                   ),
                 ),
@@ -352,10 +359,10 @@ class _LowAttendanceWarning extends ConsumerWidget {
             margin: const EdgeInsets.only(bottom: 24),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+              color: context.c.danger.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                color: context.c.danger.withValues(alpha: 0.3),
               ),
             ),
             child: Column(
@@ -366,20 +373,20 @@ class _LowAttendanceWarning extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEF4444).withValues(alpha: 0.2),
+                        color: context.c.danger.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.warning_amber_rounded,
-                        color: Color(0xFFEF4444),
+                        color: context.c.danger,
                         size: 20,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
+                    Text(
                       'Attendance Alert',
                       style: TextStyle(
-                        color: Color(0xFFEF4444),
+                        color: context.c.danger,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -390,7 +397,7 @@ class _LowAttendanceWarning extends ConsumerWidget {
                 Text(
                   'Your attendance is below 75% in the following subjects:',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: context.c.textPrimary.withValues(alpha: 0.9),
                     fontSize: 14,
                   ),
                 ),
@@ -405,15 +412,15 @@ class _LowAttendanceWarning extends ConsumerWidget {
                       children: [
                         Text(
                           '• ${s['name']}',
-                          style: const TextStyle(
-                            color: Colors.white70,
+                          style: TextStyle(
+                            color: context.c.textSecondary,
                             fontSize: 14,
                           ),
                         ),
                         Text(
                           '${percentage.toStringAsFixed(1)}%',
-                          style: const TextStyle(
-                            color: Color(0xFFEF4444),
+                          style: TextStyle(
+                            color: context.c.danger,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -433,7 +440,7 @@ class _LowAttendanceWarning extends ConsumerWidget {
           margin: const EdgeInsets.only(bottom: 24),
           height: 100,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: context.c.textPrimary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
           ),
         ),

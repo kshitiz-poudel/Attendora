@@ -7,6 +7,8 @@ import '../../shared/widgets/modern_sidebar.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../../features/auth/providers.dart';
 import '../../dashboard/notification_provider.dart';
+import '../../../core/design/app_colors.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class SuperAdminShell extends ConsumerStatefulWidget {
   const SuperAdminShell({super.key, required this.child});
@@ -35,8 +37,8 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
           appBar: isMobile
               ? AppBar(
                   title: const Text('Super Admin'),
-                  backgroundColor: const Color(0xFF0B1121),
-                  foregroundColor: Colors.white,
+                  backgroundColor: context.c.canvas,
+                  foregroundColor: context.c.textPrimary,
                   leading: isSidebarRoute
                       ? Builder(
                           builder: (context) => IconButton(
@@ -46,6 +48,11 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
                         )
                       : (context.canPop() ? const BackButton() : null),
                   actions: [
+                    // Light / dark / system switcher.
+                    const Padding(
+                      padding: EdgeInsets.only(right: 4),
+                      child: ThemeToggleButton(),
+                    ),
                     Consumer(
                       builder: (context, ref, _) {
                         final notifications = ref.watch(
@@ -66,9 +73,9 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
                             IconButton(
                               onPressed: () =>
                                   context.go('/super-admin/notifications'),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.notifications_outlined,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                               tooltip: 'Notifications',
                             ),
@@ -80,10 +87,10 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
                                   child: Container(
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
-                                      color: Colors.red,
+                                      color: context.c.danger,
                                       shape: BoxShape.circle,
                                       border: Border.all(
-                                        color: const Color(0xFF0B1121),
+                                        color: context.c.canvas,
                                         width: 2,
                                       ),
                                     ),
@@ -94,8 +101,8 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
                                     child: Center(
                                       child: Text(
                                         unreadCount > 9 ? '9+' : '$unreadCount',
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: context.c.textPrimary,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -161,9 +168,9 @@ class _Topbar extends ConsumerWidget {
       height: 72,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0B1121),
+        color: context.c.canvas,
         border: Border(
-          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          bottom: BorderSide(color: context.c.textPrimary.withValues(alpha: 0.1)),
         ),
       ),
       child: Row(
@@ -173,7 +180,7 @@ class _Topbar extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 16),
               child: IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                icon: Icon(Icons.arrow_back_rounded, color: context.c.textPrimary),
                 tooltip: 'Back',
               ),
             ),
@@ -192,9 +199,9 @@ class _Topbar extends ConsumerWidget {
                 children: [
                   IconButton(
                     onPressed: () => context.go('/super-admin/notifications'),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.notifications_outlined,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                     tooltip: 'Notifications',
                   ),
@@ -206,10 +213,10 @@ class _Topbar extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: context.c.danger,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFF0B1121),
+                              color: context.c.canvas,
                               width: 2,
                             ),
                           ),
@@ -220,8 +227,8 @@ class _Topbar extends ConsumerWidget {
                           child: Center(
                             child: Text(
                               unreadCount > 9 ? '9+' : '$unreadCount',
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: context.c.textPrimary,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -254,23 +261,23 @@ class _UserMenuButton extends ConsumerWidget {
 
     return PopupMenuButton<String>(
       offset: const Offset(0, 8),
-      color: const Color(0xFF1E293B),
+      color: context.c.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        side: BorderSide(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.2),
+            backgroundColor: context.c.accent.withValues(alpha: 0.2),
             foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
             child: Text(
               displayName.isNotEmpty ? displayName[0].toUpperCase() : 'S',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF10B981),
+                color: context.c.accent,
               ),
             ),
           ),
@@ -283,24 +290,24 @@ class _UserMenuButton extends ConsumerWidget {
                 displayName,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
               Text(
                 'SUPER ADMIN',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontSize: 10,
-                  color: const Color(0xFF10B981),
+                  color: context.c.accent,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
           const SizedBox(width: 4),
-          const Icon(
+          Icon(
             Icons.keyboard_arrow_down,
             size: 18,
-            color: Colors.white54,
+            color: context.c.textTertiary,
           ),
         ],
       ),
@@ -314,25 +321,25 @@ class _UserMenuButton extends ConsumerWidget {
                 displayName,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                 ),
               ),
               Text(
                 email,
                 style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: Colors.white54),
+                    ?.copyWith(color: context.c.textTertiary),
               ),
             ],
           ),
         ),
         const PopupMenuDivider(height: 1),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'logout',
           child: Row(
             children: [
-              Icon(Icons.logout, size: 18, color: Color(0xFFEF4444)),
+              Icon(Icons.logout, size: 18, color: context.c.danger),
               SizedBox(width: 12),
-              Text('Logout', style: TextStyle(color: Color(0xFFEF4444))),
+              Text('Logout', style: TextStyle(color: context.c.danger)),
             ],
           ),
         ),
@@ -436,13 +443,13 @@ class _LogoutButton extends ConsumerWidget {
         icon: const Icon(Icons.logout_rounded, size: 20),
         label: const Text('Logout'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1E293B),
-          foregroundColor: const Color(0xFFEF4444),
+          backgroundColor: context.c.surface,
+          foregroundColor: context.c.danger,
           elevation: 0,
           minimumSize: const Size(double.infinity, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+            side: BorderSide(color: context.c.textPrimary.withValues(alpha: 0.1)),
           ),
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 16),

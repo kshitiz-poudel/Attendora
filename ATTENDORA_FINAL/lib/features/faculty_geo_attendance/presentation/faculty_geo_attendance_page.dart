@@ -9,6 +9,7 @@ import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../models/geo_attendance_models.dart';
 import '../providers/faculty_geo_attendance_providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class FacultyGeoAttendancePage extends ConsumerStatefulWidget {
   const FacultyGeoAttendancePage({super.key});
@@ -39,11 +40,13 @@ class _FacultyGeoAttendancePageState
     });
     try {
       final service = ref.read(facultyGeoAttendanceServiceProvider);
-      final position = await service.getVerifiedCurrentPosition();
-      final distance = service.distanceFromCampus(position, settings);
-      if (distance > settings.radiusMeters) {
+
+      // First fix: fail fast before asking for a photo if clearly off campus.
+      final prePosition = await service.getVerifiedCurrentPosition();
+      final preDistance = service.distanceFromCampus(prePosition, settings);
+      if (preDistance > settings.radiusMeters) {
         throw Exception(
-          'You are ${distance.round()} m from the campus location. Attendance is allowed only within ${settings.radiusMeters.round()} m.',
+          'You are ${preDistance.round()} m from the campus location. Attendance is allowed only within ${settings.radiusMeters.round()} m.',
         );
       }
 
@@ -60,6 +63,20 @@ class _FacultyGeoAttendancePageState
         );
         return;
       }
+
+      // Second fix, taken after the photo, is the one recorded. Using only the
+      // pre-capture fix would let someone stand on campus to pass the check,
+      // then walk away and take the selfie somewhere else.
+      final position = await service.getVerifiedCurrentPosition();
+      final distance = service.distanceFromCampus(position, settings);
+      if (distance > settings.radiusMeters) {
+        throw Exception(
+          'You moved out of the campus area while taking the photo '
+          '(${distance.round()} m away). Please try again from within '
+          '${settings.radiusMeters.round()} m of campus.',
+        );
+      }
+
       final bytes = await image.readAsBytes();
       final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final photoUrl = await service.uploadEvidence(
@@ -182,8 +199,8 @@ class _FacultyGeoAttendancePageState
                               ? Icons.verified_rounded
                               : Icons.info_outline,
                           color: _message!.contains('successfully')
-                              ? Colors.greenAccent
-                              : Colors.orangeAccent,
+                              ? context.c.success
+                              : context.c.warning,
                         ),
                         const SizedBox(width: 12),
                         Expanded(child: Text(_message!)),
@@ -214,12 +231,12 @@ class _Header extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF10B981).withValues(alpha: .18),
+            color: context.c.accent.withValues(alpha: .18),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.location_on_rounded,
-            color: Color(0xFF34D399),
+            color: context.c.success,
             size: 32,
           ),
         ),
@@ -272,7 +289,7 @@ class _Chip extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: .06),
+      color: context.c.textPrimary.withValues(alpha: .06),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
@@ -336,10 +353,10 @@ class _NotConfigured extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.location_on_outlined,
             size: 48,
-            color: Colors.orangeAccent,
+            color: context.c.warning,
           ),
           const SizedBox(height: 16),
           const Text('Geo-attendance is not configured yet.'),
@@ -357,7 +374,7 @@ class _NotConfigured extends StatelessWidget {
 
 class _Disabled extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => const Center(
+  Widget build(BuildContext context) => Center(
     child: GlassCard(
       padding: EdgeInsets.all(28),
       child: Column(
@@ -366,7 +383,7 @@ class _Disabled extends StatelessWidget {
           Icon(
             Icons.location_off_outlined,
             size: 48,
-            color: Colors.orangeAccent,
+            color: context.c.warning,
           ),
           SizedBox(height: 16),
           Text(

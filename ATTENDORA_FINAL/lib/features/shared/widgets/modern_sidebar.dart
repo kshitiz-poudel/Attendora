@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/design/app_colors.dart';
+import 'theme_toggle_button.dart';
 
 /// Modern sidebar widget with improved Material Design 3 styling
 class ModernSidebar extends StatelessWidget {
@@ -24,7 +26,7 @@ class ModernSidebar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [const Color(0xFF0F172A), const Color(0xFF1E293B)],
+          colors: [context.c.canvas, context.c.surface],
         ),
         boxShadow: [
           BoxShadow(
@@ -59,6 +61,16 @@ class ModernSidebar extends StatelessWidget {
                         onTap: () => _handleNavigation(context, item),
                       ),
                 ],
+              ),
+            ),
+
+            // Theme switcher, pinned above the footer so it is reachable on
+            // desktop layouts where there is no app bar.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ThemeToggleButton(showLabel: true),
               ),
             ),
 
@@ -100,23 +112,23 @@ class _DefaultHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF10B981), Color(0xFF059669)],
+              gradient: LinearGradient(
+                colors: [context.c.accent, context.c.success],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                  color: context.c.accent.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.qr_code_2_rounded,
-              color: Colors.white,
+              color: context.c.textPrimary,
               size: 28,
             ),
           ),
@@ -128,7 +140,7 @@ class _DefaultHeader extends StatelessWidget {
               Text(
                 'ATTENDORA',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
                 ),
@@ -136,7 +148,7 @@ class _DefaultHeader extends StatelessWidget {
               Text(
                 'Smart Attendance',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF64748B),
+                  color: context.c.textTertiary,
                   fontSize: 11,
                   letterSpacing: 0.5,
                 ),
@@ -170,10 +182,10 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
   @override
   Widget build(BuildContext context) {
     final isSelected = widget.isSelected;
-    final color = isSelected ? Colors.white : const Color(0xFF94A3B8);
+    final color = isSelected ? context.c.textPrimary : context.c.textSecondary;
     final iconColor = isSelected
-        ? const Color(0xFF10B981)
-        : const Color(0xFF64748B);
+        ? context.c.accent
+        : context.c.textTertiary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -186,22 +198,22 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
             gradient: isSelected
                 ? LinearGradient(
                     colors: [
-                      const Color(0xFF10B981).withValues(alpha: 0.15),
-                      const Color(0xFF059669).withValues(alpha: 0.1),
+                      context.c.accent.withValues(alpha: 0.15),
+                      context.c.success.withValues(alpha: 0.1),
                     ],
                   )
                 : _isHovered
                 ? LinearGradient(
                     colors: [
-                      Colors.white.withValues(alpha: 0.05),
-                      Colors.white.withValues(alpha: 0.02),
+                      context.c.textPrimary.withValues(alpha: 0.05),
+                      context.c.textPrimary.withValues(alpha: 0.02),
                     ],
                   )
                 : null,
             borderRadius: BorderRadius.circular(12),
             border: isSelected
                 ? Border.all(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                    color: context.c.accent.withValues(alpha: 0.3),
                     width: 1,
                   )
                 : null,
@@ -222,9 +234,9 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFF10B981).withValues(alpha: 0.2)
+                            ? context.c.accent.withValues(alpha: 0.2)
                             : _isHovered
-                            ? Colors.white.withValues(alpha: 0.05)
+                            ? context.c.textPrimary.withValues(alpha: 0.05)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -251,13 +263,13 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444),
+                          color: context.c.danger,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           widget.item.badge!,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.c.textPrimary,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
@@ -267,8 +279,8 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
                       Container(
                         width: 4,
                         height: 4,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF10B981),
+                        decoration: BoxDecoration(
+                          color: context.c.accent,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -296,7 +308,7 @@ class _SidebarDivider extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               Colors.transparent,
-              const Color(0xFF334155).withValues(alpha: 0.5),
+              context.c.border.withValues(alpha: 0.5),
               Colors.transparent,
             ],
           ),
@@ -316,8 +328,8 @@ class _SidebarHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: Text(
         label.toUpperCase(),
-        style: const TextStyle(
-          color: Color(0xFF64748B),
+        style: TextStyle(
+          color: context.c.textTertiary,
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.5,

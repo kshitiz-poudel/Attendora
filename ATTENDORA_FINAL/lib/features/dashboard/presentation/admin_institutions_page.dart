@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../institutions/models.dart';
 import '../../institutions/providers.dart';
 import '../../super_admin/presentation/super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class AdminInstitutionsPage extends ConsumerStatefulWidget {
   const AdminInstitutionsPage({super.key});
@@ -109,9 +110,9 @@ class _AdminInstitutionsPageState extends ConsumerState<AdminInstitutionsPage> {
                                       onPressed: () => context.push(
                                         '/super-admin/institutions/${e.code}',
                                       ),
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.visibility_outlined,
-                                        color: Colors.blue,
+                                        color: context.c.info,
                                       ),
                                       tooltip: 'View Details',
                                     ),
@@ -145,13 +146,13 @@ class _AdminInstitutionsPageState extends ConsumerState<AdminInstitutionsPage> {
     Color c;
     switch (status) {
       case 'Active':
-        c = Colors.green;
+        c = context.c.success;
         break;
       case 'Pending':
-        c = Colors.orange;
+        c = context.c.warning;
         break;
       default:
-        c = Colors.red;
+        c = context.c.danger;
     }
     return Chip(
       label: Text(status),

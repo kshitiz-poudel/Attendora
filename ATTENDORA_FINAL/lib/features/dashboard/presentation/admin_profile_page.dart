@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'admin_shell.dart';
 import '../../auth/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class AdminProfilePage extends ConsumerStatefulWidget {
   const AdminProfilePage({super.key});
@@ -40,9 +41,9 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
       setState(() => _oldVerified = true);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Old password verified'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -66,9 +67,9 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
       await FirebaseAuth.instance.currentUser?.updatePassword(_newPass.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Password changed successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -77,7 +78,7 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to change password: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }

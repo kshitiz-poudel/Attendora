@@ -7,6 +7,7 @@ import 'models/active_session.dart';
 import '../auth/providers.dart';
 import '../attendance/repository.dart';
 import '../attendance/providers.dart';
+import '../attendance/qr_rotation_service.dart';
 import '../../core/logger.dart';
 
 class ConflictingSessionException implements Exception {
@@ -33,6 +34,7 @@ final activeSessionProvider =
 class ActiveSessionController extends Notifier<ActiveSession?> {
   late final StreamSubscription<int> _ticker;
   late final AttendanceRepository _repo;
+  final QrRotationService _rotation = QrRotationService();
 
   @override
   ActiveSession? build() {
@@ -71,13 +73,9 @@ class ActiveSessionController extends Notifier<ActiveSession?> {
         // Force a rebuild by creating a new state instance
         // This ensures the UI updates every second for timer and QR code
         final current = state!;
-        state = ActiveSession(
-          sessionId: current.sessionId,
-          expiresAt: current.expiresAt,
-          latitude: current.latitude,
-          longitude: current.longitude,
-          radiusMeters: current.radiusMeters,
-        );
+        // copyWith (not a fresh ActiveSession) so the per-second rebuild that
+        // drives the countdown does not discard the rotating QR secret.
+        state = current.copyWith();
 
         // Auto-end session if expired
         if (current.isExpired) {
@@ -88,6 +86,7 @@ class ActiveSessionController extends Notifier<ActiveSession?> {
     ref.onDispose(() {
       _ticker.cancel();
       _sessionSubscription?.cancel();
+      _rotation.dispose();
     });
     return null;
   }
@@ -224,7 +223,12 @@ class ActiveSessionController extends Notifier<ActiveSession?> {
                   longitude: (data['longitude'] as num?)?.toDouble() ?? 0.0,
                   radiusMeters:
                       (data['radiusMeters'] as num?)?.toDouble() ?? 50.0,
+                  qrToken: state?.qrToken,
+                  qrSlot: state?.qrSlot ?? 0,
                 );
+                // Resume publishing rotating codes for a session recovered
+                // after an app restart or reconnect.
+                _startRotation(doc.id);
               } else {
                 // Session expired, mark it inactive if it was active
                 if (data['active'] == true) {
@@ -472,6 +476,20 @@ class ActiveSessionController extends Notifier<ActiveSession?> {
       longitude: longitude,
       radiusMeters: radiusMeters,
     );
+
+    _startRotation(sessionId);
+  }
+
+  /// Publishes a fresh QR secret every 5 seconds and re-renders on each turn.
+  void _startRotation(String sessionId) {
+    _rotation.start(
+      sessionId,
+      onRotate: (token, slot) {
+        final current = state;
+        if (current == null || current.sessionId != sessionId) return;
+        state = current.copyWith(qrToken: token, qrSlot: slot);
+      },
+    );
   }
 
   String _formatTime(DateTime time) {
@@ -486,6 +504,8 @@ class ActiveSessionController extends Notifier<ActiveSession?> {
 
   Future<void> endSession() async {
     final s = state;
+    // Clear the published secret so no displayed code survives the session.
+    await _rotation.stop(clearRemote: true);
     if (s != null) {
       await _repo.endSession(s.sessionId);
     }

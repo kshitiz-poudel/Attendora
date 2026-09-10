@@ -14,6 +14,7 @@ import '../../attendance/providers.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for teacher's session attendance records
 final teacherSessionsWithAttendanceProvider =
@@ -228,7 +229,7 @@ class TeacherAttendancePage extends ConsumerWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -236,7 +237,7 @@ class TeacherAttendancePage extends ConsumerWidget {
                     'View attendance by session',
                     style: GoogleFonts.outfit(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -255,7 +256,7 @@ class TeacherAttendancePage extends ConsumerWidget {
                             Icon(
                               Icons.fact_check_outlined,
                               size: 64,
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: context.c.textPrimary.withValues(alpha: 0.5),
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -263,7 +264,7 @@ class TeacherAttendancePage extends ConsumerWidget {
                               style: GoogleFonts.outfit(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -271,7 +272,7 @@ class TeacherAttendancePage extends ConsumerWidget {
                               'Start a session to begin tracking attendance',
                               style: GoogleFonts.outfit(
                                 fontSize: 14,
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -290,8 +291,8 @@ class TeacherAttendancePage extends ConsumerWidget {
                     },
                   );
                 },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: context.c.textPrimary),
                 ),
                 error: (e, _) => Center(
                   child: GlassCard(
@@ -299,16 +300,16 @@ class TeacherAttendancePage extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: Colors.red,
+                          color: context.c.danger,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Error loading attendance',
                           style: GoogleFonts.outfit(
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -316,7 +317,7 @@ class TeacherAttendancePage extends ConsumerWidget {
                         Text(
                           e.toString(),
                           style: GoogleFonts.outfit(
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                             fontSize: 12,
                           ),
                           textAlign: TextAlign.center,
@@ -382,9 +383,9 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Attendance PDF downloaded successfully'),
-          backgroundColor: Color(0xFF10B981),
+          backgroundColor: context.c.accent,
         ),
       );
     }
@@ -426,10 +427,10 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                      color: context.c.accent.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.class_, color: Color(0xFF10B981)),
+                    child: Icon(Icons.class_, color: context.c.accent),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -441,7 +442,7 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
                           style: GoogleFonts.outfit(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -449,7 +450,7 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
                           dateStr,
                           style: GoogleFonts.outfit(
                             fontSize: 13,
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                           ),
                         ),
                       ],
@@ -464,23 +465,23 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
                         style: GoogleFonts.outfit(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       Text(
                         'Present',
                         style: GoogleFonts.outfit(
                           fontSize: 12,
-                          color: Colors.white54,
+                          color: context.c.textTertiary,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(width: 16),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.picture_as_pdf,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                     onPressed: _exportPdf,
                     tooltip: 'Export PDF',
@@ -490,14 +491,14 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
                     _isExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                 ],
               ),
             ),
           ),
           if (_isExpanded) ...[
-            Divider(height: 1, color: Colors.white.withValues(alpha: 0.1)),
+            Divider(height: 1, color: context.c.textPrimary.withValues(alpha: 0.1)),
             Padding(
               padding: const EdgeInsets.all(16),
               child: GlassTextField(
@@ -516,7 +517,7 @@ class _SessionAttendanceCardState extends State<_SessionAttendanceCard> {
                       ? 'No attendance records for this session.'
                       : 'No students match your search.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.outfit(color: Colors.white70),
+                  style: GoogleFonts.outfit(color: context.c.textSecondary),
                 ),
               )
             else
@@ -572,9 +573,9 @@ class _StudentAttendanceRow extends ConsumerWidget {
           SnackBar(
             content: Text(
               'Marked as ${newStatus.toUpperCase()}',
-              style: GoogleFonts.outfit(color: Colors.white),
+              style: GoogleFonts.outfit(color: context.c.textPrimary),
             ),
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: context.c.accent,
             duration: const Duration(seconds: 1),
           ),
         );
@@ -585,9 +586,9 @@ class _StudentAttendanceRow extends ConsumerWidget {
           SnackBar(
             content: Text(
               'Error: $e',
-              style: GoogleFonts.outfit(color: Colors.white),
+              style: GoogleFonts.outfit(color: context.c.textPrimary),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -609,13 +610,13 @@ class _StudentAttendanceRow extends ConsumerWidget {
     Color statusColor;
     String statusText;
     if (isPresent) {
-      statusColor = const Color(0xFF10B981);
+      statusColor = context.c.accent;
       statusText = 'Present';
     } else if (isLate) {
-      statusColor = const Color(0xFFF59E0B);
+      statusColor = context.c.warning;
       statusText = 'Late';
     } else {
-      statusColor = const Color(0xFFEF4444);
+      statusColor = context.c.danger;
       statusText = 'Absent';
     }
 
@@ -645,14 +646,14 @@ class _StudentAttendanceRow extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 Text(
                   rollNumber,
                   style: GoogleFonts.outfit(
                     fontSize: 12,
-                    color: Colors.white54,
+                    color: context.c.textTertiary,
                   ),
                 ),
               ],
@@ -665,7 +666,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
-                    backgroundColor: const Color(0xFF1E293B),
+                    backgroundColor: context.c.surface,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(24),
@@ -673,13 +674,13 @@ class _StudentAttendanceRow extends ConsumerWidget {
                     ),
                     builder: (context) => Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.9),
+                        color: context.c.canvas.withValues(alpha: 0.9),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(24),
                         ),
                         border: Border(
                           top: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.1),
+                            color: context.c.textPrimary.withValues(alpha: 0.1),
                           ),
                         ),
                       ),
@@ -699,7 +700,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
                                   height: 4,
                                   margin: const EdgeInsets.only(bottom: 24),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.2),
+                                    color: context.c.textPrimary.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -708,7 +709,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
                                   style: GoogleFonts.outfit(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -716,14 +717,14 @@ class _StudentAttendanceRow extends ConsumerWidget {
                                   name,
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 24),
                                 _buildStatusOption(
                                   context,
                                   'Present',
-                                  const Color(0xFF10B981),
+                                  context.c.accent,
                                   Icons.check_circle,
                                   () => _updateStatus(context, ref, 'present'),
                                 ),
@@ -731,7 +732,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
                                 _buildStatusOption(
                                   context,
                                   'Late',
-                                  const Color(0xFFF59E0B),
+                                  context.c.warning,
                                   Icons.access_time,
                                   () => _updateStatus(context, ref, 'late'),
                                 ),
@@ -739,7 +740,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
                                 _buildStatusOption(
                                   context,
                                   'Absent',
-                                  const Color(0xFFEF4444),
+                                  context.c.danger,
                                   Icons.cancel,
                                   () => _updateStatus(context, ref, 'absent'),
                                 ),
@@ -784,7 +785,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
               const SizedBox(height: 2),
               Text(
                 timeStr,
-                style: GoogleFonts.outfit(fontSize: 11, color: Colors.white38),
+                style: GoogleFonts.outfit(fontSize: 11, color: context.c.textTertiary),
               ),
             ],
           ),
@@ -817,7 +818,7 @@ class _StudentAttendanceRow extends ConsumerWidget {
               style: GoogleFonts.outfit(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
           ],

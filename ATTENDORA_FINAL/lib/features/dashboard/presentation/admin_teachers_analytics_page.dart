@@ -8,12 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../core/responsive_utils.dart';
 import '../../auth/providers.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for teachers with analytics - RBAC SCOPED
 final teachersWithAnalyticsProvider = StreamProvider<List<TeacherAnalytics>>((
@@ -155,7 +155,7 @@ class _AdminTeachersAnalyticsPageState
                 end: Alignment.bottomRight,
                 colors: [
                   Theme.of(context).colorScheme.primary.withValues(alpha: .08),
-                  const Color(0xFF1E293B),
+                  context.c.surface,
                 ],
               ),
             ),
@@ -184,7 +184,7 @@ class _AdminTeachersAnalyticsPageState
                         'Teacher Analytics',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       if (!isMobile) ...[
@@ -192,7 +192,7 @@ class _AdminTeachersAnalyticsPageState
                         Text(
                           'Review teacher performance and attendance statistics.',
                           style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: Colors.white70),
+                              ?.copyWith(color: context.c.textSecondary),
                         ),
                       ],
                     ],
@@ -216,7 +216,7 @@ class _AdminTeachersAnalyticsPageState
           hintText: 'Search teachers by name, email, or ID...',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
-          fillColor: const Color(0xFF1E293B),
+          fillColor: context.c.surface,
         ),
         onChanged: (value) => setState(() => _searchQuery = value),
       ),
@@ -252,7 +252,7 @@ class _AdminTeachersAnalyticsPageState
             subtitle: _searchQuery.isNotEmpty
                 ? 'Try adjusting your search or filters'
                 : 'Teachers will appear here once they register',
-            color: FluentColors.info,
+            color: context.c.info,
           ),
         ),
       );
@@ -319,24 +319,24 @@ class _AdminTeachersAnalyticsPageState
                       Text(
                         teacher.email,
                         style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: const Color(0xFF94A3B8)),
+                            ?.copyWith(color: context.c.textSecondary),
                       ),
                       Text(
                         'ID: ${teacher.idNumber}',
                         style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: const Color(0xFF94A3B8)),
+                            ?.copyWith(color: context.c.textSecondary),
                       ),
                     ],
                   ),
                 ),
                 // Actions
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.white70),
-                  color: const Color(0xFF1E293B),
+                  icon: Icon(Icons.more_vert, color: context.c.textSecondary),
+                  color: context.c.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: context.c.textPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   onSelected: (value) {
@@ -349,15 +349,15 @@ class _AdminTeachersAnalyticsPageState
                       value: 'details',
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.info_outline,
                             size: 18,
-                            color: Colors.white70,
+                            color: context.c.textSecondary,
                           ),
                           const SizedBox(width: 12),
                           Text(
                             'View Details',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                         ],
                       ),
@@ -379,7 +379,7 @@ class _AdminTeachersAnalyticsPageState
                       icon: Icons.event,
                       label: 'Sessions',
                       value: teacher.totalSessions.toString(),
-                      color: const Color(0xFF2F6FED),
+                      color: context.c.primary,
                     ),
                   ),
                 ],
@@ -442,10 +442,10 @@ class _AdminTeachersAnalyticsPageState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           teacher.displayName,
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -473,7 +473,7 @@ class _AdminTeachersAnalyticsPageState
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Close',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
         ],
@@ -492,7 +492,7 @@ class _AdminTeachersAnalyticsPageState
             child: Text(
               label,
               style: GoogleFonts.outfit(
-                color: Colors.white70,
+                color: context.c.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -501,7 +501,7 @@ class _AdminTeachersAnalyticsPageState
             child: Text(
               value,
               style: GoogleFonts.outfit(
-                color: Colors.white,
+                color: context.c.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),

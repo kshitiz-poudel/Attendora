@@ -8,6 +8,7 @@ import '../../../core/logger.dart';
 import '../../auth/providers.dart';
 import 'empty_state.dart';
 import 'shimmer_loading.dart';
+import '../../../core/design/app_colors.dart';
 
 final recentAttendanceProvider = StreamProvider<List<Map<String, dynamic>>>((
   ref,
@@ -139,15 +140,15 @@ class RecentAttendanceCard extends ConsumerWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            const Color(0xFF10B981),
-                            const Color(0xFF34D399),
+                            context.c.accent,
+                            context.c.success,
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.check_circle_rounded,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                         size: 24,
                       ),
                     ),
@@ -167,12 +168,12 @@ class RecentAttendanceCard extends ConsumerWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                    color: context.c.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.more_horiz,
-                    color: Color(0xFF10B981),
+                    color: context.c.accent,
                     size: 20,
                   ),
                 ),
@@ -182,12 +183,12 @@ class RecentAttendanceCard extends ConsumerWidget {
             attendanceAsync.when(
               data: (records) {
                 if (records.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.how_to_reg_outlined,
                     title: 'No Attendance Records',
                     subtitle:
                         'Records will appear when students mark attendance',
-                    color: Color(0xFF10B981),
+                    color: context.c.accent,
                   );
                 }
                 return ListView.separated(
@@ -216,10 +217,10 @@ class RecentAttendanceCard extends ConsumerWidget {
                         : '?';
 
                     final avatarColors = [
-                      const Color(0xFF10B981),
-                      const Color(0xFF2F6FED),
-                      const Color(0xFF10B981),
-                      const Color(0xFFF59E0B),
+                      context.c.accent,
+                      context.c.primary,
+                      context.c.accent,
+                      context.c.warning,
                       const Color(0xFFEC4899),
                     ];
                     final avatarColor =
@@ -268,7 +269,7 @@ class RecentAttendanceCard extends ConsumerWidget {
                                     email,
                                     style: GoogleFonts.outfit(
                                       fontSize: 11, // Smaller font for email
-                                      color: const Color(0xFF64748B),
+                                      color: context.c.textTertiary,
                                     ),
                                   ),
                               ],
@@ -285,7 +286,7 @@ class RecentAttendanceCard extends ConsumerWidget {
                                 decoration: BoxDecoration(
                                   color: status == 'present'
                                       ? scheme.primary.withValues(alpha: 0.15)
-                                      : const Color(0xFFFEF2F2),
+                                      : context.c.dangerSubtle,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -295,7 +296,7 @@ class RecentAttendanceCard extends ConsumerWidget {
                                     fontWeight: FontWeight.w600,
                                     color: status == 'present'
                                         ? scheme.primary
-                                        : const Color(0xFFDC2626),
+                                        : context.c.danger,
                                   ),
                                 ),
                               ),
@@ -305,7 +306,7 @@ class RecentAttendanceCard extends ConsumerWidget {
                                   DateFormat('MMM d, h:mm a')
                                       .format(timestamp), // Date and Time
                                   style: GoogleFonts.outfit(
-                                    color: const Color(0xFF94A3B8),
+                                    color: context.c.textSecondary,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -329,18 +330,18 @@ class RecentAttendanceCard extends ConsumerWidget {
                 final errorMsg = e.toString();
                 if (errorMsg.contains('index') ||
                     errorMsg.contains('failed-precondition')) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.build_circle_outlined,
                     title: 'Setting Up Database',
                     subtitle: 'Please wait 2-3 minutes for indexes to build, then refresh',
-                    color: Color(0xFFF59E0B),
+                    color: context.c.warning,
                   );
                 }
-                return const EmptyState(
+                return EmptyState(
                   icon: Icons.error_outline,
                   title: 'Unable to Load Attendance',
                   subtitle: 'Please try refreshing the page',
-                  color: Colors.red,
+                  color: context.c.danger,
                 );
               },
             ),

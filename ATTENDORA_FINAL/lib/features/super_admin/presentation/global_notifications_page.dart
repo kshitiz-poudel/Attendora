@@ -9,6 +9,7 @@ import '../../shared/widgets/glass_dropdown.dart';
 import '../../dashboard/providers.dart';
 import '../services/global_notification_service.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class GlobalNotificationsPage extends ConsumerStatefulWidget {
   const GlobalNotificationsPage({super.key});
@@ -55,9 +56,9 @@ class _GlobalNotificationsPageState
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Broadcast sent successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
         _titleController.clear();
@@ -66,7 +67,7 @@ class _GlobalNotificationsPageState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.c.danger),
         );
       }
     } finally {
@@ -92,7 +93,7 @@ class _GlobalNotificationsPageState
                     style: GoogleFonts.outfit(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -100,7 +101,7 @@ class _GlobalNotificationsPageState
                     'Send notifications to all users or specific groups.',
                     style: GoogleFonts.outfit(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -118,7 +119,7 @@ class _GlobalNotificationsPageState
                       style: GoogleFonts.outfit(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -126,7 +127,7 @@ class _GlobalNotificationsPageState
                     // Target Selection
                     Text(
                       'Target Audience',
-                      style: GoogleFonts.outfit(color: Colors.white70),
+                      style: GoogleFonts.outfit(color: context.c.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     SingleChildScrollView(
@@ -166,7 +167,7 @@ class _GlobalNotificationsPageState
                     // Institution Selection
                     Text(
                       'Institution (Optional)',
-                      style: GoogleFonts.outfit(color: Colors.white70),
+                      style: GoogleFonts.outfit(color: context.c.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     ref
@@ -175,9 +176,9 @@ class _GlobalNotificationsPageState
                           data: (institutions) => GlassDropdown<String>(
                             value: _selectedInstitution,
                             hint: 'All Institutions',
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.business,
-                              color: Colors.white54,
+                              color: context.c.textTertiary,
                             ),
                             items: [
                               const DropdownMenuItem(
@@ -221,19 +222,19 @@ class _GlobalNotificationsPageState
                       child: ElevatedButton.icon(
                         onPressed: _sending ? null : _send,
                         icon: _sending
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                 ),
                               )
                             : const Icon(Icons.send_rounded),
                         label: Text(_sending ? 'Sending...' : 'Send Broadcast'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
-                          foregroundColor: Colors.white,
+                          backgroundColor: context.c.accent,
+                          foregroundColor: context.c.textPrimary,
                           textStyle: GoogleFonts.outfit(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -275,19 +276,19 @@ class _TargetChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF10B981)
-              : Colors.white.withValues(alpha: 0.05),
+              ? context.c.accent
+              : context.c.textPrimary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: selected
-                ? const Color(0xFF10B981)
-                : Colors.white.withValues(alpha: 0.1),
+                ? context.c.accent
+                : context.c.textPrimary.withValues(alpha: 0.1),
           ),
         ),
         child: Text(
           label,
           style: GoogleFonts.outfit(
-            color: selected ? Colors.white : Colors.white70,
+            color: selected ? context.c.textPrimary : context.c.textSecondary,
             fontWeight: selected ? FontWeight.bold : FontWeight.normal,
           ),
         ),

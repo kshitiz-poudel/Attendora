@@ -12,6 +12,8 @@ import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
 import '../../shared/widgets/glass_dropdown.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/responsive_utils.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
@@ -57,7 +59,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           BackgroundPattern(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(context.isMobile ? 12 : 24),
                 child: FadeInUp(
                   duration: const Duration(milliseconds: 800),
                   child: ConstrainedBox(
@@ -75,9 +77,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(0xFF10B981)
+                                  context.c.accent
                                       .withValues(alpha: 0.2),
-                                  const Color(0xFF2F6FED)
+                                  context.c.primary
                                       .withValues(alpha: 0.2),
                                 ],
                               ),
@@ -90,27 +92,27 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        Color(0xFF10B981),
-                                        Color(0xFF2F6FED),
+                                        context.c.accent,
+                                        context.c.primary,
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF10B981)
+                                        color: context.c.accent
                                             .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.person_add_rounded,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                     size: 32,
                                   ),
                                 ),
@@ -120,7 +122,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                   style: GoogleFonts.outfit(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -129,7 +131,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                       ? 'You must continue with Google (@thapar.edu) first.'
                                       : 'Signed in as $email',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                     fontSize: 14,
                                   ),
                                   textAlign: TextAlign.center,
@@ -163,7 +165,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                       _obscurePassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: Colors.white54,
+                                      color: context.c.textTertiary,
                                     ),
                                     onPressed: () => setState(
                                       () =>
@@ -183,7 +185,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                       _obscureConfirmPassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: Colors.white54,
+                                      color: context.c.textTertiary,
                                     ),
                                     onPressed: () => setState(
                                       () => _obscureConfirmPassword =
@@ -205,7 +207,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                           return Text(
                                             'No class groups available yet. Contact admin.',
                                             style: GoogleFonts.outfit(
-                                              color: Colors.orange,
+                                              color: context.c.warning,
                                               fontStyle: FontStyle.italic,
                                             ),
                                           );
@@ -244,13 +246,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                         );
                                       },
                                       loading: () =>
-                                          const LinearProgressIndicator(
-                                            color: Color(0xFF10B981),
+                                          LinearProgressIndicator(
+                                            color: context.c.accent,
                                           ),
                                       error: (e, _) => Text(
                                         'Error loading groups: $e',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.red,
+                                          color: context.c.danger,
                                         ),
                                       ),
                                     );
@@ -266,7 +268,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                     Text(
                                       'Role',
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -421,22 +423,22 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                                 .finalizeOnboarding();
                                           },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF10B981),
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: context.c.accent,
+                                      foregroundColor: context.c.textPrimary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       elevation: 0,
-                                      shadowColor: const Color(0xFF10B981)
+                                      shadowColor: context.c.accent
                                           .withValues(alpha: 0.5),
                                     ),
                                     child: state.loading
-                                        ? const SizedBox(
+                                        ? SizedBox(
                                             height: 24,
                                             width: 24,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: context.c.textPrimary,
                                             ),
                                           )
                                         : Text(
@@ -454,7 +456,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                 Text(
                                   'Account creation requires a Thapar Google account. Teachers may require admin approval before full access.',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white54,
+                                    color: context.c.textTertiary,
                                     fontSize: 12,
                                   ),
                                   textAlign: TextAlign.center,
@@ -468,7 +470,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                     child: Text(
                                       'Back to login',
                                       style: GoogleFonts.outfit(
-                                        color: const Color(0xFF10B981),
+                                        color: context.c.accent,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -504,13 +506,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF10B981).withValues(alpha: 0.15)
-              : Colors.white.withValues(alpha: 0.05),
+              ? context.c.accent.withValues(alpha: 0.15)
+              : context.c.textPrimary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected
-                ? const Color(0xFF10B981)
-                : Colors.white.withValues(alpha: 0.15),
+                ? context.c.accent
+                : context.c.textPrimary.withValues(alpha: 0.15),
             width: selected ? 2 : 1,
           ),
         ),
@@ -523,16 +525,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selected ? const Color(0xFF10B981) : Colors.transparent,
+                color: selected ? context.c.accent : Colors.transparent,
                 border: Border.all(
                   color: selected
-                      ? const Color(0xFF10B981)
-                      : Colors.white.withValues(alpha: 0.4),
+                      ? context.c.accent
+                      : context.c.textPrimary.withValues(alpha: 0.4),
                   width: 2,
                 ),
               ),
               child: selected
-                  ? const Icon(Icons.check, size: 15, color: Colors.white)
+                  ? Icon(Icons.check, size: 15, color: context.c.textPrimary)
                   : null,
             ),
             const SizedBox(width: 10),
@@ -544,7 +546,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   Text(
                     label,
                     style: GoogleFonts.outfit(
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -553,7 +555,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     Text(
                       sublabel,
                       style: GoogleFonts.outfit(
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                         fontSize: 11,
                       ),
                     ),
@@ -578,7 +580,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         Text(
           label,
           style: GoogleFonts.outfit(
-            color: Colors.white70,
+            color: context.c.textSecondary,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),

@@ -16,6 +16,8 @@ import '../../student/providers.dart';
 import '../../shared/providers.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'admin_shell.dart';
+import '../services/faculty_approval_service.dart';
+import '../../../core/design/app_colors.dart';
 
 // RBAC: Teachers provider scoped by institution
 final teachersProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
@@ -125,15 +127,15 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search,
-                        color: Colors.white70,
+                        color: context.c.textSecondary,
                       ),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                                 size: 20,
                               ),
                               onPressed: () {
@@ -145,7 +147,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                             )
                           : null,
                       hintText: 'Search by name, email, or ID...',
-                      hintStyle: GoogleFonts.outfit(color: Colors.white38),
+                      hintStyle: GoogleFonts.outfit(color: context.c.textTertiary),
                       border: InputBorder.none,
                       filled: true,
                       fillColor: Colors.black.withValues(alpha: 0.2),
@@ -160,13 +162,13 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: FluentColors.accentColor.withValues(
+                          color: context.c.accent.withValues(
                             alpha: 0.5,
                           ),
                         ),
                       ),
                     ),
-                    style: GoogleFonts.outfit(color: Colors.white),
+                    style: GoogleFonts.outfit(color: context.c.textPrimary),
                     onChanged: (value) =>
                         setState(() {}), // Trigger rebuild on typing
                   ),
@@ -183,15 +185,15 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: TabBar(
               controller: _tab,
-              indicator: const UnderlineTabIndicator(
-                borderSide: BorderSide(width: 4.0, color: Colors.grey),
+              indicator: UnderlineTabIndicator(
+                borderSide: BorderSide(width: 4.0, color: context.c.textTertiary),
                 insets: EdgeInsets.symmetric(
                   horizontal: 40,
                 ), // Make it shorter ("half" length)
               ),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white60,
+              labelColor: context.c.textPrimary,
+              unselectedLabelColor: context.c.textSecondary,
               labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600),
               dividerColor: Colors.transparent,
               tabs: const [
@@ -271,14 +273,14 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                 Icon(
                   Icons.people_outline,
                   size: 64,
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: context.c.textPrimary.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'No Students Found',
                   style: GoogleFonts.outfit(
                     fontSize: 18,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -312,9 +314,9 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
 
   Widget _buildInstitutionCell(String? institutionCode) {
     if (institutionCode == null || institutionCode.isEmpty) {
-      return const Text(
+      return Text(
         'Not Set',
-        style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+        style: TextStyle(color: context.c.textTertiary, fontStyle: FontStyle.italic),
       );
     }
 
@@ -329,7 +331,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
       error: (_, __) =>
-          Text(institutionCode, style: const TextStyle(color: Colors.grey)),
+          Text(institutionCode, style: TextStyle(color: context.c.textTertiary)),
     );
   }
 
@@ -338,27 +340,27 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
     final admin = user['admin'] == true;
 
     if (admin) {
-      return const Chip(
+      return Chip(
         label: Text('Admin'),
-        backgroundColor: Color(0xFF10B981),
-        labelStyle: TextStyle(color: Colors.white),
+        backgroundColor: context.c.accent,
+        labelStyle: TextStyle(color: context.c.textPrimary),
         side: BorderSide.none,
       );
     }
 
     if (isTeacher && !approved) {
-      return const Chip(
+      return Chip(
         label: Text('Pending'),
-        backgroundColor: Color(0xFFFEF2F2),
-        labelStyle: TextStyle(color: Color(0xFFDC2626)),
+        backgroundColor: context.c.dangerSubtle,
+        labelStyle: TextStyle(color: context.c.danger),
         side: BorderSide.none,
       );
     }
 
-    return const Chip(
+    return Chip(
       label: Text('Active'),
-      backgroundColor: Color(0xFFDCFCE7),
-      labelStyle: TextStyle(color: Color(0xFF16A34A)),
+      backgroundColor: context.c.successSubtle,
+      labelStyle: TextStyle(color: context.c.success),
       side: BorderSide.none,
     );
   }
@@ -370,10 +372,19 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
     String? name,
   ) async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(userId).update({
-        'approved': !currentlyApproved,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final service = ref.read(facultyApprovalServiceProvider);
+      final institutionCode = ref.read(authControllerProvider).institutionCode;
+      if (currentlyApproved) {
+        await service.revoke(
+          teacherId: userId,
+          adminInstitutionCode: institutionCode,
+        );
+      } else {
+        await service.approve(
+          teacherId: userId,
+          adminInstitutionCode: institutionCode,
+        );
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -458,27 +469,27 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Reset Device Lock',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to reset the device lock for ${name ?? 'this user'}?\n\nThey will be able to log in from a NEW device, which will then become their registered device.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
-              backgroundColor: FluentColors.accentColor,
+              backgroundColor: context.c.accent,
             ),
             child: Text(
               'Reset Device',
@@ -525,10 +536,10 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: context.c.surface,
           title: Text(
             'Change User Role',
-            style: GoogleFonts.outfit(color: Colors.white),
+            style: GoogleFonts.outfit(color: context.c.textPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -536,13 +547,13 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
             children: [
               Text(
                 'Change role for ${user['displayName']}',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: selectedRole,
-                dropdownColor: const Color(0xFF1E293B),
-                style: GoogleFonts.outfit(color: Colors.white),
+                dropdownColor: context.c.surface,
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Role',
@@ -552,21 +563,21 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                     value: 'student',
                     child: Text(
                       'Student',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                   DropdownMenuItem(
                     value: 'teacher',
                     child: Text(
                       'Teacher',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                   DropdownMenuItem(
                     value: 'admin',
                     child: Text(
                       'Admin',
-                      style: GoogleFonts.outfit(color: Colors.white),
+                      style: GoogleFonts.outfit(color: context.c.textPrimary),
                     ),
                   ),
                 ],
@@ -584,9 +595,9 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.info_outline,
-                      color: Colors.orange,
+                      color: context.c.warning,
                       size: 20,
                     ),
                     const SizedBox(width: 12),
@@ -594,7 +605,7 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
                       child: Text(
                         'Changing roles will hide/restore associated data (subjects, classes, etc.) from active views.',
                         style: GoogleFonts.outfit(
-                          color: Colors.orange,
+                          color: context.c.warning,
                           fontSize: 12,
                         ),
                       ),
@@ -609,13 +620,13 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
               onPressed: () => Navigator.pop(context, false),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.outfit(color: Colors.white70),
+                style: GoogleFonts.outfit(color: context.c.textSecondary),
               ),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
               style: FilledButton.styleFrom(
-                backgroundColor: FluentColors.accentColor,
+                backgroundColor: context.c.accent,
               ),
               child: Text(
                 'Update Role',
@@ -746,26 +757,26 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: context.c.surface,
         title: Text(
           'Delete User',
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: context.c.textPrimary),
         ),
         content: Text(
           'Are you sure you want to delete this user? This action cannot be undone.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: context.c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.outfit(color: Colors.white70),
+              style: GoogleFonts.outfit(color: context.c.textSecondary),
             ),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             child: Text(
               'Delete',
               style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
@@ -911,10 +922,10 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
     final classGroupsAsync = ref.watch(allClassGroupsListProvider);
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF1E293B), // Dark background
+      backgroundColor: context.c.surface, // Dark background
       title: Text(
         'Edit ${isStudent ? 'Student' : 'User'}',
-        style: GoogleFonts.outfit(color: Colors.white),
+        style: GoogleFonts.outfit(color: context.c.textPrimary),
       ),
       content: SingleChildScrollView(
         child: SizedBox(
@@ -925,7 +936,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
             children: [
               TextField(
                 controller: _nameController,
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'Full Name',
@@ -935,7 +946,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _idController,
-                style: GoogleFonts.outfit(color: Colors.white),
+                style: GoogleFonts.outfit(color: context.c.textPrimary),
                 decoration: fluentInputDecoration(
                   context: context,
                   labelText: 'ID Number',
@@ -944,12 +955,12 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
               ),
               if (isStudent) ...[
                 const SizedBox(height: 24),
-                const Divider(color: Colors.white10),
+                Divider(color: context.c.border),
                 const SizedBox(height: 16),
                 Text(
                   'Class Groups',
                   style: GoogleFonts.outfit(
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -967,8 +978,8 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                       children: [
                         DropdownButtonFormField<String>(
                           initialValue: _selectedLectureGroup,
-                          dropdownColor: const Color(0xFF1E293B),
-                          style: GoogleFonts.outfit(color: Colors.white),
+                          dropdownColor: context.c.surface,
+                          style: GoogleFonts.outfit(color: context.c.textPrimary),
                           decoration: fluentInputDecoration(
                             context: context,
                             labelText: 'Lecture Group',
@@ -980,7 +991,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                               child: Text(
                                 'None',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                 ),
                               ),
                             ),
@@ -990,7 +1001,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                                 child: Text(
                                   g.name,
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                               ),
@@ -1002,8 +1013,8 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
                           initialValue: _selectedLabGroup,
-                          dropdownColor: const Color(0xFF1E293B),
-                          style: GoogleFonts.outfit(color: Colors.white),
+                          dropdownColor: context.c.surface,
+                          style: GoogleFonts.outfit(color: context.c.textPrimary),
                           decoration: fluentInputDecoration(
                             context: context,
                             labelText: 'Lab Group',
@@ -1015,7 +1026,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                               child: Text(
                                 'None',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                 ),
                               ),
                             ),
@@ -1025,7 +1036,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                                 child: Text(
                                   g.name,
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                               ),
@@ -1040,7 +1051,7 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
                   loading: () => const LinearProgressIndicator(),
                   error: (e, _) => Text(
                     'Error loading groups: $e',
-                    style: GoogleFonts.outfit(color: Colors.red),
+                    style: GoogleFonts.outfit(color: context.c.danger),
                   ),
                 ),
               ],
@@ -1053,21 +1064,21 @@ class _EditUserDialogState extends ConsumerState<_EditUserDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancel',
-            style: GoogleFonts.outfit(color: Colors.white70),
+            style: GoogleFonts.outfit(color: context.c.textSecondary),
           ),
         ),
         FilledButton(
           onPressed: _isLoading ? null : _saveChanges,
           style: FilledButton.styleFrom(
-            backgroundColor: FluentColors.accentColor,
+            backgroundColor: context.c.accent,
           ),
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 )
               : Text(
@@ -1182,18 +1193,18 @@ class _StudentDetailsDialog extends ConsumerWidget {
     );
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF1E293B), // Dark background
+      backgroundColor: context.c.surface, // Dark background
       title: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Colors.white.withValues(alpha: 0.1),
+            backgroundColor: context.c.textPrimary.withValues(alpha: 0.1),
             backgroundImage: user['photoUrl'] != null
                 ? NetworkImage(user['photoUrl'])
                 : null,
             child: user['photoUrl'] == null
                 ? Text(
                     (user['displayName'] as String? ?? 'S')[0].toUpperCase(),
-                    style: GoogleFonts.outfit(color: Colors.white),
+                    style: GoogleFonts.outfit(color: context.c.textPrimary),
                   )
                 : null,
           ),
@@ -1205,14 +1216,14 @@ class _StudentDetailsDialog extends ConsumerWidget {
                 Text(
                   user['displayName'] ?? 'Student',
                   style: GoogleFonts.outfit(
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   user['idNumber'] ?? user['rollNumber'] ?? '',
                   style: GoogleFonts.outfit(
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                     fontSize: 12,
                   ),
                 ),
@@ -1229,9 +1240,9 @@ class _StudentDetailsDialog extends ConsumerWidget {
           child: Column(
             children: [
               TabBar(
-                labelColor: FluentColors.accentColor,
-                unselectedLabelColor: Colors.white60,
-                indicatorColor: FluentColors.accentColor,
+                labelColor: context.c.accent,
+                unselectedLabelColor: context.c.textSecondary,
+                indicatorColor: context.c.accent,
                 labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                 tabs: const [
                   Tab(text: 'Attendance'),
@@ -1248,7 +1259,7 @@ class _StudentDetailsDialog extends ConsumerWidget {
                           return Center(
                             child: Text(
                               'No attendance history found',
-                              style: GoogleFonts.outfit(color: Colors.white54),
+                              style: GoogleFonts.outfit(color: context.c.textTertiary),
                             ),
                           );
                         }
@@ -1270,21 +1281,21 @@ class _StudentDetailsDialog extends ConsumerWidget {
                                 _StatItem(
                                   label: 'Total Sessions',
                                   value: total.toString(),
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                 ),
                                 _StatItem(
                                   label: 'Present',
                                   value: present.toString(),
-                                  color: Colors.greenAccent,
+                                  color: context.c.success,
                                 ),
                                 _StatItem(
                                   label: 'Attendance',
                                   value: '$percentage%',
-                                  color: FluentColors.accentColor,
+                                  color: context.c.accent,
                                 ),
                               ],
                             ),
-                            const Divider(height: 32, color: Colors.white10),
+                            Divider(height: 32, color: context.c.border),
                             Expanded(
                               child: ListView.builder(
                                 itemCount: records.length,
@@ -1297,13 +1308,13 @@ class _StudentDetailsDialog extends ConsumerWidget {
                                           ? Icons.check_circle
                                           : Icons.cancel,
                                       color: isPresent
-                                          ? Colors.greenAccent
-                                          : Colors.redAccent,
+                                          ? context.c.success
+                                          : context.c.danger,
                                     ),
                                     title: Text(
                                       record['subject'] ?? 'Unknown',
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white,
+                                        color: context.c.textPrimary,
                                       ),
                                     ),
                                     subtitle: Text(
@@ -1311,7 +1322,7 @@ class _StudentDetailsDialog extends ConsumerWidget {
                                         '.',
                                       )[0],
                                       style: GoogleFonts.outfit(
-                                        color: Colors.white54,
+                                        color: context.c.textTertiary,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -1319,8 +1330,8 @@ class _StudentDetailsDialog extends ConsumerWidget {
                                       isPresent ? 'Present' : 'Missed',
                                       style: GoogleFonts.outfit(
                                         color: isPresent
-                                            ? Colors.greenAccent
-                                            : Colors.redAccent,
+                                            ? context.c.success
+                                            : context.c.danger,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -1346,7 +1357,7 @@ class _StudentDetailsDialog extends ConsumerWidget {
                           return Center(
                             child: Text(
                               'No enrolled subjects',
-                              style: GoogleFonts.outfit(color: Colors.white54),
+                              style: GoogleFonts.outfit(color: context.c.textTertiary),
                             ),
                           );
                         }
@@ -1358,7 +1369,7 @@ class _StudentDetailsDialog extends ConsumerWidget {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 8),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: context.c.textPrimary.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: ListTile(
@@ -1367,19 +1378,19 @@ class _StudentDetailsDialog extends ConsumerWidget {
                                       ? Icons.science
                                       : Icons.book,
                                   color: subject['type'] == 'Lab'
-                                      ? Colors.greenAccent
-                                      : Colors.blueAccent,
+                                      ? context.c.success
+                                      : context.c.info,
                                 ),
                                 title: Text(
                                   subject['name'] ?? 'Unknown',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                                 subtitle: Text(
                                   '${subject['code'] ?? ''} • ${subject['type'] ?? 'Lecture'}',
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white54,
+                                    color: context.c.textTertiary,
                                   ),
                                 ),
                               ),
@@ -1406,7 +1417,7 @@ class _StudentDetailsDialog extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Close',
-            style: GoogleFonts.outfit(color: Colors.white70),
+            style: GoogleFonts.outfit(color: context.c.textSecondary),
           ),
         ),
       ],
@@ -1433,7 +1444,7 @@ class _StatItem extends StatelessWidget {
             color: color,
           ),
         ),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(label, style: TextStyle(fontSize: 12, color: context.c.textTertiary)),
       ],
     );
   }
@@ -1472,7 +1483,7 @@ class _UserList extends StatelessWidget {
           icon: isTeacher ? Icons.school_outlined : Icons.people_alt_outlined,
           title: isTeacher ? 'No Teachers Found' : 'No Students Found',
           subtitle: 'Try adjusting your search filters',
-          color: FluentColors.info,
+          color: context.c.info,
         ),
       );
     }
@@ -1494,7 +1505,7 @@ class _UserList extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.1),
+                          backgroundColor: context.c.textPrimary.withValues(alpha: 0.1),
                           backgroundImage: user['photoUrl'] != null
                               ? NetworkImage(user['photoUrl'])
                               : null,
@@ -1503,7 +1514,7 @@ class _UserList extends StatelessWidget {
                                   (user['displayName'] as String? ?? 'U')[0]
                                       .toUpperCase(),
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 )
                               : null,
@@ -1517,14 +1528,14 @@ class _UserList extends StatelessWidget {
                                 user['displayName'] ?? 'Unknown',
                                 style: GoogleFonts.outfit(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: context.c.textPrimary,
                                   fontSize: 16,
                                 ),
                               ),
                               Text(
                                 user['email'] ?? '',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                   fontSize: 12,
                                 ),
                               ),
@@ -1541,7 +1552,7 @@ class _UserList extends StatelessWidget {
                         Text(
                           user['idNumber'] ?? user['rollNumber'] ?? 'N/A',
                           style: GoogleFonts.outfit(
-                            color: Colors.white54,
+                            color: context.c.textTertiary,
                             fontSize: 13,
                           ),
                         ),
@@ -1549,25 +1560,23 @@ class _UserList extends StatelessWidget {
                           children: [
                             if (!isTeacher && onViewDetails != null)
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.visibility,
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                   size: 20,
                                 ),
                                 onPressed: () => onViewDetails!(user),
                               ),
                             PopupMenuButton<String>(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.more_vert,
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                               ),
-                              color: const Color(
-                                0xFF1E293B,
-                              ), // Dark slate background
+                              color: context.c.surface, // Dark slate background
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 side: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: context.c.textPrimary.withValues(alpha: 0.1),
                                 ),
                               ),
                               onSelected: (value) {
@@ -1596,16 +1605,16 @@ class _UserList extends StatelessWidget {
                                   value: 'edit',
                                   child: Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.edit_outlined,
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
                                         'Edit Profile',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white,
+                                          color: context.c.textPrimary,
                                         ),
                                       ),
                                     ],
@@ -1615,16 +1624,16 @@ class _UserList extends StatelessWidget {
                                   value: 'role',
                                   child: Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.admin_panel_settings_outlined,
-                                        color: Colors.white70,
+                                        color: context.c.textSecondary,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
                                         'Change Role',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white,
+                                          color: context.c.textPrimary,
                                         ),
                                       ),
                                     ],
@@ -1635,16 +1644,16 @@ class _UserList extends StatelessWidget {
                                     value: 'reset',
                                     child: Row(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.lock_reset,
-                                          color: Colors.white70,
+                                          color: context.c.textSecondary,
                                           size: 20,
                                         ),
                                         const SizedBox(width: 12),
                                         Text(
                                           'Reset Device Lock',
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white,
+                                            color: context.c.textPrimary,
                                           ),
                                         ),
                                       ],
@@ -1660,8 +1669,8 @@ class _UserList extends StatelessWidget {
                                               ? Icons.block
                                               : Icons.check_circle_outline,
                                           color: user['approved'] == true
-                                              ? Colors.orangeAccent
-                                              : Colors.greenAccent,
+                                              ? context.c.warning
+                                              : context.c.success,
                                           size: 20,
                                         ),
                                         const SizedBox(width: 12),
@@ -1670,7 +1679,7 @@ class _UserList extends StatelessWidget {
                                               ? 'Revoke Approval'
                                               : 'Approve',
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white,
+                                            color: context.c.textPrimary,
                                           ),
                                         ),
                                       ],
@@ -1680,16 +1689,16 @@ class _UserList extends StatelessWidget {
                                   value: 'delete',
                                   child: Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.delete_outline,
-                                        color: Colors.redAccent,
+                                        color: context.c.danger,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
                                         'Delete User',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.redAccent,
+                                          color: context.c.danger,
                                         ),
                                       ),
                                     ],
@@ -1716,9 +1725,9 @@ class _UserList extends StatelessWidget {
                 child: DataTable(
                   headingTextStyle: GoogleFonts.outfit(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
-                  dataTextStyle: GoogleFonts.outfit(color: Colors.white70),
+                  dataTextStyle: GoogleFonts.outfit(color: context.c.textSecondary),
                   columns: const [
                     DataColumn(label: Text('Name')),
                     DataColumn(label: Text('Email')),
@@ -1756,27 +1765,27 @@ class _UserList extends StatelessWidget {
                                 if (!isTeacher && onViewDetails != null)
                                   IconButton(
                                     onPressed: () => onViewDetails!(user),
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.visibility_outlined,
-                                      color: Colors.white70,
+                                      color: context.c.textSecondary,
                                       size: 20,
                                     ),
                                     tooltip: 'View Details',
                                   ),
                                 IconButton(
                                   onPressed: () => onEdit(user),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.edit_outlined,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                     size: 20,
                                   ),
                                   tooltip: 'Edit User',
                                 ),
                                 IconButton(
                                   onPressed: () => onChangeRole(user),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.admin_panel_settings_outlined,
-                                    color: Colors.white70,
+                                    color: context.c.textSecondary,
                                     size: 20,
                                   ),
                                   tooltip: 'Change Role',
@@ -1784,9 +1793,9 @@ class _UserList extends StatelessWidget {
                                 if (!isTeacher)
                                   IconButton(
                                     onPressed: () => onResetLock(user),
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.lock_reset,
-                                      color: Colors.white70,
+                                      color: context.c.textSecondary,
                                       size: 20,
                                     ),
                                     tooltip: 'Reset Device Lock',
@@ -1799,8 +1808,8 @@ class _UserList extends StatelessWidget {
                                           ? Icons.check_circle
                                           : Icons.pending,
                                       color: user['approved'] == true
-                                          ? Colors.green
-                                          : Colors.orange,
+                                          ? context.c.success
+                                          : context.c.warning,
                                       size: 20,
                                     ),
                                     tooltip: user['approved'] == true
@@ -1809,9 +1818,9 @@ class _UserList extends StatelessWidget {
                                   ),
                                 IconButton(
                                   onPressed: () => onDelete(user),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.delete_outline,
-                                    color: Colors.redAccent,
+                                    color: context.c.danger,
                                     size: 20,
                                   ),
                                   tooltip: 'Delete',

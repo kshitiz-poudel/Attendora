@@ -9,6 +9,7 @@ import '../../auth/providers.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'glass_card.dart';
+import '../../../core/design/app_colors.dart';
 
 final attendanceChartSpotsProvider = StreamProvider<List<FlSpot>>((ref) {
   final repo = ref.watch(attendanceRepositoryProvider);
@@ -96,14 +97,14 @@ class AttendanceChart extends ConsumerWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     Text(
                       'Last 12 Hours',
                       style: GoogleFonts.outfit(
                         fontSize: 12,
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                       ),
                     ),
                   ],
@@ -120,7 +121,7 @@ class AttendanceChart extends ConsumerWidget {
                       show: true,
                       drawVerticalLine: false,
                       getDrawingHorizontalLine: (value) => FlLine(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: context.c.textPrimary.withValues(alpha: 0.1),
                         strokeWidth: 1,
                       ),
                     ),
@@ -156,7 +157,7 @@ class AttendanceChart extends ConsumerWidget {
                               child: Text(
                                 '$hour12 $ampm',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white38,
+                                  color: context.c.textTertiary,
                                   fontSize: 10,
                                 ),
                               ),
@@ -201,7 +202,7 @@ class AttendanceChart extends ConsumerWidget {
                 child: Center(
                   child: Text(
                     'Failed to load chart',
-                    style: GoogleFonts.outfit(color: Colors.white54),
+                    style: GoogleFonts.outfit(color: context.c.textTertiary),
                   ),
                 ),
               ),

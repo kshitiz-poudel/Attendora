@@ -10,6 +10,7 @@ import '../../dashboard/notification_provider.dart';
 import '../../../core/fluent_theme.dart';
 import '../../notifications/providers.dart';
 import '../../../features/auth/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class SuperAdminNotificationsPage extends ConsumerWidget {
   const SuperAdminNotificationsPage({super.key});
@@ -37,7 +38,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -80,9 +81,9 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                               ),
                               label: const Text('Mark all read'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: FluentColors.accentColor,
+                                foregroundColor: context.c.accent,
                                 side: BorderSide(
-                                  color: FluentColors.accentColor,
+                                  color: context.c.accent,
                                 ),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -109,8 +110,8 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                               icon: const Icon(Icons.delete_outline, size: 18),
                               label: const Text('Clear all'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.redAccent,
-                                side: const BorderSide(color: Colors.redAccent),
+                                foregroundColor: context.c.danger,
+                                side: BorderSide(color: context.c.danger),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
@@ -131,7 +132,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     Row(
@@ -173,7 +174,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            foregroundColor: FluentColors.accentColor,
+                            foregroundColor: context.c.accent,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -197,7 +198,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
+                            foregroundColor: context.c.danger,
                           ),
                         ),
                       ],
@@ -252,12 +253,12 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: isRead
                                     ? Colors.grey.withValues(alpha: 0.1)
-                                    : FluentColors.info.withValues(alpha: 0.1),
+                                    : context.c.info.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 _getIconForType(notification.type),
-                                color: isRead ? Colors.grey : FluentColors.info,
+                                color: isRead ? context.c.textTertiary : context.c.info,
                                 size: 24,
                               ),
                             ),
@@ -277,8 +278,8 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                                                 : FontWeight.bold,
                                             fontSize: 16,
                                             color: isRead
-                                                ? Colors.grey
-                                                : Colors.white,
+                                                ? context.c.textTertiary
+                                                : context.c.textPrimary,
                                           ),
                                         ),
                                       ),
@@ -300,8 +301,8 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                                     notification.message,
                                     style: TextStyle(
                                       color: isRead
-                                          ? Colors.grey
-                                          : Colors.white70,
+                                          ? context.c.textTertiary
+                                          : context.c.textSecondary,
                                     ),
                                   ),
                                   if (notification.institutionId != null ||
@@ -314,7 +315,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                                       runSpacing: 4,
                                       children: [
                                         if (notification.institutionId != null)
-                                          _buildTag(
+                                          _buildTag(context, 
                                             Icons.business,
                                             notification.institutionId!,
                                             isRead,
@@ -323,7 +324,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                                                 .senderName
                                                 .isNotEmpty &&
                                             notification.senderName != 'System')
-                                          _buildTag(
+                                          _buildTag(context, 
                                             Icons.person,
                                             notification.senderName,
                                             isRead,
@@ -341,9 +342,9 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.close,
-                                      color: Colors.red,
+                                      color: context.c.danger,
                                     ),
                                     tooltip: 'Reject',
                                     onPressed: () => _rejectTeacher(
@@ -353,9 +354,9 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.check,
-                                      color: Colors.green,
+                                      color: context.c.success,
                                     ),
                                     tooltip: 'Approve',
                                     onPressed: () => _approveTeacher(
@@ -368,9 +369,9 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
                               ),
                             ] else if (!isRead)
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.check_circle_outline,
-                                  color: Colors.white54,
+                                  color: context.c.textTertiary,
                                 ),
                                 tooltip: 'Mark as read',
                                 onPressed: () {
@@ -447,9 +448,9 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
           });
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Teacher approved successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
@@ -458,7 +459,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error approving teacher: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -485,7 +486,7 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Reject'),
           ),
@@ -514,30 +515,30 @@ class SuperAdminNotificationsPage extends ConsumerWidget {
     }
   }
 
-  Widget _buildTag(IconData icon, String label, bool isRead) {
+  Widget _buildTag(BuildContext context, IconData icon, String label, bool isRead) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isRead
             ? Colors.grey.withValues(alpha: 0.1)
-            : Colors.white.withValues(alpha: 0.1),
+            : context.c.textPrimary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: isRead
               ? Colors.grey.withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.2),
+              : context.c.textPrimary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: isRead ? Colors.grey : Colors.white70),
+          Icon(icon, size: 12, color: isRead ? context.c.textTertiary : context.c.textSecondary),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 11,
-              color: isRead ? Colors.grey : Colors.white70,
+              color: isRead ? context.c.textTertiary : context.c.textSecondary,
             ),
           ),
         ],

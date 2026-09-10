@@ -9,6 +9,7 @@ import '../../auth/providers.dart';
 import '../../shared/providers.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for all subjects, optionally filtered by institution
 final subjectCatalogProvider =
@@ -81,12 +82,12 @@ class AdminSubjectsPage extends ConsumerWidget {
                       duration: const Duration(milliseconds: 500),
                       child: FluentAcrylicCard(
                         padding: const EdgeInsets.all(48),
-                        child: const EmptyState(
+                        child: EmptyState(
                           icon: Icons.book_outlined,
                           title: 'No Subjects Found',
                           subtitle:
                               'Add a subject to the catalog to get started',
-                          color: FluentColors.info,
+                          color: context.c.info,
                         ),
                       ),
                     );
@@ -144,14 +145,14 @@ class AdminSubjectsPage extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF10B981), Color(0xFF7C3AED)],
+                          gradient: LinearGradient(
+                            colors: [context.c.accent, Color(0xFF7C3AED)],
                           ),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.book,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                           size: 32,
                         ),
                       ),
@@ -173,8 +174,8 @@ class AdminSubjectsPage extends ConsumerWidget {
                                     color:
                                         Theme.of(context).brightness ==
                                             Brightness.dark
-                                        ? FluentColors.textSecondaryDark
-                                        : FluentColors.textSecondary,
+                                        ? context.c.textSecondary
+                                        : context.c.textSecondary,
                                   ),
                             ),
                           ],
@@ -199,14 +200,14 @@ class AdminSubjectsPage extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF7C3AED)],
+                      gradient: LinearGradient(
+                        colors: [context.c.accent, Color(0xFF7C3AED)],
                       ),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.book,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       size: 32,
                     ),
                   ),
@@ -228,8 +229,8 @@ class AdminSubjectsPage extends ConsumerWidget {
                                 color:
                                     Theme.of(context).brightness ==
                                         Brightness.dark
-                                    ? FluentColors.textSecondaryDark
-                                    : FluentColors.textSecondary,
+                                    ? context.c.textSecondary
+                                    : context.c.textSecondary,
                               ),
                         ),
                       ],
@@ -255,7 +256,7 @@ class AdminSubjectsPage extends ConsumerWidget {
     List<Map<String, dynamic>> subjects,
     bool isMobile,
   ) {
-    final color = _getYearColor(year);
+    final color = _getYearColor(context, year);
 
     return FadeInUp(
       duration: const Duration(milliseconds: 600),
@@ -343,18 +344,18 @@ class AdminSubjectsPage extends ConsumerWidget {
     );
   }
 
-  Color _getYearColor(String year) {
+  Color _getYearColor(BuildContext context, String year) {
     switch (year) {
       case 'First Year':
-        return const Color(0xFF10B981); // Emerald
+        return context.c.accent; // Emerald
       case 'Second Year':
-        return const Color(0xFF2F6FED); // Blue
+        return context.c.primary; // Blue
       case 'Third Year':
-        return const Color(0xFFF59E0B); // Amber
+        return context.c.warning; // Amber
       case 'Fourth Year':
         return const Color(0xFFEC4899); // Pink
       default:
-        return Colors.grey;
+        return context.c.textTertiary;
     }
   }
 
@@ -365,9 +366,9 @@ class AdminSubjectsPage extends ConsumerWidget {
     bool isMobile,
   ) {
     final colors = [
-      const Color(0xFF10B981), // emerald
-      const Color(0xFF2F6FED), // blue
-      const Color(0xFFF59E0B), // amber
+      context.c.accent, // emerald
+      context.c.primary, // blue
+      context.c.warning, // amber
       const Color(0xFFEC4899), // pink
     ];
 
@@ -379,13 +380,13 @@ class AdminSubjectsPage extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
-            ? FluentColors.cardBackgroundDark
-            : FluentColors.cardBackground,
+            ? context.c.surface
+            : context.c.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white.withValues(alpha: 0.1)
-              : FluentColors.borderColor,
+              ? context.c.textPrimary.withValues(alpha: 0.1)
+              : context.c.border,
         ),
         boxShadow: [
           BoxShadow(
@@ -427,8 +428,8 @@ class AdminSubjectsPage extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 14,
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? FluentColors.textSecondaryDark
-                        : FluentColors.textSecondary,
+                        ? context.c.textSecondary
+                        : context.c.textSecondary,
                   ),
                 ),
               ],
@@ -472,13 +473,13 @@ class AdminSubjectsPage extends ConsumerWidget {
                   ],
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                    Icon(Icons.delete_outline, color: context.c.danger, size: 20),
                     SizedBox(width: 12),
-                    Text('Delete', style: TextStyle(color: Colors.red)),
+                    Text('Delete', style: TextStyle(color: context.c.danger)),
                   ],
                 ),
               ),
@@ -540,16 +541,16 @@ class AdminSubjectsPage extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.red,
+                    color: context.c.danger,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Warning: This will permanently delete this subject from the catalog AND remove all active classes ($subjectCode) assigned to teachers.',
-                      style: const TextStyle(color: Colors.red, fontSize: 13),
+                      style: TextStyle(color: context.c.danger, fontSize: 13),
                     ),
                   ),
                 ],
@@ -575,7 +576,7 @@ class AdminSubjectsPage extends ConsumerWidget {
                       content: Text(
                         'Deleted "$subjectName" and all active classes.',
                       ),
-                      backgroundColor: Colors.red,
+                      backgroundColor: context.c.danger,
                     ),
                   );
                 }
@@ -590,7 +591,7 @@ class AdminSubjectsPage extends ConsumerWidget {
                 }
               }
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
             child: const Text('Delete Forever'),
           ),
         ],
@@ -709,9 +710,9 @@ class _AddSubjectDialogState extends ConsumerState<_AddSubjectDialog> {
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Subject added to catalog!'),
-                    backgroundColor: FluentColors.success,
+                    backgroundColor: context.c.success,
                   ),
                 );
               }
@@ -892,12 +893,12 @@ class _SubjectDetailsDialog extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                      color: context.c.accent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.analytics_outlined,
-                      color: Color(0xFF10B981),
+                      color: context.c.accent,
                       size: 24,
                     ),
                   ),
@@ -914,7 +915,7 @@ class _SubjectDetailsDialog extends ConsumerWidget {
                         Text(
                           'Code: ${subject['code']} • ${subject['year'] ?? 'Unassigned Year'}',
                           style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: FluentColors.textSecondary),
+                              ?.copyWith(color: context.c.textSecondary),
                         ),
                       ],
                     ),
@@ -930,11 +931,11 @@ class _SubjectDetailsDialog extends ConsumerWidget {
                 child: instancesAsync.when(
                   data: (instances) {
                     if (instances.isEmpty) {
-                      return const EmptyState(
+                      return EmptyState(
                         icon: Icons.class_outlined,
                         title: 'No Active Classes',
                         subtitle: 'This subject is not currently assigned to any groups.',
-                        color: FluentColors.textSecondary,
+                        color: context.c.textSecondary,
                       );
                     }
 
@@ -973,9 +974,9 @@ class _SubjectDetailsDialog extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: context.c.textPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -984,9 +985,9 @@ class _SubjectDetailsDialog extends ConsumerWidget {
             flex: 2,
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.groups_outlined,
-                  color: Color(0xFF10B981),
+                  color: context.c.accent,
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -1003,7 +1004,7 @@ class _SubjectDetailsDialog extends ConsumerWidget {
                     Text(
                       instance['type'] ?? 'Lecture',
                       style: TextStyle(
-                        color: FluentColors.textSecondary,
+                        color: context.c.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -1043,11 +1044,11 @@ class _TeacherInfo extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: const Color(0xFF2F6FED).withValues(alpha: 0.2),
+              backgroundColor: context.c.primary.withValues(alpha: 0.2),
               child: Text(
                 (data['displayName'] ?? 'T')[0],
-                style: const TextStyle(
-                  color: Color(0xFF2F6FED),
+                style: TextStyle(
+                  color: context.c.primary,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),
@@ -1064,7 +1065,7 @@ class _TeacherInfo extends ConsumerWidget {
                 Text(
                   data['email'] ?? '',
                   style: TextStyle(
-                    color: FluentColors.textSecondary,
+                    color: context.c.textSecondary,
                     fontSize: 12,
                   ),
                 ),

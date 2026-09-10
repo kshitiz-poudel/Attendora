@@ -13,6 +13,7 @@ import 'teacher_shell.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../attendance/providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class ManualAttendancePage extends ConsumerStatefulWidget {
   const ManualAttendancePage({super.key});
@@ -125,7 +126,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error fetching students: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -193,9 +194,9 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Attendance Saved Successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
         Navigator.pop(context);
@@ -206,7 +207,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error saving attendance: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -238,7 +239,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                     style: GoogleFonts.outfit(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -246,7 +247,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                     'Mark attendance for a class manually.',
                     style: GoogleFonts.outfit(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -273,11 +274,11 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                               builder: (context, child) {
                                 return Theme(
                                   data: Theme.of(context).copyWith(
-                                    colorScheme: const ColorScheme.dark(
-                                      primary: Color(0xFF10B981),
-                                      onPrimary: Colors.white,
-                                      surface: Color(0xFF1E293B),
-                                      onSurface: Colors.white,
+                                    colorScheme: ColorScheme.dark(
+                                      primary: context.c.accent,
+                                      onPrimary: context.c.textPrimary,
+                                      surface: context.c.surface,
+                                      onSurface: context.c.textPrimary,
                                     ),
                                   ),
                                   child: child!,
@@ -294,17 +295,17 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
+                              color: context.c.textPrimary.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color: context.c.textPrimary.withValues(alpha: 0.1),
                               ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.calendar_today,
-                                  color: Colors.white70,
+                                  color: context.c.textSecondary,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 12),
@@ -312,7 +313,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                   DateFormat('MMM dd, yyyy')
                                       .format(_selectedDate),
                                   style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                               ],
@@ -331,8 +332,8 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
             // Student List
             Expanded(
               child: _loading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
+                  ? Center(
+                      child: CircularProgressIndicator(color: context.c.textPrimary),
                     )
                   : _students.isEmpty
                   ? Center(
@@ -340,7 +341,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                         _selectedSubject == null
                             ? 'Select a subject to load students'
                             : 'No students found for this group',
-                        style: GoogleFonts.outfit(color: Colors.white54),
+                        style: GoogleFonts.outfit(color: context.c.textTertiary),
                       ),
                     )
                   : Column(
@@ -358,7 +359,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                               TextButton(
                                 onPressed: () => _markAll('absent'),
                                 style: TextButton.styleFrom(
-                                  foregroundColor: Colors.redAccent,
+                                  foregroundColor: context.c.danger,
                                 ),
                                 child: const Text('Mark All Absent'),
                               ),
@@ -384,14 +385,14 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                   children: [
                                     CircleAvatar(
                                       radius: 16,
-                                      backgroundColor: Colors.white.withValues(
+                                      backgroundColor: context.c.textPrimary.withValues(
                                         alpha: 0.1,
                                       ),
                                       child: Text(
                                         (student['displayName'] as String)[0]
                                             .toUpperCase(),
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white,
+                                          color: context.c.textPrimary,
                                         ),
                                       ),
                                     ),
@@ -404,14 +405,14 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                           Text(
                                             student['displayName'],
                                             style: GoogleFonts.outfit(
-                                              color: Colors.white,
+                                              color: context.c.textPrimary,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                           Text(
                                             student['rollNumber'],
                                             style: GoogleFonts.outfit(
-                                              color: Colors.white54,
+                                              color: context.c.textTertiary,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -423,7 +424,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                       children: [
                                         _StatusButton(
                                           label: 'P',
-                                          color: const Color(0xFF10B981),
+                                          color: context.c.accent,
                                           isSelected: status == 'present',
                                           onTap: () => setState(
                                             () => _attendanceStatus[uid] =
@@ -433,7 +434,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                         const SizedBox(width: 8),
                                         _StatusButton(
                                           label: 'L',
-                                          color: const Color(0xFFF59E0B),
+                                          color: context.c.warning,
                                           isSelected: status == 'late',
                                           onTap: () => setState(
                                             () =>
@@ -443,7 +444,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                                         const SizedBox(width: 8),
                                         _StatusButton(
                                           label: 'A',
-                                          color: const Color(0xFFEF4444),
+                                          color: context.c.danger,
                                           isSelected: status == 'absent',
                                           onTap: () => setState(
                                             () => _attendanceStatus[uid] =
@@ -465,8 +466,8 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
                           child: ElevatedButton(
                             onPressed: _saveAttendance,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF10B981),
-                              foregroundColor: Colors.white,
+                              backgroundColor: context.c.accent,
+                              foregroundColor: context.c.textPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -497,7 +498,7 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
         return GlassDropdown<String>(
           value: _selectedSubject,
           hint: 'Select Subject & Group',
-          icon: const Icon(Icons.class_, color: Colors.white70),
+          icon: Icon(Icons.class_, color: context.c.textSecondary),
           items: allSubjects.map((subject) {
             final name = subject['name'] ?? 'Untitled';
             final group = subject['group'] ?? 'No Group';
@@ -517,10 +518,10 @@ class _ManualAttendancePageState extends ConsumerState<ManualAttendancePage> {
         );
       },
       loading: () =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
-      error: (_, __) => const Text(
+          Center(child: CircularProgressIndicator(color: context.c.textPrimary)),
+      error: (_, __) => Text(
         'Error loading subjects',
-        style: TextStyle(color: Colors.red),
+        style: TextStyle(color: context.c.danger),
       ),
     );
   }
@@ -548,14 +549,14 @@ class _StatusButton extends StatelessWidget {
         height: 32,
         decoration: BoxDecoration(
           color: isSelected ? color : Colors.transparent,
-          border: Border.all(color: isSelected ? color : Colors.white24),
+          border: Border.all(color: isSelected ? color : context.c.border),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
           child: Text(
             label,
             style: GoogleFonts.outfit(
-              color: isSelected ? Colors.white : Colors.white54,
+              color: isSelected ? context.c.textPrimary : context.c.textTertiary,
               fontWeight: FontWeight.bold,
             ),
           ),

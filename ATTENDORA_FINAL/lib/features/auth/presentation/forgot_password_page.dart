@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../../../core/design/app_colors.dart';
 
 class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -39,7 +40,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             'Please enter your email address',
             style: GoogleFonts.outfit(),
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: context.c.warning,
         ),
       );
       return;
@@ -53,7 +54,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             'Please enter a valid email address',
             style: GoogleFonts.outfit(),
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: context.c.warning,
         ),
       );
       return;
@@ -67,7 +68,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             'Please enter your ID Number',
             style: GoogleFonts.outfit(),
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: context.c.warning,
         ),
       );
       return;
@@ -100,7 +101,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 'ID Number does not match the email provided.',
                 style: GoogleFonts.outfit(),
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: context.c.danger,
             ),
           );
         }
@@ -132,7 +133,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message, style: GoogleFonts.outfit()),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -145,7 +146,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               'An unexpected error occurred: $e',
               style: GoogleFonts.outfit(),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -175,8 +176,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color(0xFFF59E0B).withValues(alpha: 0.2),
-                              const Color(0xFFEF4444).withValues(alpha: 0.2),
+                              context.c.warning.withValues(alpha: 0.2),
+                              context.c.danger.withValues(alpha: 0.2),
                             ],
                           ),
                           borderRadius: const BorderRadius.only(
@@ -189,27 +190,27 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(
+                                gradient: LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
-                                    Color(0xFFF59E0B),
-                                    Color(0xFFEF4444),
+                                    context.c.warning,
+                                    context.c.danger,
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFF59E0B)
+                                    color: context.c.warning
                                         .withValues(alpha: 0.3),
                                     blurRadius: 20,
                                     offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.lock_reset_rounded,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                                 size: 32,
                               ),
                             ),
@@ -219,7 +220,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                               style: GoogleFonts.outfit(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -228,7 +229,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                   ? 'Check your email for reset instructions'
                                   : 'Enter your email to receive a password reset link',
                               style: GoogleFonts.outfit(
-                                color: Colors.white70,
+                                color: context.c.textSecondary,
                                 fontSize: 14,
                               ),
                               textAlign: TextAlign.center,
@@ -252,7 +253,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                       Text(
                                         'Email Address',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white70,
+                                          color: context.c.textSecondary,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -263,21 +264,21 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         keyboardType:
                                             TextInputType.emailAddress,
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white,
+                                          color: context.c.textPrimary,
                                         ),
                                         decoration: InputDecoration(
                                           hintText: 'you@example.com',
                                           hintStyle: GoogleFonts.outfit(
-                                            color: Colors.white.withValues(
+                                            color: context.c.textPrimary.withValues(
                                               alpha: 0.3,
                                             ),
                                           ),
-                                          prefixIcon: const Icon(
+                                          prefixIcon: Icon(
                                             Icons.email_outlined,
-                                            color: Colors.white54,
+                                            color: context.c.textTertiary,
                                           ),
                                           filled: true,
-                                          fillColor: Colors.white.withValues(
+                                          fillColor: context.c.textPrimary.withValues(
                                             alpha: 0.05,
                                           ),
                                           border: OutlineInputBorder(
@@ -285,7 +286,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                               12,
                                             ),
                                             borderSide: BorderSide(
-                                              color: Colors.white.withValues(
+                                              color: context.c.textPrimary.withValues(
                                                 alpha: 0.1,
                                               ),
                                             ),
@@ -295,7 +296,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                               12,
                                             ),
                                             borderSide: BorderSide(
-                                              color: Colors.white.withValues(
+                                              color: context.c.textPrimary.withValues(
                                                 alpha: 0.1,
                                               ),
                                             ),
@@ -304,8 +305,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFF59E0B),
+                                            borderSide: BorderSide(
+                                              color: context.c.warning,
                                               width: 2,
                                             ),
                                           ),
@@ -329,7 +330,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                       Text(
                                         'ID Number',
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white70,
+                                          color: context.c.textSecondary,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -339,21 +340,21 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         controller: _idController,
                                         keyboardType: TextInputType.number,
                                         style: GoogleFonts.outfit(
-                                          color: Colors.white,
+                                          color: context.c.textPrimary,
                                         ),
                                         decoration: InputDecoration(
                                           hintText: 'e.g., 1023670091',
                                           hintStyle: GoogleFonts.outfit(
-                                            color: Colors.white.withValues(
+                                            color: context.c.textPrimary.withValues(
                                               alpha: 0.3,
                                             ),
                                           ),
-                                          prefixIcon: const Icon(
+                                          prefixIcon: Icon(
                                             Icons.badge_outlined,
-                                            color: Colors.white54,
+                                            color: context.c.textTertiary,
                                           ),
                                           filled: true,
-                                          fillColor: Colors.white.withValues(
+                                          fillColor: context.c.textPrimary.withValues(
                                             alpha: 0.05,
                                           ),
                                           border: OutlineInputBorder(
@@ -361,7 +362,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                               12,
                                             ),
                                             borderSide: BorderSide(
-                                              color: Colors.white.withValues(
+                                              color: context.c.textPrimary.withValues(
                                                 alpha: 0.1,
                                               ),
                                             ),
@@ -371,7 +372,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                               12,
                                             ),
                                             borderSide: BorderSide(
-                                              color: Colors.white.withValues(
+                                              color: context.c.textPrimary.withValues(
                                                 alpha: 0.1,
                                               ),
                                             ),
@@ -380,8 +381,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFF59E0B),
+                                            borderSide: BorderSide(
+                                              color: context.c.warning,
                                               width: 2,
                                             ),
                                           ),
@@ -405,10 +406,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                           ? null
                                           : _sendPasswordResetEmail,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFFF59E0B,
-                                        ),
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: context.c.warning,
+                                        foregroundColor: context.c.textPrimary,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
                                             12,
@@ -417,12 +416,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         elevation: 0,
                                       ),
                                       child: _loading
-                                          ? const SizedBox(
+                                          ? SizedBox(
                                               height: 20,
                                               width: 20,
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2,
-                                                color: Colors.white,
+                                                color: context.c.textPrimary,
                                               ),
                                             )
                                           : Text(
@@ -446,7 +445,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         Text(
                                           'Remember your password? ',
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white70,
+                                            color: context.c.textSecondary,
                                             fontSize: 14,
                                           ),
                                         ),
@@ -463,7 +462,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                           child: Text(
                                             'Log in',
                                             style: GoogleFonts.outfit(
-                                              color: const Color(0xFFF59E0B),
+                                              color: context.c.warning,
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -481,26 +480,26 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                   Container(
                                     padding: const EdgeInsets.all(20),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF10B981)
+                                      color: context.c.accent
                                           .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: const Color(0xFF10B981)
+                                        color: context.c.accent
                                             .withValues(alpha: 0.3),
                                       ),
                                     ),
                                     child: Column(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.check_circle_outline,
-                                          color: Color(0xFF10B981),
+                                          color: context.c.accent,
                                           size: 48,
                                         ),
                                         const SizedBox(height: 16),
                                         Text(
                                           'Email Sent!',
                                           style: GoogleFonts.outfit(
-                                            color: const Color(0xFF10B981),
+                                            color: context.c.accent,
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -509,7 +508,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         Text(
                                           'We\'ve sent a password reset link to:',
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white70,
+                                            color: context.c.textSecondary,
                                             fontSize: 14,
                                           ),
                                           textAlign: TextAlign.center,
@@ -518,7 +517,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         Text(
                                           _emailController.text.trim(),
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white,
+                                            color: context.c.textPrimary,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -528,7 +527,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         Text(
                                           'Please check your inbox and follow the instructions to reset your password.',
                                           style: GoogleFonts.outfit(
-                                            color: Colors.white60,
+                                            color: context.c.textSecondary,
                                             fontSize: 13,
                                           ),
                                           textAlign: TextAlign.center,
@@ -547,8 +546,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                       });
                                     },
                                     style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(
-                                        color: Color(0xFFF59E0B),
+                                      side: BorderSide(
+                                        color: context.c.warning,
                                       ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -560,7 +559,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                     child: Text(
                                       'Resend Email',
                                       style: GoogleFonts.outfit(
-                                        color: const Color(0xFFF59E0B),
+                                        color: context.c.warning,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -576,10 +575,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                         context.go('/login');
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF10B981,
-                                        ),
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: context.c.accent,
+                                        foregroundColor: context.c.textPrimary,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
                                             12,

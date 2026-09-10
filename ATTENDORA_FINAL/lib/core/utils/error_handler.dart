@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../core/design/app_colors.dart';
 
 /// Professional error handling utility
 /// Converts technical errors to user-friendly messages
@@ -89,38 +90,83 @@ class ErrorHandler {
     return 'Something went wrong. Please try again';
   }
 
+  /// A short technical tag appended to the friendly message: the Firebase
+  /// error code when there is one, otherwise a trimmed form of the raw
+  /// error. Previously, passing `customMessage` (every call site in the app
+  /// does) discarded the real exception entirely - every failure anywhere
+  /// showed the same generic banner with no way to tell a permission
+  /// problem from a network timeout from a bad write, for the person
+  /// hitting it or for whoever they reported it to.
+  static String? _technicalTag(dynamic error) {
+    if (error is FirebaseException) return error.code;
+    if (error is FirebaseAuthException) return error.code;
+    if (error == null) return null;
+    var text = error.toString();
+    if (text.startsWith('Exception: ')) {
+      text = text.substring('Exception: '.length);
+    }
+    return text.length > 140 ? '${text.substring(0, 140)}…' : text;
+  }
+
   /// Show professional error SnackBar
   static void showErrorSnackBar(
     BuildContext context,
     dynamic error, {
     String? customMessage,
   }) {
+    // Always logged, regardless of customMessage, so the real cause is at
+    // least in the browser/device console even when the UI shows a
+    // simplified message.
+    debugPrint('ErrorHandler: $error');
+
     if (!context.mounted) return;
 
     final message = customMessage ?? getUserFriendlyMessage(error);
+    final tag = _technicalTag(error);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            Icon(Icons.error_outline, color: context.c.textPrimary, size: 20),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message,
+                    style: TextStyle(color: context.c.textPrimary, fontSize: 14),
+                  ),
+                  // Shown whenever we have anything more specific than the
+                  // friendly message, so an admin can read the actual
+                  // reason (a permission code, a timeout, ...) without
+                  // opening devtools.
+                  if (tag != null && tag.isNotEmpty && tag != message)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        tag,
+                        style: TextStyle(
+                          color: context.c.textPrimary.withValues(alpha: 0.7),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFFEF4444), // Red
+        backgroundColor: context.c.danger, // Red
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 6),
         action: SnackBarAction(
           label: 'Dismiss',
-          textColor: Colors.white,
+          textColor: context.c.textPrimary,
           onPressed: () {},
         ),
       ),
@@ -135,21 +181,21 @@ class ErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle_outline,
-              color: Colors.white,
+              color: context.c.textPrimary,
               size: 20,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: context.c.textPrimary, fontSize: 14),
               ),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF10B981), // Green
+        backgroundColor: context.c.accent, // Green
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         margin: const EdgeInsets.all(16),
@@ -166,17 +212,17 @@ class ErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.info_outline, color: Colors.white, size: 20),
+            Icon(Icons.info_outline, color: context.c.textPrimary, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: context.c.textPrimary, fontSize: 14),
               ),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF2F6FED), // Blue
+        backgroundColor: context.c.primary, // Blue
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         margin: const EdgeInsets.all(16),
@@ -193,21 +239,21 @@ class ErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.warning_amber_rounded,
-              color: Colors.white,
+              color: context.c.textPrimary,
               size: 20,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: context.c.textPrimary, fontSize: 14),
               ),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFFF59E0B), // Orange
+        backgroundColor: context.c.warning, // Orange
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         margin: const EdgeInsets.all(16),
@@ -220,7 +266,10 @@ class ErrorHandler {
   static Widget buildErrorWidget(dynamic error, {String? customMessage}) {
     final message = customMessage ?? getUserFriendlyMessage(error);
 
-    return Center(
+    // Builder supplies a BuildContext so the error styling can resolve theme
+    // tokens, without every caller having to pass one in.
+    return Builder(
+      builder: (context) => Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -229,27 +278,28 @@ class ErrorHandler {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                color: context.c.danger.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.error_outline,
-                color: Color(0xFFEF4444),
+                color: context.c.danger,
                 size: 48,
               ),
             ),
             const SizedBox(height: 16),
             Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFFEF4444),
+                color: context.c.danger,
               ),
               textAlign: TextAlign.center,
             ),
           ],
         ),
+      ),
       ),
     );
   }

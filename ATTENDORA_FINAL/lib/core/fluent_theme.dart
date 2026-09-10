@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'design/app_colors.dart';
+
 /// Fluent Design color system
 class FluentColors {
   // Primary accent
@@ -248,8 +250,8 @@ class _FluentButtonState extends State<FluentButton> {
                 Icon(
                   widget.icon,
                   color: widget.isPrimary
-                      ? Colors.white
-                      : FluentColors.accentColor,
+                      ? context.c.onPrimary
+                      : context.c.accent,
                   size: 20,
                 ),
                 const SizedBox(width: FluentDesignTokens.spacingSmall),
@@ -257,10 +259,8 @@ class _FluentButtonState extends State<FluentButton> {
               DefaultTextStyle(
                 style: TextStyle(
                   color: widget.isPrimary
-                      ? Colors.white
-                      : (isDark
-                            ? FluentColors.textPrimaryDark
-                            : FluentColors.textPrimary),
+                      ? context.c.onPrimary
+                      : context.c.textPrimary,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,

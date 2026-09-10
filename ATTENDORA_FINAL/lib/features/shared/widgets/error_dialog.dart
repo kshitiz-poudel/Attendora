@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/design/app_colors.dart';
 
 class ErrorDialog {
   static Future<void> show(
@@ -23,8 +24,8 @@ class ErrorDialog {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1E293B).withValues(alpha: 0.95),
-                  const Color(0xFF0F172A).withValues(alpha: 0.95),
+                  context.c.surface.withValues(alpha: 0.95),
+                  context.c.canvas.withValues(alpha: 0.95),
                 ],
               ),
               borderRadius: BorderRadius.circular(20),
@@ -49,9 +50,9 @@ class ErrorDialog {
                         width: 2,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.error_outline,
-                      color: Colors.red,
+                      color: context.c.danger,
                       size: 48,
                     ),
                   ),
@@ -63,7 +64,7 @@ class ErrorDialog {
                     style: GoogleFonts.outfit(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -74,7 +75,7 @@ class ErrorDialog {
                     message,
                     style: GoogleFonts.outfit(
                       fontSize: 14,
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                       height: 1.5,
                     ),
                     textAlign: TextAlign.center,
@@ -91,8 +92,8 @@ class ErrorDialog {
                         onAction?.call();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                        backgroundColor: context.c.danger,
+                        foregroundColor: context.c.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

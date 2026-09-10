@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../shared/widgets/glass_card.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class AuditLogsPage extends ConsumerWidget {
   const AuditLogsPage({super.key});
@@ -26,7 +27,7 @@ class AuditLogsPage extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -34,7 +35,7 @@ class AuditLogsPage extends ConsumerWidget {
                   'Track all critical actions performed in the system.',
                   style: GoogleFonts.outfit(
                     fontSize: 16,
-                    color: Colors.white70,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -53,7 +54,7 @@ class AuditLogsPage extends ConsumerWidget {
                   return Center(
                     child: Text(
                       'Error: ${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: context.c.danger),
                     ),
                   );
                 }
@@ -70,12 +71,12 @@ class AuditLogsPage extends ConsumerWidget {
                         Icon(
                           Icons.history_edu_rounded,
                           size: 64,
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: context.c.textPrimary.withValues(alpha: 0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'No logs found',
-                          style: GoogleFonts.outfit(color: Colors.white38),
+                          style: GoogleFonts.outfit(color: context.c.textTertiary),
                         ),
                       ],
                     ),
@@ -117,21 +118,21 @@ class _AuditLogItem extends StatelessWidget {
         ? DateFormat('MMM dd, HH:mm').format(timestamp)
         : 'N/A';
 
-    Color actionColor = Colors.blue;
+    Color actionColor = context.c.info;
     IconData icon = Icons.info_outline;
 
     if (action.contains('DELETE') ||
         action.contains('BAN') ||
         action.contains('REMOVE')) {
-      actionColor = Colors.redAccent;
+      actionColor = context.c.danger;
       icon = Icons.delete_outline;
     } else if (action.contains('CREATE') ||
         action.contains('ADD') ||
         action.contains('APPROVE')) {
-      actionColor = Colors.greenAccent;
+      actionColor = context.c.success;
       icon = Icons.add_circle_outline;
     } else if (action.contains('UPDATE') || action.contains('EDIT')) {
-      actionColor = Colors.orangeAccent;
+      actionColor = context.c.warning;
       icon = Icons.edit_outlined;
     } else if (action.contains('LOGIN') || action.contains('IMPERSONATE')) {
       actionColor = Colors.purpleAccent;
@@ -169,7 +170,7 @@ class _AuditLogItem extends StatelessWidget {
                     Text(
                       'by $actorName',
                       style: GoogleFonts.outfit(
-                        color: Colors.white54,
+                        color: context.c.textTertiary,
                         fontSize: 12,
                       ),
                     ),
@@ -179,7 +180,7 @@ class _AuditLogItem extends StatelessWidget {
                   Text(
                     details,
                     style: GoogleFonts.outfit(
-                      color: Colors.white70,
+                      color: context.c.textSecondary,
                       fontSize: 13,
                     ),
                   ),
@@ -188,7 +189,7 @@ class _AuditLogItem extends StatelessWidget {
           ),
           Text(
             timeStr,
-            style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12),
+            style: GoogleFonts.outfit(color: context.c.textTertiary, fontSize: 12),
           ),
         ],
       ),

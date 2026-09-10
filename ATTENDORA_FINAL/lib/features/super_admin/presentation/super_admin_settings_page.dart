@@ -6,6 +6,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../services/system_settings_service.dart';
 import 'super_admin_shell.dart';
+import '../../../core/design/app_colors.dart';
 
 class SuperAdminSettingsPage extends ConsumerStatefulWidget {
   const SuperAdminSettingsPage({super.key});
@@ -58,7 +59,7 @@ class _SuperAdminSettingsPageState
                         style: GoogleFonts.outfit(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -66,7 +67,7 @@ class _SuperAdminSettingsPageState
                         'Configure global system behavior and flags.',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
-                          color: Colors.white70,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -87,18 +88,18 @@ class _SuperAdminSettingsPageState
                           style: GoogleFonts.outfit(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 24),
                         SwitchListTile(
                           title: Text(
                             'Maintenance Mode',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                           subtitle: Text(
                             'Prevent non-admin users from logging in',
-                            style: GoogleFonts.outfit(color: Colors.white54),
+                            style: GoogleFonts.outfit(color: context.c.textTertiary),
                           ),
                           value: maintenanceMode,
                           onChanged: (value) {
@@ -106,17 +107,17 @@ class _SuperAdminSettingsPageState
                                 .read(systemSettingsServiceProvider)
                                 .updateMaintenanceMode(value);
                           },
-                          activeThumbColor: Colors.redAccent,
+                          activeThumbColor: context.c.danger,
                         ),
-                        const Divider(color: Colors.white10),
+                        Divider(color: context.c.border),
                         SwitchListTile(
                           title: Text(
                             'Allow New Registrations',
-                            style: GoogleFonts.outfit(color: Colors.white),
+                            style: GoogleFonts.outfit(color: context.c.textPrimary),
                           ),
                           subtitle: Text(
                             'Enable or disable new user signups globally',
-                            style: GoogleFonts.outfit(color: Colors.white54),
+                            style: GoogleFonts.outfit(color: context.c.textTertiary),
                           ),
                           value: allowNewRegistrations,
                           onChanged: (value) {
@@ -124,7 +125,7 @@ class _SuperAdminSettingsPageState
                                 .read(systemSettingsServiceProvider)
                                 .updateAllowNewRegistrations(value);
                           },
-                          activeThumbColor: const Color(0xFF10B981),
+                          activeThumbColor: context.c.accent,
                         ),
                       ],
                     ),
@@ -146,26 +147,26 @@ class _SuperAdminSettingsPageState
                           style: GoogleFonts.outfit(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'This message will be displayed to all users on their dashboard.',
-                          style: GoogleFonts.outfit(color: Colors.white54),
+                          style: GoogleFonts.outfit(color: context.c.textTertiary),
                         ),
                         const SizedBox(height: 24),
                         TextField(
                           controller: _announcementController,
-                          style: GoogleFonts.outfit(color: Colors.white),
+                          style: GoogleFonts.outfit(color: context.c.textPrimary),
                           maxLines: 3,
                           decoration: InputDecoration(
                             hintText: 'Enter announcement message...',
                             hintStyle: GoogleFonts.outfit(
-                              color: Colors.white30,
+                              color: context.c.borderStrong,
                             ),
                             filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.05),
+                            fillColor: context.c.textPrimary.withValues(alpha: 0.05),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -191,7 +192,7 @@ class _SuperAdminSettingsPageState
                               }
                             },
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF10B981),
+                              backgroundColor: context.c.accent,
                             ),
                             child: const Text('Update Announcement'),
                           ),
@@ -206,7 +207,7 @@ class _SuperAdminSettingsPageState
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text('Error: $e', style: const TextStyle(color: Colors.red)),
+          child: Text('Error: $e', style: TextStyle(color: context.c.danger)),
         ),
       ),
     );

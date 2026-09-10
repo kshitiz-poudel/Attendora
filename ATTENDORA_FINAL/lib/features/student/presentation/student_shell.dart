@@ -7,6 +7,8 @@ import '../../shared/widgets/modern_sidebar.dart';
 import '../../../features/auth/providers.dart';
 import '../../notifications/providers.dart';
 import '../services/scheduler_service.dart';
+import '../../../core/design/app_colors.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class StudentShell extends ConsumerWidget {
   const StudentShell({super.key, required this.child});
@@ -137,8 +139,8 @@ class StudentShell extends ConsumerWidget {
                 child: IgnorePointer(
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: context.c.danger,
                       shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(
@@ -147,8 +149,8 @@ class StudentShell extends ConsumerWidget {
                     ),
                     child: Text(
                       unreadCount > 9 ? '9+' : '$unreadCount',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.c.textPrimary,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -174,10 +176,15 @@ class StudentShell extends ConsumerWidget {
           appBar: isMobile
               ? AppBar(
                   title: const Text('Attendora'),
-                  backgroundColor: const Color(0xFF0B1121),
-                  foregroundColor: Colors.white,
+                  backgroundColor: context.c.canvas,
+                  foregroundColor: context.c.textPrimary,
                   leading: context.canPop() ? const BackButton() : null,
                   actions: [
+                    // Light / dark / system switcher.
+                    const Padding(
+                      padding: EdgeInsets.only(right: 4),
+                      child: ThemeToggleButton(),
+                    ),
                     if (!location.contains('/student/notifications'))
                       notificationIcon,
                     const SizedBox(width: 8),
@@ -198,16 +205,16 @@ class StudentShell extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.visibility,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'You are impersonating this user',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -219,8 +226,8 @@ class StudentShell extends ConsumerWidget {
                                 .stopImpersonation();
                           },
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: const BorderSide(color: Colors.white),
+                            foregroundColor: context.c.textPrimary,
+                            side: BorderSide(color: context.c.textPrimary),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 0,
@@ -284,8 +291,8 @@ class _LogoutButton extends ConsumerWidget {
       icon: const Icon(Icons.logout_rounded),
       label: const Text('Logout'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1E293B),
-        foregroundColor: const Color(0xFF94A3B8),
+        backgroundColor: context.c.surface,
+        foregroundColor: context.c.textSecondary,
         minimumSize: const Size(double.infinity, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

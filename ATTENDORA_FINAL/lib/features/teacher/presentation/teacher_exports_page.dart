@@ -7,6 +7,7 @@ import '../../auth/providers.dart';
 import '../providers.dart';
 import '../../../core/subject_export_generator.dart';
 import '../../shared/services/file_download_helper.dart';
+import '../../../core/design/app_colors.dart';
 
 class TeacherExportsPage extends ConsumerStatefulWidget {
   const TeacherExportsPage({super.key});
@@ -39,9 +40,9 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('PDF downloaded successfully'),
-            backgroundColor: Color(0xFF10B981),
+            backgroundColor: context.c.accent,
           ),
         );
       }
@@ -50,7 +51,7 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error exporting PDF: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -83,9 +84,9 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Excel downloaded successfully'),
-              backgroundColor: Color(0xFF10B981),
+              backgroundColor: context.c.accent,
             ),
           );
         }
@@ -95,7 +96,7 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error exporting Excel: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.c.danger,
           ),
         );
       }
@@ -119,10 +120,10 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF10B981), Color(0xFF2F6FED)],
+                colors: [context.c.accent, context.c.primary],
               ),
             ),
             padding: const EdgeInsets.all(24),
@@ -131,12 +132,12 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: context.c.textPrimary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.download_rounded,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                     size: 32,
                   ),
                 ),
@@ -150,7 +151,7 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
                         style: GoogleFonts.outfit(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -158,7 +159,7 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
                         'Download comprehensive attendance reports for your subjects',
                         style: GoogleFonts.outfit(
                           fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: context.c.textPrimary.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -233,10 +234,10 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.error_outline,
                       size: 48,
-                      color: Colors.red,
+                      color: context.c.danger,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -251,7 +252,7 @@ class _TeacherExportsPageState extends ConsumerState<TeacherExportsPage> {
                       error.toString(),
                       style: GoogleFonts.outfit(
                         fontSize: 12,
-                        color: Colors.grey,
+                        color: context.c.textTertiary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -289,10 +290,10 @@ class _SubjectExportCard extends StatelessWidget {
     final type = subject['type'] as String? ?? '';
 
     final colors = [
-      const Color(0xFF10B981),
-      const Color(0xFF2F6FED),
-      const Color(0xFF10B981),
-      const Color(0xFFF59E0B),
+      context.c.accent,
+      context.c.primary,
+      context.c.accent,
+      context.c.warning,
       const Color(0xFFEC4899),
     ];
     final color = colors[subjectName.length % colors.length];
@@ -403,8 +404,8 @@ class _SubjectExportCard extends StatelessWidget {
                     label: Text('PDF', style: GoogleFonts.outfit(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: const Color(0xFFEF4444),
-                      foregroundColor: Colors.white,
+                      backgroundColor: context.c.danger,
+                      foregroundColor: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -425,8 +426,8 @@ class _SubjectExportCard extends StatelessWidget {
                     ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: const Color(0xFF10B981),
-                      foregroundColor: Colors.white,
+                      backgroundColor: context.c.accent,
+                      foregroundColor: context.c.textPrimary,
                     ),
                   ),
                 ),

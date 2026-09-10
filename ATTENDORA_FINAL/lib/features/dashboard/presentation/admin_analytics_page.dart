@@ -8,6 +8,7 @@ import '../../../core/utils/error_handler.dart';
 import '../../shared/widgets/attendance_chart.dart';
 import 'admin_shell.dart';
 import 'analytics_providers.dart';
+import '../../../core/design/app_colors.dart';
 
 class AdminAnalyticsPage extends ConsumerWidget {
   const AdminAnalyticsPage({super.key});
@@ -75,7 +76,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
           end: Alignment.bottomRight,
           colors: [
             Theme.of(context).colorScheme.primary.withValues(alpha: .08),
-            const Color(0xFF1E293B),
+            context.c.surface,
           ],
         ),
       ),
@@ -104,7 +105,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                   'Attendance Analytics',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: Colors.white, // White text
+                    color: context.c.textPrimary, // White text
                   ),
                 ),
                 if (!isMobile) ...[
@@ -112,7 +113,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                   Text(
                     'Monitor attendance trends, user activity, and system performance in real-time.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(
+                      color: context.c.textPrimary.withValues(
                         alpha: 0.7,
                       ), // Light white text
                     ),
@@ -152,14 +153,14 @@ class AdminAnalyticsPage extends ConsumerWidget {
         value: totalStatsAsync.isLoading ? '...' : totalStudents.toString(),
         subtitle: 'Registered students',
         icon: Icons.people,
-        color: const Color(0xFF2F6FED),
+        color: context.c.primary,
       ),
       _MetricCardData(
         title: 'Total Sessions',
         value: totalStatsAsync.isLoading ? '...' : totalSessions.toString(),
         subtitle: '$todaySessions created today',
         icon: Icons.event,
-        color: const Color(0xFF10B981),
+        color: context.c.accent,
       ),
       _MetricCardData(
         title: 'Active Sessions',
@@ -168,7 +169,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
             : activeSessions.toString(),
         subtitle: 'Running right now',
         icon: Icons.qr_code_scanner,
-        color: const Color(0xFF10B981),
+        color: context.c.accent,
       ),
       _MetricCardData(
         title: 'Total Attendance',
@@ -177,7 +178,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
             : totalAttendance.toString(),
         subtitle: 'Records across all sessions',
         icon: Icons.check_circle,
-        color: const Color(0xFF16A34A),
+        color: context.c.success,
       ),
       _MetricCardData(
         title: 'Avg per Session',
@@ -243,9 +244,9 @@ class AdminAnalyticsPage extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B), // Dark background for better contrast
+        color: context.c.surface, // Dark background for better contrast
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: .1),
@@ -274,7 +275,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
             data.value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Colors.white, // White text for better contrast
+              color: context.c.textPrimary, // White text for better contrast
             ),
           ),
           const SizedBox(height: 4),
@@ -282,14 +283,14 @@ class AdminAnalyticsPage extends ConsumerWidget {
             data.title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: Colors.white.withValues(alpha: 0.9), // White text
+              color: context.c.textPrimary.withValues(alpha: 0.9), // White text
             ),
           ),
           const SizedBox(height: 2),
           Text(
             data.subtitle,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white.withValues(
+              color: context.c.textPrimary.withValues(
                 alpha: 0.6,
               ), // Light white text for subtitle
             ),
@@ -305,9 +306,9 @@ class AdminAnalyticsPage extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B), // Dark background
+        color: context.c.surface, // Dark background
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: context.c.textPrimary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +320,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                   'Recent Sessions',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.white, // White text
+                    color: context.c.textPrimary, // White text
                   ),
                 ),
               ),
@@ -340,7 +341,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                     child: Text(
                       'No recent activity',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: context.c.textPrimary.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -353,7 +354,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                 itemCount: activities.length,
                 separatorBuilder: (_, __) => Divider(
                   height: 24,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: context.c.textPrimary.withValues(alpha: 0.1),
                 ),
                 itemBuilder: (context, index) {
                   final activity = activities[index];
@@ -381,15 +382,15 @@ class AdminAnalyticsPage extends ConsumerWidget {
           height: 40,
           decoration: BoxDecoration(
             color: activity.isActive
-                ? const Color(0xFF10B981).withValues(alpha: .1)
-                : const Color(0xFF64748B).withValues(alpha: .1),
+                ? context.c.accent.withValues(alpha: .1)
+                : context.c.textTertiary.withValues(alpha: .1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             activity.isActive ? Icons.play_circle : Icons.check_circle,
             color: activity.isActive
-                ? const Color(0xFF10B981)
-                : const Color(0xFF64748B),
+                ? context.c.accent
+                : context.c.textTertiary,
             size: 20,
           ),
         ),
@@ -400,10 +401,10 @@ class AdminAnalyticsPage extends ConsumerWidget {
             children: [
               Text(
                 activity.subject,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
-                  color: Colors.white, // White text
+                  color: context.c.textPrimary, // White text
                 ),
               ),
               const SizedBox(height: 2),
@@ -411,7 +412,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                 'by ${activity.teacherName}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withValues(
+                  color: context.c.textPrimary.withValues(
                     alpha: 0.6,
                   ), // Light white text
                 ),
@@ -429,7 +430,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                     '${activity.attendanceCount} attended',
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.white.withValues(
+                      color: context.c.textPrimary.withValues(
                         alpha: 0.5,
                       ), // Light white text
                     ),
@@ -440,7 +441,7 @@ class AdminAnalyticsPage extends ConsumerWidget {
                       '• ${_formatTimestamp(activity.timestamp!)}',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.white.withValues(
+                        color: context.c.textPrimary.withValues(
                           alpha: 0.5,
                         ), // Light white text
                       ),
@@ -455,15 +456,15 @@ class AdminAnalyticsPage extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF10B981),
+              color: context.c.accent,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: const Text(
+            child: Text(
               'LIVE',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
             ),
           ),

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
 import 'empty_state.dart';
@@ -12,6 +11,7 @@ import 'shimmer_loading.dart';
 
 // Provider for low attendance alerts - connected to real Firestore data
 import 'package:async/async.dart';
+import '../../../core/design/app_colors.dart';
 
 // Provider for alerts - connected to real Firestore data via Streams
 final lowAttendanceAlertsProvider = StreamProvider<List<Map<String, dynamic>>>((
@@ -245,16 +245,16 @@ class AlertsCard extends ConsumerWidget {
     }
   }
 
-  Color _getSeverityColor(String severity) {
+  Color _getSeverityColor(BuildContext context, String severity) {
     switch (severity) {
       case 'critical':
-        return const Color(0xFFDC2626);
+        return context.c.danger;
       case 'warning':
-        return const Color(0xFFF59E0B);
+        return context.c.warning;
       case 'info':
-        return const Color(0xFF2F6FED);
+        return context.c.primary;
       default:
-        return const Color(0xFF64748B);
+        return context.c.textTertiary;
     }
   }
 
@@ -290,14 +290,14 @@ class AlertsCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF59E0B), Color(0xFFF97316)],
+                  gradient: LinearGradient(
+                    colors: [context.c.warning, Color(0xFFF97316)],
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_active,
-                  color: Colors.white,
+                  color: context.c.textPrimary,
                   size: 20,
                 ),
               ),
@@ -308,7 +308,7 @@ class AlertsCard extends ConsumerWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.c.textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -319,32 +319,32 @@ class AlertsCard extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDC2626),
+                  color: context.c.danger,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: alertsAsync.when(
                   data: (alerts) => Text(
                     '${alerts.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  loading: () => const SizedBox(
+                  loading: () => SizedBox(
                     width: 12,
                     height: 12,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(context.c.textPrimary),
                     ),
                   ),
-                  error: (_, __) => const Text(
+                  error: (_, __) => Text(
                     '0',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -355,11 +355,11 @@ class AlertsCard extends ConsumerWidget {
           alertsAsync.when(
             data: (alerts) {
               if (alerts.isEmpty) {
-                return const EmptyState(
+                return EmptyState(
                   icon: Icons.check_circle_outline,
                   title: 'All Clear!',
                   subtitle: 'No alerts or warnings at this time',
-                  color: FluentColors.success,
+                  color: context.c.success,
                 );
               }
 
@@ -372,7 +372,7 @@ class AlertsCard extends ConsumerWidget {
                   final alert = alerts[index];
                   final severity = alert['severity'] as String;
                   final type = alert['type'] as String;
-                  final color = _getSeverityColor(severity);
+                  final color = _getSeverityColor(context, severity);
                   final icon = _getAlertIcon(type);
                   final message = _getAlertMessage(alert);
 
@@ -399,16 +399,16 @@ class AlertsCard extends ConsumerWidget {
                             message,
                             style: GoogleFonts.outfit(
                               fontSize: 14,
-                              color: Colors.white,
+                              color: context.c.textPrimary,
                             ),
                           ),
                         ),
                         IconButton(
                           onPressed: () {},
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_forward_ios,
                             size: 14,
-                            color: Colors.white54,
+                            color: context.c.textTertiary,
                           ),
                           iconSize: 14,
                           padding: EdgeInsets.zero,

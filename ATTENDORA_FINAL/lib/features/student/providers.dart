@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../core/utils/async_combine.dart';
 import '../auth/providers.dart';
 import '../attendance/providers.dart';
 import 'models/attendance_record.dart';
@@ -102,9 +103,16 @@ final studentAttendanceStreamProvider = StreamProvider<List<AttendanceRecord>>((
   final auth = ref.watch(authControllerProvider);
   final uid = auth.uid;
   if (uid == null) return const Stream.empty();
-  final records =
-      ref.watch(studentAttendanceFamilyProvider(uid)).asData?.value ?? [];
-  return Stream.value(records);
+  // Forward the underlying async state instead of collapsing "loading" into
+  // an empty list: an empty stream keeps this provider in the loading state,
+  // so dependents render a skeleton rather than a bogus zeroed-out result.
+  return ref
+      .watch(studentAttendanceFamilyProvider(uid))
+      .when(
+        data: Stream.value,
+        loading: () => const Stream.empty(),
+        error: Stream<List<AttendanceRecord>>.error,
+      );
 });
 
 typedef StudentSubjectParams = ({
@@ -220,9 +228,13 @@ final studentSubjectsProvider = StreamProvider<List<Map<String, dynamic>>>((
     electives: auth.electives,
   );
 
-  final subjects =
-      ref.watch(studentSubjectsFamilyProvider(params)).asData?.value ?? [];
-  return Stream.value(subjects);
+  return ref
+      .watch(studentSubjectsFamilyProvider(params))
+      .when(
+        data: Stream.value,
+        loading: () => const Stream.empty(),
+        error: Stream<List<Map<String, dynamic>>>.error,
+      );
 });
 
 // Provider for subjects with attendance stats for the current student
@@ -273,17 +285,18 @@ final studentDetentionsProvider = StreamProvider<Set<String>>((ref) {
       });
 });
 
-final studentSubjectsWithStatsProvider = StreamProvider<List<Map<String, dynamic>>>((
-  ref,
-) {
-  final subjects = ref.watch(studentSubjectsProvider).asData?.value ?? [];
-  final attendance =
-      ref.watch(studentAttendanceStreamProvider).asData?.value ?? [];
-  final allSessions =
-      ref.watch(institutionSessionsProvider).asData?.value ?? [];
-  final detainedKeys =
-      ref.watch(studentDetentionsProvider).asData?.value ?? <String>{};
-
+// Stays in the loading state until subjects, attendance, sessions and
+// detentions have all arrived. Previously each input fell back to an empty
+// list while loading, so this emitted a complete-looking result showing every
+// subject at 0% before snapping to the real figures.
+final studentSubjectsWithStatsProvider =
+    Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
+  return (
+    ref.watch(studentSubjectsProvider),
+    ref.watch(studentAttendanceStreamProvider),
+    ref.watch(institutionSessionsProvider),
+    ref.watch(studentDetentionsProvider),
+  ).combine((subjects, attendance, allSessions, detainedKeys) {
   final result = subjects.map((subject) {
     final subjectName = subject['name'] as String? ?? '';
     final subjectGroup = subject['group'] as String? ?? '';
@@ -403,24 +416,24 @@ final studentSubjectsWithStatsProvider = StreamProvider<List<Map<String, dynamic
     };
   }).toList();
 
-  return Stream.value(result);
+  return result;
+  });
 });
 
 // Provider for complete attendance history (attended + missed sessions)
 final studentCompleteAttendanceHistoryProvider =
-    StreamProvider<List<Map<String, dynamic>>>((ref) {
+    Provider<AsyncValue<List<Map<String, dynamic>>>>((ref) {
       final auth = ref.watch(authControllerProvider);
       final uid = auth.uid;
 
-      if (uid == null) return Stream.value([]);
+      if (uid == null) return const AsyncData([]);
 
-      final subjects = ref.watch(studentSubjectsProvider).asData?.value ?? [];
-      final attendanceRecords =
-          ref.watch(studentAttendanceFamilyProvider(uid)).asData?.value ?? [];
-      final allSessions =
-          ref.watch(institutionSessionsProvider).asData?.value ?? [];
-
-      if (subjects.isEmpty) return Stream.value([]);
+      return (
+        ref.watch(studentSubjectsProvider),
+        ref.watch(studentAttendanceFamilyProvider(uid)),
+        ref.watch(institutionSessionsProvider),
+      ).combine((subjects, attendanceRecords, allSessions) {
+      if (subjects.isEmpty) return <Map<String, dynamic>>[];
 
       // Build a set of composite subject names for the student
       final studentSubjectNames = subjects.map((s) {
@@ -515,12 +528,13 @@ final studentCompleteAttendanceHistoryProvider =
             (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime),
       );
 
-      return Stream.value(history);
+      return history;
+      });
     });
 // Provider for complete attendance history for ANY student (parameterized)
 final studentCompleteHistoryFamilyProvider =
-    StreamProvider.family<
-      List<Map<String, dynamic>>,
+    Provider.family<
+      AsyncValue<List<Map<String, dynamic>>>,
       ({
         String uid,
         String? lectureGroup,
@@ -535,24 +549,15 @@ final studentCompleteHistoryFamilyProvider =
         electives: params.electives,
       );
 
-      final subjects =
-          ref
-              .watch(studentSubjectsFamilyProvider(subjectParams))
-              .asData
-              ?.value ??
-          [];
-      final attendanceRecords =
-          ref.watch(studentAttendanceFamilyProvider(uid)).asData?.value ?? [];
-
       // We need all sessions for the institution.
-      // Ideally we should filter by institution code, but here we might not have it easily accessible in params.
-      // However, institutionSessionsProvider relies on auth.institutionCode.
-      // If the admin is viewing, auth.institutionCode is the admin's institution.
-      // This should work fine for admins viewing students in their own institution.
-      final allSessions =
-          ref.watch(institutionSessionsProvider).asData?.value ?? [];
-
-      if (subjects.isEmpty) return Stream.value([]);
+      // institutionSessionsProvider relies on auth.institutionCode, so when an
+      // admin views a student this scopes to the admin's own institution.
+      return (
+        ref.watch(studentSubjectsFamilyProvider(subjectParams)),
+        ref.watch(studentAttendanceFamilyProvider(uid)),
+        ref.watch(institutionSessionsProvider),
+      ).combine((subjects, attendanceRecords, allSessions) {
+      if (subjects.isEmpty) return <Map<String, dynamic>>[];
 
       // Build a set of composite subject names for the student
       final studentSubjectNames = subjects.map((s) {
@@ -646,5 +651,6 @@ final studentCompleteHistoryFamilyProvider =
             (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime),
       );
 
-      return Stream.value(history);
+      return history;
+      });
     });

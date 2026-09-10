@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/fluent_theme.dart';
+import '../../../core/design/app_colors.dart';
 
 /// Beautiful empty state widget with Fluent Design
 class EmptyState extends StatelessWidget {
@@ -24,7 +25,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emptyColor = color ?? FluentColors.textSecondary;
+    final emptyColor = color ?? context.c.textSecondary;
 
     return Center(
       child: Padding(
@@ -58,7 +59,7 @@ class EmptyState extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: context.c.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -68,7 +69,7 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: FluentDesignTokens.spacingSmall),
               Text(
                 subtitle!,
-                style: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+                style: GoogleFonts.outfit(fontSize: 14, color: context.c.textSecondary),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -108,7 +109,7 @@ class ListEmptyState extends StatelessWidget {
       icon: icon,
       title: message,
       subtitle: hint,
-      color: FluentColors.info,
+      color: context.c.info,
     );
   }
 }
@@ -130,7 +131,7 @@ class CollectionEmptyState extends StatelessWidget {
       icon: Icons.folder_off_outlined,
       title: 'No $collectionName Yet',
       subtitle: hint ?? 'Data will appear here once available',
-      color: FluentColors.textSecondary,
+      color: context.c.textSecondary,
     );
   }
 }

@@ -58,37 +58,157 @@ service cloud.firestore {
     // ===============================================================
     // Users Collection
     // ===============================================================
+
+    // Fields that decide what a user is allowed to do. A user must never be
+    // able to write these about themselves — only an institution admin or a
+    // super admin may. Without this, any signed-in teacher could simply set
+    // approved:true (or admin:true) on their own document.
+    function privilegedUserFields() {
+      return [
+        'approved', 'approvedAt', 'approvedBy',
+        'rejectedAt', 'rejectedBy', 'rejectionReason',
+        'revokedAt', 'revokedBy', 'revocationReason',
+        'role', 'admin', 'isSuperAdmin', 'institutionCode',
+        'loginEnabled', 'active', 'forceLogoutAt',
+        'idNumber', 'rollNumber'
+      ];
+    }
+
+    function touchesPrivilegedFields() {
+      return request.resource.data.diff(resource.data)
+        .affectedKeys().hasAny(privilegedUserFields());
+    }
+
+    // The device lock is meaningful only if a student cannot clear it. Allow
+    // binding a device when none is registered yet; changing an existing
+    // binding is an admin action.
+    function deviceLockRespected() {
+      return !request.resource.data.diff(resource.data)
+                .affectedKeys().hasAny(['registeredDeviceId'])
+        || resource.data.get('registeredDeviceId', '') == '';
+    }
+
+    // A self-signup may not mint privileges: no admin/super-admin flags, and
+    // a teacher always starts unapproved.
+    function selfCreateIsUnprivileged() {
+      return request.resource.data.get('admin', false) == false
+        && request.resource.data.get('isSuperAdmin', false) == false
+        && request.resource.data.get('role', '') != 'admin'
+        && (
+          request.resource.data.get('role', '') != 'teacher'
+          || request.resource.data.get('approved', false) == false
+        );
+    }
+
+    // An institution admin manages users inside their own tenant. Legacy
+    // documents with no institutionCode may be claimed, but only by an admin
+    // who stamps their own code onto the document in the same write.
+    function canAdministerUser() {
+      return isSuperAdmin()
+        || isInstitutionAdmin(resource.data.get('institutionCode', ''))
+        || (
+          resource.data.get('institutionCode', '') == '' &&
+          isInstitutionAdmin(request.resource.data.get('institutionCode', ''))
+        );
+    }
+
     match /users/{userId} {
-      // Allow reading user profiles if authenticated or looking up login accounts
+      // Public read is required for roll-number login lookup before sign-in.
       allow read: if true;
-      
-      // Creating user document on signup
+
       allow create: if isAuthenticated() && (
-        request.auth.uid == userId || isSuperAdmin()
+        isSuperAdmin() ||
+        (request.auth.uid == userId && selfCreateIsUnprivileged())
       );
 
-      // Updating user document
       allow update: if isAuthenticated() && (
-        request.auth.uid == userId ||
+        isSuperAdmin() ||
+        canAdministerUser() ||
+        (
+          request.auth.uid == userId &&
+          !touchesPrivilegedFields() &&
+          deviceLockRespected()
+        )
+      );
+
+      // Institution admins need this so rejecting an application (which
+      // removes the account) works for anyone other than the super admin.
+      allow delete: if isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''));
+    }
+
+    // Index enforcing unique Roll/ID numbers. This is only an actual lock if
+    // an existing entry cannot be overwritten by another account, so creation
+    // is allowed exactly once and only the owner (or an admin) may release it.
+    match /id_index/{indexId} {
+      allow read: if true;
+      allow create: if isAuthenticated() &&
+        request.resource.data.get('uid', '') == request.auth.uid;
+      allow update: if isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''));
+      allow delete: if isAuthenticated() && (
+        resource.data.get('uid', '') == request.auth.uid ||
         isSuperAdmin() ||
         isInstitutionAdmin(resource.data.get('institutionCode', ''))
       );
-
-      // Deleting user document
-      allow delete: if isSuperAdmin();
-    }
-
-    // Index for ensuring unique Roll/ID numbers atomically
-    match /id_index/{indexId} {
-      allow read: if true;
-      allow write: if isAuthenticated();
     }
 
     // ===============================================================
     // Attendance Sessions & Records
     // ===============================================================
+
+    function sessionData(sessionId) {
+      return get(/databases/$(database)/documents/sessions/$(sessionId)).data;
+    }
+
+    // The rotating QR secret. Students have no read access to this path (there
+    // is no `allow read` below, and rules do not cascade into subcollections),
+    // but get() inside a rule still resolves it — so the token can be verified
+    // server-side without ever being readable by the people it guards against.
+    function qrSecret(sessionId) {
+      return get(
+        /databases/$(database)/documents/sessions/$(sessionId)/secure/qr
+      ).data;
+    }
+
+    // Sessions created by builds that predate signed codes do not carry this
+    // flag, so their unsigned codes keep working through the migration window.
+    // To end the grace period and require signed codes everywhere, change the
+    // default below from `false` to `true`.
+    function sessionRequiresSignedQr(sessionId) {
+      return sessionData(sessionId).get('requireSignedQr', false) == true;
+    }
+
+    // A submitted token is valid only if it matches the secret the presenting
+    // device published moments ago. Accepting the previous token as well
+    // covers a scan that lands just as the code flips; anything older — a
+    // screenshot, a forwarded photo, a replayed code — no longer matches.
+    function qrTokenIsValid(sessionId) {
+      let submitted = request.resource.data.get('qrToken', '');
+      let secret = qrSecret(sessionId);
+      return submitted != '' && (
+        submitted == secret.get('token', '') ||
+        submitted == secret.get('prevToken', '')
+      );
+    }
+
+    function qrCheckPasses(sessionId) {
+      return !sessionRequiresSignedQr(sessionId) || qrTokenIsValid(sessionId);
+    }
+
     match /sessions/{sessionId} {
       allow read: if isAuthenticated();
+
+      // Only the owning teacher (or an admin) may publish rotating secrets,
+      // and no one may read them back through the API.
+      match /secure/{docId} {
+        allow read: if false;
+        allow write: if isAuthenticated() && (
+          sessionData(sessionId).get('teacherUid', '') == request.auth.uid ||
+          isSuperAdmin() ||
+          isInstitutionAdmin(sessionData(sessionId).get('institutionCode', ''))
+        );
+      }
       
       // Teachers and Admins can create sessions
       allow create: if isAuthenticated() && (
@@ -127,6 +247,7 @@ service cloud.firestore {
             request.resource.data.get('sessionId', '') == sessionId &&
             request.resource.data.get('status', '') == 'present' &&
             request.resource.data.get('distanceMeters', -1) is number &&
+            qrCheckPasses(sessionId) &&
             (
               get(/databases/$(database)/documents/sessions/$(sessionId)).data.get('bypassLocation', false) == true ||
               request.resource.data.get('distanceMeters', -1) <=
@@ -151,6 +272,7 @@ service cloud.firestore {
             request.resource.data.get('sessionId', '') == sessionId &&
             request.resource.data.get('status', '') == 'present' &&
             request.resource.data.get('distanceMeters', -1) is number &&
+            qrCheckPasses(sessionId) &&
             get(/databases/$(database)/documents/sessions/$(sessionId)).data.get('active', false) == true &&
             get(/databases/$(database)/documents/sessions/$(sessionId)).data.get('expiresAt', request.time) > request.time
           )
@@ -212,7 +334,15 @@ service cloud.firestore {
     }
 
     match /faculty_geo_attendance/{attendanceId} {
-      allow read: if isAuthenticated();
+      // Verification selfies and precise GPS traces are sensitive. These were
+      // readable by every authenticated user, which included students; access
+      // is now limited to the faculty member themselves and to administrators
+      // of their institution.
+      allow read: if isAuthenticated() && (
+        resource.data.get('facultyId', '') == request.auth.uid ||
+        isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''))
+      );
       allow create: if isAuthenticated() && (
         request.resource.data.get('facultyId', '') == request.auth.uid ||
         isSuperAdmin() ||

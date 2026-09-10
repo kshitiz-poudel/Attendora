@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../attendance/providers.dart';
+import '../../../../core/design/app_colors.dart';
 
 class EditSessionDialog extends ConsumerStatefulWidget {
   final String sessionId;
@@ -60,16 +61,16 @@ class _EditSessionDialogState extends ConsumerState<EditSessionDialog> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Session updated successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: context.c.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.c.danger),
         );
       }
     } finally {
@@ -133,12 +134,12 @@ class _EditSessionDialogState extends ConsumerState<EditSessionDialog> {
                 FilledButton(
                   onPressed: _isLoading ? null : _save,
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.c.textPrimary,
                           ),
                         )
                       : const Text('Save Changes'),

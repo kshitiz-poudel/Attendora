@@ -212,8 +212,13 @@ final pendingTeachersListProvider = StreamProvider<List<Map<String, dynamic>>>((
     // Filter for pending teachers
     var pendingTeachers = snap.docs
         .map((doc) => {'id': doc.id, ...doc.data()})
+        // `!= true` rather than `== false`: legacy teacher documents created
+        // before the field existed have no `approved` key at all, and those
+        // are exactly the applications an admin still needs to action. The
+        // matching count provider already used this form, so the dashboard
+        // badge and this list previously disagreed.
         .where(
-          (data) => _isTeacherRole(data['role']) && data['approved'] == false,
+          (data) => _isTeacherRole(data['role']) && data['approved'] != true,
         )
         .toList();
 

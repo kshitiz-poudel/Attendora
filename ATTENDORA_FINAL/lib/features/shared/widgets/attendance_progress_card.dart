@@ -13,6 +13,7 @@ import 'glass_card.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../student/models/attendance_record.dart';
+import '../../../core/design/app_colors.dart';
 
 import '../../student/providers.dart'; // Import studentSubjectsProvider
 
@@ -181,7 +182,7 @@ class AttendanceProgressCard extends ConsumerWidget {
             style: GoogleFonts.outfit(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 24),
@@ -193,10 +194,10 @@ class AttendanceProgressCard extends ConsumerWidget {
               final status = data['status'] as String;
 
               final statusColor = status == 'good'
-                  ? const Color(0xFF10B981)
+                  ? context.c.accent
                   : status == 'warning'
-                  ? const Color(0xFFF59E0B)
-                  : const Color(0xFFDC2626);
+                  ? context.c.warning
+                  : context.c.danger;
 
               return Column(
                 children: [
@@ -211,7 +212,7 @@ class AttendanceProgressCard extends ConsumerWidget {
                           painter: _CircularProgressPainter(
                             percentage: percentage,
                             color: statusColor,
-                            trackColor: Colors.white.withValues(alpha: 0.1),
+                            trackColor: context.c.textPrimary.withValues(alpha: 0.1),
                           ),
                         ),
                         Column(
@@ -228,7 +229,7 @@ class AttendanceProgressCard extends ConsumerWidget {
                             Text(
                               'Attendance Rate',
                               style: GoogleFonts.outfit(
-                                color: Colors.white54,
+                                color: context.c.textTertiary,
                                 fontSize: 12,
                               ),
                             ),
@@ -245,12 +246,12 @@ class AttendanceProgressCard extends ConsumerWidget {
                         icon: Icons.check_circle_rounded,
                         label: 'Present',
                         value: '$totalPresent',
-                        color: const Color(0xFF10B981),
+                        color: context.c.accent,
                       ),
                       Container(
                         width: 1,
                         height: 40,
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: context.c.textPrimary.withValues(alpha: 0.1),
                       ),
                       _StatItem(
                         icon: Icons.event_note_rounded,
@@ -309,12 +310,12 @@ class _StatItem extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: context.c.textPrimary,
           ),
         ),
         Text(
           label,
-          style: GoogleFonts.outfit(color: Colors.white54, fontSize: 12),
+          style: GoogleFonts.outfit(color: context.c.textTertiary, fontSize: 12),
         ),
       ],
     );
