@@ -1,18 +1,20 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/config/app_links.dart';
 import '../../../core/design/app_colors.dart';
 
-/// Where the Android build is published. `scripts/build_mobile.sh android`
-/// writes the APK to `build/web/downloads/attendora.apk`, so this resolves
-/// against whatever origin the portal is served from.
-Uri get androidApkUri => Uri.base.resolve('downloads/attendora.apk');
-
-Future<bool> launchAndroidApk() async {
+/// Opens the configured Android download link (see `core/config/app_links.dart`
+/// for how it is resolved). Returns false when the browser could not open it.
+Future<bool> launchAndroidApk(WidgetRef ref) async {
   try {
-    return await launchUrl(androidApkUri, mode: LaunchMode.externalApplication);
+    return await launchUrl(
+      await resolveAndroidApkUri(ref),
+      mode: LaunchMode.externalApplication,
+    );
   } catch (_) {
     return false;
   }
@@ -22,7 +24,7 @@ Future<bool> launchAndroidApk() async {
 ///
 /// Only meaningful on the web build — inside the installed app there is
 /// nothing to download, so it renders nothing there.
-class AppDownloadCard extends StatelessWidget {
+class AppDownloadCard extends ConsumerWidget {
   const AppDownloadCard({
     super.key,
     required this.audience,
@@ -36,8 +38,12 @@ class AppDownloadCard extends StatelessWidget {
   bool get _isTeacher => audience == 'teacher';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (!kIsWeb) return const SizedBox.shrink();
+
+    // Subscribe to the settings now so the link is already known by the time
+    // the button is pressed.
+    ref.watch(androidApkUriProvider);
 
     final c = context.c;
     final headline = _isTeacher
@@ -110,7 +116,7 @@ class AppDownloadCard extends StatelessWidget {
             children: [
               FilledButton.icon(
                 onPressed: () async {
-                  final ok = await launchAndroidApk();
+                  final ok = await launchAndroidApk(ref);
                   if (!ok && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -158,16 +164,16 @@ class AppDownloadCard extends StatelessWidget {
 }
 
 /// Slim app-bar action pointing at the same download.
-class AppDownloadButton extends StatelessWidget {
+class AppDownloadButton extends ConsumerWidget {
   const AppDownloadButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (!kIsWeb) return const SizedBox.shrink();
     return IconButton(
       tooltip: 'Get the mobile app',
       onPressed: () async {
-        final ok = await launchAndroidApk();
+        final ok = await launchAndroidApk(ref);
         if (!ok && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('The Android build is not published yet.')),

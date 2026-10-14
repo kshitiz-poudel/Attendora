@@ -6,6 +6,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../../core/fluent_theme.dart';
 import '../../../core/utils/error_handler.dart';
+import '../../../core/utils/firestore_retry.dart';
 import '../../auth/providers.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'teacher_shell.dart';
@@ -15,6 +16,7 @@ import '../../../core/responsive_utils.dart';
 import '../../notifications/repository.dart';
 import '../../notifications/providers.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/constants/attendance_rules.dart';
 
 // Provider for students grouped by Subject, with attendance stats
 final studentsProvider =
@@ -536,6 +538,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
   final TextEditingController _studentSearchController =
       TextEditingController();
   String _studentSearchQuery = '';
+  final Set<String> _detentionsInFlight = {};
 
   @override
   void dispose() {
@@ -1026,12 +1029,16 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
                     ),
                   ),
                 ],
+                // Detain / Un-detain action. Under the details rather than
+                // beside them: next to the text it left the name and
+                // attendance a one-letter-wide column on a phone.
+                if (_detainActionVisible(student)) ...[
+                  const SizedBox(height: 10),
+                  _buildDetainButton(context, ref, student),
+                ],
               ],
             ),
           ),
-          // Detain / Un-detain action
-          if (student['stats'] != null)
-            _buildDetainButton(context, ref, student),
           IconButton(
             onPressed: () => _showStudentDetails(context, student),
             icon: Icon(Icons.info_outline, color: context.c.accent),
@@ -1042,28 +1049,66 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
     );
   }
 
+  /// Whether this student gets a Detain / Remove-detention button: already
+  /// detained, or below the attendance threshold over enough sessions.
+  bool _detainActionVisible(Map<String, dynamic> student) {
+    final stats = student['stats'];
+    if (stats == null) return false;
+    if (student['detained'] == true) return true;
+    final percentage = stats['percentage'] as double;
+    final totalSessions = stats['totalSessions'] as int;
+    return totalSessions >= kMinSessionsForDetention &&
+        percentage < kMinAttendancePercent;
+  }
+
   Widget _buildDetainButton(
     BuildContext context,
     WidgetRef ref,
     Map<String, dynamic> student,
   ) {
     final isDetained = student['detained'] == true;
-    final percentage = student['stats']['percentage'] as double;
-    final eligible = percentage < 60.0;
+    final key = _detentionKey(student);
+    final busy = _detentionsInFlight.contains(key);
 
-    if (!isDetained && !eligible) {
-      // Attendance is healthy and student isn't detained - nothing to show.
-      return const SizedBox.shrink();
-    }
-
-    return IconButton(
-      onPressed: () => _confirmToggleDetention(context, ref, student),
-      icon: Icon(
-        isDetained ? Icons.lock_open_rounded : Icons.block_rounded,
-        color: context.c.danger,
-      ),
-      tooltip: isDetained ? 'Remove Detention' : 'Detain Student',
-    );
+    // A labelled button rather than a bare icon: this is the action the
+    // teacher is here to take, and it should be obvious which students it
+    // applies to.
+    return isDetained
+        ? OutlinedButton.icon(
+            onPressed: busy
+                ? null
+                : () => _confirmToggleDetention(context, ref, student),
+            icon: busy
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.lock_open_rounded, size: 18),
+            // Scales down instead of wrapping to "detentio / n" in the
+            // narrow details column on a phone.
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('Remove detention'),
+            ),
+          )
+        : FilledButton.icon(
+            style: FilledButton.styleFrom(backgroundColor: context.c.danger),
+            onPressed: busy
+                ? null
+                : () => _confirmToggleDetention(context, ref, student),
+            icon: busy
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: context.c.onPrimary,
+                    ),
+                  )
+                : const Icon(Icons.block_rounded, size: 18),
+            label: const Text('Detain'),
+          );
   }
 
   Future<void> _confirmToggleDetention(
@@ -1085,9 +1130,10 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
         content: Text(
           isDetained
               ? '$name will regain access to mark attendance for $subjectName.'
-              : '$name has $percentage% attendance in $subjectName (below 60%). '
-                    'Detaining will block them from being marked present in this course '
-                    'and show them a detained notice.',
+              : '$name has $percentage% attendance in $subjectName '
+                    '(below ${kMinAttendancePercent.toStringAsFixed(0)}%). '
+                    'They will be marked as detained for this course and '
+                    'receive a "You are detained" notification.',
         ),
         actions: [
           TextButton(
@@ -1116,15 +1162,28 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
     String sanitize(String s) =>
         s.replaceAll(RegExp(r'[^a-z0-9]+'), '_').trim();
     final docId = '${uid}_${sanitize(nameNorm)}_${sanitize(groupNorm)}';
-    final docRef = FirebaseFirestore.instance
-        .collection('detentions')
-        .doc(docId);
+    final db = FirebaseFirestore.instance;
+    final docRef = db.collection('detentions').doc(docId);
+
+    final key = _detentionKey(student);
+    if (!_detentionsInFlight.add(key)) return;
+    setState(() {});
 
     try {
+      // The detention record and the student's notification are written in
+      // one batch: either the student is detained AND told, or neither
+      // happens. Two separate writes could leave a student silently detained
+      // if the second one failed.
+      final batch = db.batch();
+      final courseLabel = subjectGroup.isEmpty
+          ? subjectName
+          : '$subjectName ($subjectGroup)';
+      final teacherName = auth.displayName ?? 'Your teacher';
+
       if (isDetained) {
-        await docRef.delete();
+        batch.delete(docRef);
       } else {
-        await docRef.set({
+        batch.set(docRef, {
           'studentId': uid,
           'subjectName': subjectName,
           'subjectGroup': subjectGroup,
@@ -1133,26 +1192,67 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
           'teacherUid': teacherUid,
           'institutionCode': institutionCode,
           'detainedAt': FieldValue.serverTimestamp(),
+          'attendancePercentage': student['stats']['percentage'],
         });
       }
+
+      // Same document shape every other notification in the app uses, so it
+      // appears in the student's notification list and triggers the
+      // on-device alert through the existing listener.
+      batch.set(db.collection('notifications').doc(), {
+        'recipientUid': uid,
+        'senderUid': teacherUid,
+        'senderName': teacherName,
+        'senderRollNumber': '',
+        'institutionId': institutionCode,
+        'title': isDetained ? 'Detention removed' : 'You are detained',
+        'message': isDetained
+            ? '$teacherName has removed your detention for $courseLabel.'
+            : 'You are detained from $courseLabel because your attendance '
+                  'is ${(student['stats']['percentage'] as double).toStringAsFixed(1)}%, '
+                  'below the required ${kMinAttendancePercent.toStringAsFixed(0)}%. '
+                  'Please contact $teacherName.',
+        'type': isDetained ? 'detention_removed' : 'detained',
+        'timestamp': Timestamp.now(),
+        'read': false,
+        'metadata': {
+          'subject': subjectName,
+          'group': subjectGroup,
+          'detained': !isDetained,
+        },
+      });
+
+      await withFirestoreRetry(batch.commit);
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               isDetained
-                  ? 'Detention removed for $name.'
-                  : '$name has been detained from $subjectName.',
+                  ? 'Detention removed for $name. They have been notified.'
+                  : '$name has been detained from $subjectName and notified.',
             ),
           ),
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+        ErrorHandler.showErrorSnackBar(
+          context,
+          e,
+          customMessage: 'Could not update the detention',
+        );
       }
+    } finally {
+      _detentionsInFlight.remove(key);
+      if (mounted) setState(() {});
     }
   }
+
+  /// Identifies one student's detention for one course while its write is in
+  /// flight, so a slow connection cannot turn a double-tap into two writes.
+  String _detentionKey(Map<String, dynamic> student) =>
+      '${student['id']}|${student['subjectName']}|${student['subjectGroup']}';
 
   void _showStudentDetails(BuildContext context, Map<String, dynamic> student) {
     showDialog(
@@ -1222,7 +1322,7 @@ class _SubjectGroupCardState extends State<_SubjectGroupCard> {
   }
 
   Color _getAttendanceColor(double percentage) {
-    if (percentage >= 75) return context.c.success;
+    if (percentage >= kMinAttendancePercent) return context.c.success;
     if (percentage >= 60) return context.c.warning;
     return context.c.danger;
   }

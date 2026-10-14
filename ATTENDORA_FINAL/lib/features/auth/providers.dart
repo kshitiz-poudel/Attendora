@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +8,12 @@ import 'dart:async';
 import 'repository.dart';
 import 'services/biometric_service.dart';
 import '../../core/services/secure_storage_service.dart';
+
+/// True only in debug builds or when running against the local Firebase
+/// emulators. Both inputs are compile-time constants, so in a release build
+/// this is `false` and anything guarded by it is dropped by the compiler.
+const bool _builtInAdminEnabled =
+    kDebugMode || bool.fromEnvironment('USE_FIREBASE_EMULATOR');
 
 enum UserRole { none, admin, teacher, student }
 
@@ -434,10 +441,16 @@ class AuthController extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(loading: true, error: null);
 
-    // Permanent built-in admin login for demo/prototype purposes.
-    // Bypasses Firebase entirely so it always works regardless of
-    // what's in the live database.
-    if (rollNumber.trim() == '1234567890' && password == 'ADMIN123') {
+    // Built-in demo admin: bypasses Firebase entirely, so it works regardless
+    // of what is in the database. It used to be compiled into every build, which
+    // put a fixed administrator login inside the public website and the APK
+    // (anyone can read it out of the shipped JavaScript). It is now limited to
+    // debug builds and runs against the local emulators (see tool/emulator),
+    // where it is harmless, and the constant is false in release builds so the
+    // whole block - including these literals - is removed from the output.
+    if (_builtInAdminEnabled &&
+        rollNumber.trim() == '1234567890' &&
+        password == 'ADMIN123') {
       state = state.copyWith(
         loading: false,
         role: UserRole.admin,

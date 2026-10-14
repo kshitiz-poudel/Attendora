@@ -12,6 +12,7 @@ import '../models/geo_attendance_models.dart';
 import '../providers/faculty_geo_attendance_providers.dart';
 import 'widgets/attendance_evidence_dialog.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/services/precise_location.dart';
 
 class FacultyGeoAttendanceAdminPage extends ConsumerStatefulWidget {
   const FacultyGeoAttendanceAdminPage({super.key});
@@ -60,6 +61,7 @@ class _FacultyGeoAttendanceAdminPageState
           permission == LocationPermission.deniedForever) {
         throw Exception('Location permission is required.');
       }
+      await ensurePreciseLocation();
       final p = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,

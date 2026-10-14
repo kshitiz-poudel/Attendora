@@ -11,6 +11,7 @@ import '../../student/providers.dart';
 import 'student_shell.dart';
 import '../../../core/responsive_utils.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/constants/attendance_rules.dart';
 
 class StudentAnalyticsPage extends ConsumerWidget {
   const StudentAnalyticsPage({super.key});
@@ -291,7 +292,7 @@ class _SubjectPerformanceList extends ConsumerWidget {
                   final attended = stats?['attended'] as int? ?? 0;
 
                   Color progressColor = context.c.accent; // Green
-                  if (percentage < 75) {
+                  if (percentage < kMinAttendancePercent) {
                     progressColor = context.c.danger; // Red
                   } else if (percentage < 85) {
                     progressColor = context.c.warning; // Orange

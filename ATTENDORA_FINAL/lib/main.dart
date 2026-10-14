@@ -6,6 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'firebase_options.dart';
+import 'core/ios_firebase_bootstrap.dart';
+import 'firebase_options_ios.dart';
+import 'firebase_setup_needed_app.dart';
 import 'core/firestore_init.dart';
 import 'core/services/notification_service.dart';
 
@@ -47,10 +50,29 @@ Future<void> _bootstrap() async {
     return true;
   };
 
-  // Web and Android use the generated FlutterFire options. iOS uses the
-  // native GoogleService-Info.plist generated for the SAME Firebase project.
+  const useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
+
+  // Web and Android use the generated FlutterFire options. iPhone uses the
+  // options written by scripts/ios_setup.sh from GoogleService-Info.plist; if
+  // there are none it tries a plist added through Xcode, and if that is missing
+  // too it shows a setup screen. Without this, an unconfigured iPhone build
+  // would fail here and leave a blank screen with no explanation.
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
-    await Firebase.initializeApp();
+    try {
+      // In emulator mode with no real iOS config this falls back to a
+      // placeholder, so the project can be run in Xcode against fake data
+      // without access to the real Firebase project.
+      await Firebase.initializeApp(
+        options: resolveIosFirebaseOptions(
+          configured: iosFirebaseOptions,
+          useEmulator: useEmulator,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Firebase is not configured for iOS: $e');
+      runApp(FirebaseSetupNeededApp(error: e));
+      return;
+    }
   } else {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -61,12 +83,17 @@ Future<void> _bootstrap() async {
   // (--dart-define=USE_FIREBASE_EMULATOR=true). Off by default, so normal
   // builds are completely unaffected and this can never accidentally target
   // an emulator in production.
-  const useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
   if (useEmulator) {
-    final emulatorHost =
-        kIsWeb || defaultTargetPlatform != TargetPlatform.android
-            ? 'localhost'
-            : '10.0.2.2';
+    // Where the emulators are. The default works for the web, the iOS
+    // Simulator and the Android emulator. A real phone cannot reach
+    // "localhost" on the computer: pass the computer's address with
+    // --dart-define=EMULATOR_HOST=192.168.x.x (see tool/emulator/README.md).
+    const hostOverride = String.fromEnvironment('EMULATOR_HOST');
+    final emulatorHost = hostOverride.isNotEmpty
+        ? hostOverride
+        : (kIsWeb || defaultTargetPlatform != TargetPlatform.android
+              ? 'localhost'
+              : '10.0.2.2');
     await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
     FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8180);
     await FirebaseStorage.instance.useStorageEmulator(emulatorHost, 9199);
@@ -107,7 +134,10 @@ Future<void> _bootstrap() async {
   final firestoreInit = FirestoreInitService();
   firestoreInit.logRequiredIndexes();
 
-  await NotificationService().initialize();
+  // Not awaited: on a fresh install iOS shows a permission pop-up here, and
+  // waiting for the answer left the app a blank white screen until it was
+  // tapped (it looked broken). The pop-up now appears over the login screen.
+  unawaited(NotificationService().initialize());
 
   // Only the transparent status bar is set here. Brightness and the system
   // navigation bar colour depend on the active theme, so they are applied in

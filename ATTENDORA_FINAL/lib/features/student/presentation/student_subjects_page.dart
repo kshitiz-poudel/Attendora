@@ -14,6 +14,7 @@ import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/glass_text_field.dart';
 import '../../shared/widgets/async_section.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/constants/attendance_rules.dart';
 
 class StudentSubjectsPage extends ConsumerStatefulWidget {
   const StudentSubjectsPage({super.key});
@@ -451,7 +452,7 @@ class _StudentSubjectCardState extends State<_StudentSubjectCard> {
   }
 
   Color _getAttendanceColor(double percentage) {
-    if (percentage >= 75) return context.c.accent;
+    if (percentage >= kMinAttendancePercent) return context.c.accent;
     if (percentage >= 60) return context.c.warning;
     return context.c.danger;
   }

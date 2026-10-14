@@ -309,6 +309,65 @@ service cloud.firestore {
     }
 
     // ===============================================================
+    // Collections the app uses that previously had NO rule at all
+    // ===============================================================
+    // Firestore denies any collection without a matching rule, so each of
+    // these was unreadable/unwritable under this file even though the app
+    // depends on them. Added so that deploying these rules cannot break
+    // features that rely on them.
+
+    // Teacher "detain" action. A detention is written by the teacher who
+    // issued it (or an admin); the student it concerns can read their own.
+    match /detentions/{detentionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.get('studentId', '') == request.auth.uid ||
+        resource.data.get('teacherUid', '') == request.auth.uid ||
+        isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''))
+      );
+      // Queries filtered by studentId / teacherUid need list access, which
+      // the per-document check above covers as long as the query filter
+      // guarantees the same condition.
+      allow create: if isAuthenticated() && (
+        isTeacher() || isSuperAdmin() ||
+        isInstitutionAdmin(request.resource.data.get('institutionCode', ''))
+      ) && request.resource.data.get('teacherUid', '') == request.auth.uid;
+      allow update, delete: if isAuthenticated() && (
+        resource.data.get('teacherUid', '') == request.auth.uid ||
+        isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''))
+      );
+    }
+
+    // Admin-managed subject catalogue (read by teachers to pick subjects).
+    // create/update/delete are split because `request.resource` does not
+    // exist on a delete, so a single combined rule would always fail there.
+    match /subject_catalog/{catalogId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (
+        isSuperAdmin() ||
+        isInstitutionAdmin(request.resource.data.get('institutionCode', ''))
+      );
+      allow update, delete: if isAuthenticated() && (
+        isSuperAdmin() ||
+        isInstitutionAdmin(resource.data.get('institutionCode', ''))
+      );
+    }
+
+    // Super-admin broadcasts shown in every user's notification list.
+    match /global_notifications/{notificationId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Per-user read/dismissed state for notifications lives under the user
+    // document; only that user may touch it. (A rule on /users/{id} does not
+    // cascade into subcollections, so this needs its own match.)
+    match /users/{userId}/notification_states/{stateId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ===============================================================
     // Notifications & Broadcasts
     // ===============================================================
     match /notifications/{notificationId} {

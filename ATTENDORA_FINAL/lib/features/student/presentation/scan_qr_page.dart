@@ -24,7 +24,9 @@ import '../../shared/widgets/glass_card.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import '../../attendance/qr_token.dart';
+import '../../../core/config/app_links.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/services/precise_location.dart';
 
 class ScanQrPage extends ConsumerStatefulWidget {
   const ScanQrPage({super.key});
@@ -138,6 +140,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
             permission == LocationPermission.deniedForever) {
           note = 'Location denied.';
         } else {
+          await ensurePreciseLocation();
           final pos = await Geolocator.getCurrentPosition();
           final lat = (data['latitude'] as num?)?.toDouble() ?? 0;
           final lng = (data['longitude'] as num?)?.toDouble() ?? 0;
@@ -209,6 +212,9 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
         }
       }
     } catch (e) {
+      // A person who only allowed approximate location needs to be told that,
+      // not shown a generic failure.
+      if (e is PreciseLocationException) note = e.message;
       // Keep a friendly message for unexpected Firestore/location failures.
       if (note.isEmpty) {
         note = 'Unable to record attendance. Please try again.';
@@ -360,7 +366,7 @@ class _ScanQrPageState extends ConsumerState<ScanQrPage> {
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () async {
-                      final uri = Uri.base.resolve('downloads/attendora.apk');
+                      final uri = await resolveAndroidApkUri(ref);
                       await launchUrl(
                         uri,
                         mode: LaunchMode.externalApplication,

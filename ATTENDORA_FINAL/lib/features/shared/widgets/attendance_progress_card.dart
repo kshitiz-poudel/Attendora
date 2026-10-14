@@ -14,6 +14,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../student/models/attendance_record.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/constants/attendance_rules.dart';
 
 import '../../student/providers.dart'; // Import studentSubjectsProvider
 
@@ -153,7 +154,7 @@ final attendanceProgressProvider = StreamProvider<Map<String, dynamic>>((ref) {
           'percentage': percentage,
           'totalSessions': totalSessions,
           'totalPresent': totalPresent,
-          'status': percentage >= 75
+          'status': percentage >= kMinAttendancePercent
               ? 'good'
               : percentage >= 50
               ? 'warning'

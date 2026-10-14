@@ -1,0 +1,9 @@
+# Copies made by start.sh (the Firebase CLI refuses rules files outside this folder)
+firestore.rules
+storage.rules
+node_modules/
+package.json
+package-lock.json
+*.log
+# Written by start.sh --lan
+firebase.lan.json

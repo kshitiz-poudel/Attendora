@@ -31,6 +31,16 @@ class NotificationService {
 
   bool _isInitialized = false;
 
+  /// How a notification is presented on iPhone. Alert, badge and sound are
+  /// requested explicitly so a banner appears even while the app is open (the
+  /// AppDelegate makes the app the notification centre's delegate, which is
+  /// what allows foreground presentation).
+  static const DarwinNotificationDetails _iosDetails = DarwinNotificationDetails(
+    presentAlert: true,
+    presentBadge: true,
+    presentSound: true,
+  );
+
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -111,22 +121,28 @@ class NotificationService {
         }
       });
 
-      // 7. Get Token
-      try {
-        // VAPID key is required for Web, but we can try without it or catch the error
-        final token = await _firebaseMessaging.getToken(
-          vapidKey: kIsWeb
-              ? 'BKh6PnVdfAc6nLi73vCKGIt8THXo5lw8w55UPv1j4f5dUKWKT5t-xdCUgs3UX6qKvYJKFnkNaTMveZazsxzO6bo'
-              : null,
-        );
-        debugPrint('FCM Token: $token');
-      } catch (e) {
-        debugPrint('Error getting FCM token: $e');
-      }
+      // 7. Get Token - in the background. Nothing here uses the token yet (the
+      // project has no server sending push messages), so it must never delay
+      // or fail app start-up. On an iPhone without the Push Notifications
+      // capability this call can wait a long time for an APNs token.
+      unawaited(_logFcmToken());
 
       _isInitialized = true;
     } catch (e) {
       debugPrint('Error initializing NotificationService: $e');
+    }
+  }
+
+  Future<void> _logFcmToken() async {
+    try {
+      final token = await _firebaseMessaging.getToken(
+        vapidKey: kIsWeb
+            ? 'BKh6PnVdfAc6nLi73vCKGIt8THXo5lw8w55UPv1j4f5dUKWKT5t-xdCUgs3UX6qKvYJKFnkNaTMveZazsxzO6bo'
+            : null,
+      );
+      debugPrint('FCM Token: $token');
+    } catch (e) {
+      debugPrint('Error getting FCM token: $e');
     }
   }
 
@@ -190,6 +206,7 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
         ),
+        iOS: _iosDetails,
       ),
       payload: payload,
     );
@@ -215,6 +232,7 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
         ),
+        iOS: _iosDetails,
       ),
       payload: payload,
     );
@@ -247,6 +265,7 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
         ),
+        iOS: _iosDetails,
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: payload,
@@ -261,6 +280,8 @@ class NotificationService {
     required int maxProgress,
   }) async {
     if (kIsWeb) return;
+    // iOS has no progress notification; the completion banner is enough.
+    if (defaultTargetPlatform == TargetPlatform.iOS) return;
 
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(

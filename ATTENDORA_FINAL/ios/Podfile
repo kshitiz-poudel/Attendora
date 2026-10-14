@@ -1,5 +1,9 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '15.0'
+# Minimum iOS. The plugins here need at most 13.0 (the Firebase iOS SDK), but
+# Xcode 27 refuses any deployment target below 15.0 ("supported deployment
+# target versions are 15.0 to 27.0"), so 15.0 is the lowest that builds with
+# current Xcode. It still covers every iPhone from the 6s on, and older Xcode
+# versions accept it too. The Xcode project (Runner.xcodeproj) must match.
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -39,5 +43,13 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # Some pods still declare an older minimum than the app. Raise them to the
+    # app's target so Xcode does not emit deployment-target warnings (or fail
+    # linking) for pods built below the app's own minimum.
+    target.build_configurations.each do |config|
+      current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0' if current < 15.0
+    end
   end
 end

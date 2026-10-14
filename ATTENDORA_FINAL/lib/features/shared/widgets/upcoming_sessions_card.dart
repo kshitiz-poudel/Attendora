@@ -14,6 +14,7 @@ import '../../../core/utils/error_handler.dart';
 import 'empty_state.dart';
 import 'shimmer_loading.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/services/precise_location.dart';
 
 final upcomingSessionsProvider =
     StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) async* {
@@ -251,6 +252,7 @@ class UpcomingSessionsCard extends ConsumerWidget {
               distanceFilter: 100,
             );
 
+      await ensurePreciseLocation();
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );

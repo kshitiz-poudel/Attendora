@@ -15,6 +15,7 @@ import '../../shared/widgets/shimmer_loading.dart';
 import '../../shared/widgets/app_download_card.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/design/app_colors.dart';
+import '../../../core/constants/attendance_rules.dart';
 
 class StudentHomePage extends ConsumerWidget {
   const StudentHomePage({super.key});
@@ -348,7 +349,7 @@ class _LowAttendanceWarning extends ConsumerWidget {
           final percentage = stats['percentage'] as double? ?? 0.0;
           final total = stats['total'] as int? ?? 0;
           // Only warn if they have attended at least a few sessions to avoid noise at start of semester
-          return total > 2 && percentage < 75.0;
+          return total > 2 && percentage < kMinAttendancePercent;
         }).toList();
 
         if (lowAttendanceSubjects.isEmpty) return const SizedBox.shrink();

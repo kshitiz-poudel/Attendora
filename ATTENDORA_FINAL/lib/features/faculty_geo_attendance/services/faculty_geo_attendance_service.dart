@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../models/geo_attendance_models.dart';
+import '../../../core/services/precise_location.dart';
 
 class FacultyGeoAttendanceService {
   FacultyGeoAttendanceService({
@@ -73,6 +74,7 @@ class FacultyGeoAttendanceService {
         'Location permission is required to mark faculty attendance.',
       );
     }
+    await ensurePreciseLocation();
     return Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,

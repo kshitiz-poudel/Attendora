@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../auth/providers.dart';
@@ -10,6 +9,7 @@ import '../../shared/widgets/glass_card.dart';
 import '../models/geo_attendance_models.dart';
 import '../providers/faculty_geo_attendance_providers.dart';
 import '../../../core/design/app_colors.dart';
+import 'widgets/selfie_capture_flow.dart';
 
 class FacultyGeoAttendancePage extends ConsumerStatefulWidget {
   const FacultyGeoAttendancePage({super.key});
@@ -50,13 +50,14 @@ class _FacultyGeoAttendancePageState
         );
       }
 
-      final image = await ImagePicker().pickImage(
-        source: ImageSource.camera,
-        preferredCameraDevice: CameraDevice.front,
-        imageQuality: 85,
-        maxWidth: 1600,
+      // The location check above awaited, so make sure the page is still
+      // on screen before opening dialogs on it.
+      if (!mounted) return;
+      final photoBytes = await captureCampusSelfie(
+        context,
+        isEntry: type == 'checkIn',
       );
-      if (image == null) {
+      if (photoBytes == null) {
         setState(
           () => _message =
               'Attendance was cancelled because no live photo was captured.',
@@ -77,7 +78,7 @@ class _FacultyGeoAttendancePageState
         );
       }
 
-      final bytes = await image.readAsBytes();
+      final bytes = photoBytes;
       final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final photoUrl = await service.uploadEvidence(
         facultyId: uid,

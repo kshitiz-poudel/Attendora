@@ -10,6 +10,7 @@ import '../../../core/utils/error_handler.dart';
 import '../../auth/providers.dart';
 import '../../teacher/providers.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/services/precise_location.dart';
 
 // Provider to get the next session starting soon
 final nextSessionProvider = StreamProvider<Map<String, dynamic>?>((ref) {
@@ -117,6 +118,7 @@ class _UpcomingSessionNotificationState
       }
 
       // Get current position
+      await ensurePreciseLocation();
       final pos = await Geolocator.getCurrentPosition();
 
       // Start session

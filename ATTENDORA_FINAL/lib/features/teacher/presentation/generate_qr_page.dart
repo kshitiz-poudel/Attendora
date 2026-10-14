@@ -12,7 +12,9 @@ import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/background_pattern.dart';
 import '../../shared/widgets/glass_text_field.dart';
 import 'widgets/rotating_qr_view.dart';
+import '../../../core/config/app_links.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/services/precise_location.dart';
 
 class _WebStep extends StatelessWidget {
   const _WebStep({required this.number, required this.text});
@@ -93,11 +95,9 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
     super.dispose();
   }
 
-  Uri get _androidDownloadUri => Uri.base.resolve('downloads/attendora.apk');
-
   Future<void> _downloadAndroidApp() async {
     final launched = await launchUrl(
-      _androidDownloadUri,
+      await resolveAndroidApkUri(ref),
       mode: LaunchMode.externalApplication,
     );
     if (!launched && mounted) {
@@ -138,6 +138,7 @@ class _GenerateQrPageState extends ConsumerState<GenerateQrPage> {
               distanceFilter: 100,
             );
 
+      await ensurePreciseLocation();
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );

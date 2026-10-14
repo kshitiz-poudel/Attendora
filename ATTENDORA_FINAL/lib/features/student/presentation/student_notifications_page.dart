@@ -299,6 +299,10 @@ class StudentNotificationsPage extends ConsumerWidget {
         return Icons.warning_amber_rounded;
       case 'location_violation':
         return Icons.location_off;
+      case 'detained':
+        return Icons.block_rounded;
+      case 'detention_removed':
+        return Icons.lock_open_rounded;
       case 'info':
       default:
         return Icons.info_outline;

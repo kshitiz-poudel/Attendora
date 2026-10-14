@@ -19,9 +19,13 @@ class SuperAdminSettingsPage extends ConsumerStatefulWidget {
 class _SuperAdminSettingsPageState
     extends ConsumerState<SuperAdminSettingsPage> {
   final _announcementController = TextEditingController();
+  final _apkController = TextEditingController();
+  bool _apkInitialised = false;
+  bool _savingApk = false;
 
   @override
   void dispose() {
+    _apkController.dispose();
     _announcementController.dispose();
     super.dispose();
   }
@@ -44,6 +48,13 @@ class _SuperAdminSettingsPageState
           if (_announcementController.text.isEmpty &&
               globalAnnouncement.isNotEmpty) {
             _announcementController.text = globalAnnouncement;
+          }
+
+          // Fill the APK field once from the stored value; after that the
+          // text box belongs to whoever is typing in it.
+          if (!_apkInitialised) {
+            _apkController.text = (settings['androidApkUrl'] as String?) ?? '';
+            _apkInitialised = true;
           }
 
           return SingleChildScrollView(
@@ -195,6 +206,96 @@ class _SuperAdminSettingsPageState
                               backgroundColor: context.c.accent,
                             ),
                             child: const Text('Update Announcement'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Android app download link
+                FadeInUp(
+                  delay: const Duration(milliseconds: 250),
+                  child: GlassCard(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Android App Download Link',
+                          style: GoogleFonts.outfit(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: context.c.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Paste the Google Drive link to the APK (share it as '
+                          '"Anyone with the link"). The Download button on the '
+                          'Teacher and Student portals opens this link. Drive '
+                          'share links are converted to a direct download '
+                          'automatically.',
+                          style: GoogleFonts.outfit(color: context.c.textTertiary),
+                        ),
+                        const SizedBox(height: 24),
+                        TextField(
+                          controller: _apkController,
+                          style: GoogleFonts.outfit(color: context.c.textPrimary),
+                          keyboardType: TextInputType.url,
+                          decoration: InputDecoration(
+                            hintText: 'https://drive.google.com/file/d/…/view',
+                            prefixIcon: const Icon(Icons.link_rounded),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FilledButton(
+                            onPressed: _savingApk
+                                ? null
+                                : () async {
+                                    setState(() => _savingApk = true);
+                                    final messenger = ScaffoldMessenger.of(context);
+                                    try {
+                                      await ref
+                                          .read(systemSettingsServiceProvider)
+                                          .updateAndroidApkUrl(
+                                            _apkController.text,
+                                          );
+                                      messenger.showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Download link saved'),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            e is ArgumentError
+                                                ? '${e.message}'
+                                                : 'Could not save the link: $e',
+                                          ),
+                                        ),
+                                      );
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() => _savingApk = false);
+                                      }
+                                    }
+                                  },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: context.c.accent,
+                            ),
+                            child: _savingApk
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Text('Save Link'),
                           ),
                         ),
                       ],

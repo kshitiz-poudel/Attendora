@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
+import '../../firebase_options_ios.dart';
 
 import 'providers.dart';
 
@@ -24,7 +25,11 @@ class AuthRepository {
              scopes: const ['email'],
              clientId: kIsWeb
                  ? '623151828674-5ptejpfng8qpd53uev3sk7cr4r2f41g7.apps.googleusercontent.com'
-                 : null,
+                 // iPhone: written by scripts/ios_setup.sh. Null elsewhere,
+                 // where the platform reads it from its own config.
+                 : (defaultTargetPlatform == TargetPlatform.iOS
+                       ? iosGoogleClientId
+                       : null),
            );
 
   final FirebaseAuth _auth;

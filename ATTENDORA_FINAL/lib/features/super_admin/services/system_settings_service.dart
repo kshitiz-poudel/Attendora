@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/app_links.dart';
 import 'audit_log_service.dart';
 
 final systemSettingsServiceProvider = Provider<SystemSettingsService>((ref) {
@@ -47,6 +48,24 @@ class SystemSettingsService {
       'allowNewRegistrations': allowed,
     }, SetOptions(merge: true));
     await _log('REGISTRATION_TOGGLE', 'New registrations set to $allowed');
+  }
+
+  /// Sets (or clears, when [url] is empty) the hosted Android APK link shown
+  /// on the teacher and student portals. Throws [ArgumentError] for anything
+  /// that is not an http(s) URL so a malformed link is rejected here rather
+  /// than silently breaking every portal's download button.
+  Future<void> updateAndroidApkUrl(String url) async {
+    final trimmed = url.trim();
+    if (trimmed.isNotEmpty && normalizeDownloadUrl(trimmed) == null) {
+      throw ArgumentError('Enter a full link starting with https://');
+    }
+    await _settingsRef.set({
+      'androidApkUrl': trimmed,
+    }, SetOptions(merge: true));
+    await _log(
+      'APK_LINK_UPDATE',
+      trimmed.isEmpty ? 'Android APK link cleared' : 'Android APK link updated',
+    );
   }
 
   Future<void> updateGlobalAnnouncement(String message) async {

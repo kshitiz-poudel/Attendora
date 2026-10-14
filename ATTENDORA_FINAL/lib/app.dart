@@ -44,7 +44,7 @@ class AttendoraApp extends ConsumerWidget {
                 ? Brightness.light
                 : Brightness.dark,
           ),
-          child: child ?? const SizedBox.shrink(),
+          child: _SandboxBanner(child: child ?? const SizedBox.shrink()),
         );
       },
     );
@@ -61,5 +61,27 @@ class _AppScrollBehavior extends MaterialScrollBehavior {
   ) {
     // No glow on web; clean minimal scroll like shadcn sites
     return child;
+  }
+}
+
+/// A corner ribbon shown only when running against the local Firebase
+/// emulators, so nobody mistakes fake test data for the real system. (The
+/// "emulator mode" banner Firebase draws itself exists only on the web.)
+class _SandboxBanner extends StatelessWidget {
+  const _SandboxBanner({required this.child});
+
+  final Widget child;
+
+  static const bool _enabled = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_enabled) return child;
+    return Banner(
+      message: 'SANDBOX',
+      location: BannerLocation.topEnd,
+      color: const Color(0xFFB45309),
+      child: child,
+    );
   }
 }

@@ -13,6 +13,7 @@ import '../../shared/widgets/glass_card.dart';
 import '../../shared/providers.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/constants/attendance_rules.dart';
 
 class MonthlySummaryStats {
   final double overallPercentage;
@@ -400,7 +401,7 @@ class StudentMonthlySummaryPage extends ConsumerWidget {
 
   Color _getColorForPercentage(BuildContext context, double percentage) {
     if (percentage >= 85) return context.c.accent;
-    if (percentage >= 75) return context.c.warning;
+    if (percentage >= kMinAttendancePercent) return context.c.warning;
     return context.c.danger;
   }
 }
